@@ -1,0 +1,134 @@
+.pagina-recuperar {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pagina-recuperar .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.pagina-recuperar .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.pagina-recuperar .logo-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #04120c;
+}
+
+.pagina-recuperar .logo h1 {
+  font-size: 20px;
+}
+
+.pagina-recuperar .logo p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pagina-recuperar .titulo {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+
+.pagina-recuperar .descripcion {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.pagina-recuperar .campo {
+  margin-bottom: 18px;
+}
+
+.pagina-recuperar .campo label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.pagina-recuperar .campo input {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1626;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+
+.pagina-recuperar .campo input:focus {
+  border-color: var(--accent);
+}
+
+.pagina-recuperar .btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #04120c;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pagina-recuperar .btn:hover {
+  background: var(--accent-dark);
+}
+
+.pagina-recuperar .exito {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: var(--ok);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pagina-recuperar .volver {
+  display: block;
+  margin-top: 18px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.pagina-recuperar .volver a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pagina-recuperar .volver a:hover {
+  text-decoration: underline;
+}
+
+.pagina-recuperar .app-footer {
+  max-width: 420px;
+}

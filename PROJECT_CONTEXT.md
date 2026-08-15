@@ -9,7 +9,9 @@
 - **Dinero real:** no se utilizará. Todo saldo y transacción es ficticio.
 - **Fase actual:** Fase 0 — Contexto académico.
 - **Workspace:** `C:\Proyectos\ApuestaDB` (independiente de MiControlDiDi).
+- **Integrantes del equipo (2):** Jhon Bayron Peláez Guerra y Shantal Coneo García (15/ago/2026).
 - **Frontend: React** (decisión de Jhon, 15/ago/2026; pendiente de validación del profesor). Proyecto Vite + React creado en `src/frontend` como sandbox de aprendizaje, sin conexión a base de datos.
+- **Repositorio GitHub privado:** `https://github.com/BayronPG/apuestadb` (creado 15/ago/2026, rama `main`). Equipo de 2 personas; pendiente invitar a la compañera como colaboradora.
 
 ## Información provisional
 

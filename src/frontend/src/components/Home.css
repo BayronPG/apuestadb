@@ -1,0 +1,391 @@
+.pagina-home {
+  min-height: 100vh;
+}
+
+.pagina-home a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pagina-home a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Barra superior ---------- */
+.pagina-home header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.pagina-home .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagina-home .logo-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #04120c;
+}
+
+.pagina-home .logo h1 {
+  font-size: 17px;
+}
+
+.pagina-home .logo span {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+}
+
+.pagina-home nav {
+  display: flex;
+  gap: 18px;
+  font-size: 14px;
+}
+
+.pagina-home nav a {
+  color: var(--muted);
+}
+
+.pagina-home nav a.activo {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pagina-home .usuario {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pagina-home .saldo {
+  text-align: right;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 14px;
+}
+
+.pagina-home .saldo .etiqueta {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pagina-home .saldo .valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+.pagina-home .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #04120c;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* ---------- Contenido ---------- */
+.pagina-home main {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .pagina-home main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pagina-home .tarjeta {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.pagina-home .tarjeta h2 {
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+/* Filtros */
+.pagina-home .filtros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.pagina-home .filtros .chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.pagina-home .filtros .chip.activo {
+  background: var(--accent);
+  color: #04120c;
+  font-weight: 600;
+  border-color: var(--accent);
+}
+
+/* Eventos */
+.pagina-home .evento {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.pagina-home .evento .meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pagina-home .estado {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.pagina-home .estado.proximo {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--warn);
+}
+
+.pagina-home .estado.vivo {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.pagina-home .equipos {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pagina-home .equipos .vs {
+  color: var(--muted);
+  font-weight: 400;
+  margin: 0 6px;
+}
+
+.pagina-home .cuotas {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.pagina-home .cuota {
+  text-align: center;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  min-width: 76px;
+}
+
+.pagina-home .cuota:hover {
+  border-color: var(--accent);
+}
+
+.pagina-home .cuota .nombre {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pagina-home .cuota .valor {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.pagina-home .nota-evento {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+/* Panel lateral */
+.pagina-home .lateral .bloque {
+  margin-bottom: 16px;
+}
+
+.pagina-home .lateral h3 {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pagina-home .movimiento {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.pagina-home .movimiento .detalle {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pagina-home .movimiento .monto.abono {
+  color: var(--ok);
+}
+
+.pagina-home .movimiento .monto.debito {
+  color: #f87171;
+}
+
+.pagina-home .resumen {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+}
+
+.pagina-home .resumen .valor {
+  font-weight: 600;
+}
+
+.pagina-home .resumen .valor.ok {
+  color: var(--ok);
+}
+
+/* Boleto de apuesta */
+.pagina-home .boleto {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.pagina-home .boleto-evento {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.pagina-home .boleto-seleccion {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.pagina-home .boleto-seleccion b {
+  color: var(--text);
+}
+
+.pagina-home .boleto-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pagina-home .boleto-fila label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pagina-home .boleto-fila input {
+  width: 110px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0e1626;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  text-align: right;
+}
+
+.pagina-home .boleto-fila input:focus {
+  border-color: var(--accent);
+}
+
+.pagina-home .btn-boleto {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #04120c;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pagina-home .btn-boleto:hover {
+  background: var(--accent-dark);
+}
+
+.pagina-home .nota-boleto {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.pagina-home .enlaces {
+  font-size: 13px;
+  line-height: 2;
+}
+
+.pagina-home .app-footer {
+  max-width: 100%;
+}

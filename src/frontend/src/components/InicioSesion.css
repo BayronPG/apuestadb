@@ -1,0 +1,150 @@
+.pagina-login {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pagina-login .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.pagina-login .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.pagina-login .logo-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #04120c;
+}
+
+.pagina-login .logo h1 {
+  font-size: 20px;
+  letter-spacing: 0.3px;
+}
+
+.pagina-login .logo p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pagina-login .subtitulo {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 14px 0 22px;
+  line-height: 1.5;
+}
+
+.pagina-login .campo {
+  margin-bottom: 16px;
+}
+
+.pagina-login .campo label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.pagina-login .campo input {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1626;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+
+.pagina-login .campo input:focus {
+  border-color: var(--accent);
+}
+
+.pagina-login .fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+
+.pagina-login .fila label {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.pagina-login .fila a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pagina-login .fila a:hover {
+  text-decoration: underline;
+}
+
+.pagina-login .btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #04120c;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pagina-login .btn:hover {
+  background: var(--accent-dark);
+}
+
+.pagina-login .alerta {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+.pagina-login .nota {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.pagina-login .nota a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pagina-login .app-footer {
+  max-width: 420px;
+}
