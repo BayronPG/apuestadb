@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicio — ApuestaDB</title>
+<!--
+  MOCKUP ACADÉMICO — PROPUESTA (no aprobado)
+  Pantalla: Home / panel principal
+  Proyecto: ApuestaDB — Bases de Datos 2, Tecnológico de Antioquia
+  Contenido de ejemplo: fútbol, mercado resultado del partido (local/empate/visitante),
+  cuotas ficticias, saldo ficticio. Sin dinero real.
+-->
+<style>
+  :root{
+    --bg:#0b1220; --card:#131c2e; --card2:#182338; --border:#243450;
+    --text:#e6edf7; --muted:#8fa3bf;
+    --accent:#10b981; --accent-dark:#0d9668;
+    --ok:#34d399; --warn:#fbbf24;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{ font-family:'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  /* ---------- Barra superior ---------- */
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:14px 24px; background:var(--card);
+    border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-badge{
+    width:36px; height:36px; border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#059669);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:15px; color:#04120c;
+  }
+  .logo h1{ font-size:17px; }
+  .logo span{ font-size:11px; color:var(--muted); display:block; }
+  nav{ display:flex; gap:18px; font-size:14px; }
+  nav a{ color:var(--muted); }
+  nav a.activo{ color:var(--text); font-weight:600; }
+  .usuario{ display:flex; align-items:center; gap:14px; }
+  .saldo{
+    text-align:right; background:var(--card2); border:1px solid var(--border);
+    border-radius:10px; padding:6px 14px;
+  }
+  .saldo .etiqueta{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+  .saldo .valor{ font-size:16px; font-weight:700; color:var(--ok); }
+  .avatar{
+    width:36px; height:36px; border-radius:50%;
+    background:var(--accent); color:#04120c; font-weight:700;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+
+  /* ---------- Contenido ---------- */
+  main{ display:grid; grid-template-columns:1fr 300px; gap:20px; padding:24px; max-width:1200px; margin:0 auto; }
+  @media (max-width:900px){ main{ grid-template-columns:1fr; } }
+
+  .tarjeta{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
+  .tarjeta h2{ font-size:15px; margin-bottom:14px; }
+
+  /* Filtros */
+  .filtros{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .filtros .chip{
+    padding:6px 14px; border-radius:20px; font-size:12px;
+    border:1px solid var(--border); background:var(--card2); color:var(--muted); cursor:pointer;
+  }
+  .filtros .chip.activo{ background:var(--accent); color:#04120c; font-weight:600; border-color:var(--accent); }
+
+  /* Eventos */
+  .evento{
+    display:grid; grid-template-columns:1fr auto; gap:12px;
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:12px; padding:14px 16px; margin-bottom:12px;
+  }
+  .evento .meta{ font-size:11px; color:var(--muted); margin-bottom:6px; display:flex; gap:10px; align-items:center; }
+  .estado{ font-size:10px; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:10px; }
+  .estado.proximo{ background:rgba(251,191,36,.15); color:var(--warn); }
+  .estado.vivo{ background:rgba(239,68,68,.15); color:#f87171; }
+  .equipos{ font-size:15px; font-weight:600; }
+  .equipos .vs{ color:var(--muted); font-weight:400; margin:0 6px; }
+  .cuotas{ display:flex; gap:8px; margin-top:10px; }
+  .cuota{
+    text-align:center; padding:8px 14px; border-radius:10px;
+    background:var(--card); border:1px solid var(--border); cursor:pointer; min-width:76px;
+  }
+  .cuota:hover{ border-color:var(--accent); }
+  .cuota .nombre{ display:block; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .cuota .valor{ display:block; font-size:15px; font-weight:700; margin-top:2px; }
+
+  /* Panel lateral */
+  .lateral .bloque{ margin-bottom:16px; }
+  .lateral h3{ font-size:13px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.5px; }
+  .movimiento{ display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px dashed var(--border); }
+  .movimiento .detalle{ color:var(--muted); font-size:12px; }
+  .movimiento .monto.abono{ color:var(--ok); }
+  .movimiento .monto.debito{ color:#f87171; }
+  .resumen{ display:flex; justify-content:space-between; font-size:13px; padding:6px 0; }
+  .resumen .valor{ font-weight:600; }
+
+  /* Boleto de apuesta */
+  .boleto{ background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:12px; }
+  .boleto-evento{ font-size:13px; font-weight:600; margin-bottom:4px; }
+  .boleto-seleccion{ font-size:12px; color:var(--muted); margin-bottom:10px; }
+  .boleto-seleccion b{ color:var(--text); }
+  .boleto-fila{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .boleto-fila label{ font-size:12px; color:var(--muted); }
+  .boleto-fila input{
+    width:110px; padding:7px 9px; border-radius:8px;
+    border:1px solid var(--border); background:#0e1626; color:var(--text); font-size:13px; outline:none; text-align:right;
+  }
+  .boleto-fila input:focus{ border-color:var(--accent); }
+  .btn-boleto{
+    width:100%; margin-top:10px; padding:10px; border:none; border-radius:10px;
+    background:var(--accent); color:#04120c; font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .btn-boleto:hover{ background:var(--accent-dark); }
+
+  footer{ text-align:center; font-size:11px; color:#5b6d8a; padding:18px 24px 26px; line-height:1.6; }
+</style>
+</head>
+<body>
+
+  <!-- Barra superior -->
+  <header>
+    <div class="logo">
+      <div class="logo-badge">AD</div>
+      <div>
+        <h1>ApuestaDB</h1>
+        <span>apuestas deportivas simuladas</span>
+      </div>
+    </div>
+
+    <nav>
+      <a href="home.html" class="activo">Eventos</a>
+      <a href="#">Mis apuestas</a>
+      <a href="#">Historial</a>
+      <a href="#">Reportes</a>
+    </nav>
+
+    <div class="usuario">
+      <div class="saldo">
+        <div class="etiqueta">Saldo ficticio</div>
+        <div class="valor">$ 100.000</div>
+      </div>
+      <div class="avatar">JP</div>
+      <a href="inicio.html" title="Cerrar sesión">Salir</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Columna principal: eventos -->
+    <section>
+      <div class="filtros">
+        <span class="chip activo">Todos</span>
+        <span class="chip">Fútbol</span>
+        <span class="chip">Próximos</span>
+        <span class="chip">En vivo</span>
+      </div>
+
+      <!-- Evento 1 -->
+      <div class="evento">
+        <div>
+          <div class="meta">
+            <span>Liga Colombiana · Fecha 5</span>
+            <span class="estado proximo">Próximo</span>
+            <span>Sáb 16/08 · 18:00</span>
+          </div>
+          <div class="equipos">Atlético Nacional <span class="vs">vs</span> Millonarios</div>
+          <div class="cuotas">
+            <div class="cuota"><span class="nombre">Local</span><span class="valor">2.10</span></div>
+            <div class="cuota"><span class="nombre">Empate</span><span class="valor">3.25</span></div>
+            <div class="cuota"><span class="nombre">Visitante</span><span class="valor">3.60</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evento 2 -->
+      <div class="evento">
+        <div>
+          <div class="meta">
+            <span>Liga Colombiana · Fecha 5</span>
+            <span class="estado proximo">Próximo</span>
+            <span>Dom 17/08 · 15:30</span>
+          </div>
+          <div class="equipos">América de Cali <span class="vs">vs</span> Deportivo Cali</div>
+          <div class="cuotas">
+            <div class="cuota"><span class="nombre">Local</span><span class="valor">2.40</span></div>
+            <div class="cuota"><span class="nombre">Empate</span><span class="valor">3.10</span></div>
+            <div class="cuota"><span class="nombre">Visitante</span><span class="valor">2.90</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evento 3 -->
+      <div class="evento">
+        <div>
+          <div class="meta">
+            <span>Liga Colombiana · Fecha 5</span>
+            <span class="estado vivo">En vivo</span>
+            <span>Min 63 · 1-1</span>
+          </div>
+          <div class="equipos">Junior <span class="vs">vs</span> Santa Fe</div>
+          <div class="cuotas">
+            <div class="cuota"><span class="nombre">Local</span><span class="valor">2.85</span></div>
+            <div class="cuota"><span class="nombre">Empate</span><span class="valor">2.15</span></div>
+            <div class="cuota"><span class="nombre">Visitante</span><span class="valor">3.40</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;">
+        * Cuotas y equipos de ejemplo. Regla de negocio provisional: no se puede apostar en eventos iniciados, finalizados, cancelados o suspendidos.
+      </p>
+    </section>
+
+    <!-- Panel lateral: saldo y movimientos -->
+    <aside class="lateral">
+      <div class="tarjeta">
+        <div class="bloque">
+          <h3>Resumen</h3>
+          <div class="resumen"><span>Saldo disponible</span><span class="valor" style="color:var(--ok);">$ 100.000</span></div>
+          <div class="resumen"><span>Apuestas activas</span><span class="valor">2</span></div>
+          <div class="resumen"><span>Ganadas</span><span class="valor">5</span></div>
+        </div>
+
+        <div class="bloque">
+          <h3>Últimos movimientos</h3>
+          <div class="movimiento">
+            <div><div>Abono de saldo inicial</div><div class="detalle">Hoy · 10:05</div></div>
+            <div class="monto abono">+ $ 100.000</div>
+          </div>
+          <div class="movimiento">
+            <div><div>Apuesta #A-014</div><div class="detalle">Nacional vs Millonarios · 2.10</div></div>
+            <div class="monto debito">- $ 10.000</div>
+          </div>
+          <div class="movimiento">
+            <div><div>Liquidación apuesta #A-011</div><div class="detalle">Ganada · cuota 1.80</div></div>
+            <div class="monto abono">+ $ 18.000</div>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <h3>Boleto de apuesta</h3>
+          <div class="boleto">
+            <div class="boleto-evento">Nacional vs Millonarios</div>
+            <div class="boleto-seleccion">Local (1) @ <b>2.10</b></div>
+            <div class="boleto-fila">
+              <label for="monto-boleto">Monto</label>
+              <input type="number" id="monto-boleto" value="10000" step="1000" min="0">
+            </div>
+            <div class="resumen"><span>Posible ganancia</span><span class="valor" style="color:var(--ok);">$ 21.000</span></div>
+            <button class="btn-boleto" type="button">Confirmar apuesta (simulado)</button>
+          </div>
+          <p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;">
+            * Reglas provisionales: no se apuesta por más saldo del disponible y la cuota queda congelada al confirmar.
+          </p>
+        </div>
+
+        <div class="bloque">
+          <h3>Enlaces</h3>
+          <p style="font-size:13px;line-height:2;">
+            <a href="#">Registrar apuesta</a><br>
+            <a href="#">Ver historial completo</a><br>
+            <a href="#">Consultas y reportes</a>
+          </p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Proyecto académico — Bases de Datos 2 · Tecnológico de Antioquia<br>
+    Saldo ficticio. No se utiliza ni se gestiona dinero real.
+  </footer>
+
+</body>
+</html>

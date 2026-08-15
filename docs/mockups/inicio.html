@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — ApuestaDB</title>
+<!--
+  MOCKUP ACADÉMICO — PROPUESTA (no aprobado)
+  Pantalla: Inicio de sesión
+  Proyecto: ApuestaDB — Bases de Datos 2, Tecnológico de Antioquia
+  Nota: sin dinero real, saldo ficticio. Datos de ejemplo.
+-->
+<style>
+  :root{
+    --bg:#0b1220; --card:#131c2e; --border:#243450;
+    --text:#e6edf7; --muted:#8fa3bf;
+    --accent:#10b981; --accent-dark:#0d9668; --danger:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:24px;
+  }
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:36px 32px;
+    width:100%; max-width:400px;
+    box-shadow:0 12px 32px rgba(0,0,0,.4);
+  }
+  .logo{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .logo-badge{
+    width:42px; height:42px; border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),#059669);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:18px; color:#04120c;
+  }
+  .logo h1{ font-size:20px; letter-spacing:.3px; }
+  .logo p{ font-size:12px; color:var(--muted); }
+  .subtitulo{ font-size:14px; color:var(--muted); margin:14px 0 22px; line-height:1.5; }
+  .campo{ margin-bottom:16px; }
+  .campo label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .campo input{
+    width:100%; padding:11px 12px; border-radius:10px;
+    border:1px solid var(--border); background:#0e1626; color:var(--text);
+    font-size:14px; outline:none;
+  }
+  .campo input:focus{ border-color:var(--accent); }
+  .fila{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; font-size:13px; }
+  .fila label{ color:var(--muted); display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .fila a{ color:var(--accent); text-decoration:none; }
+  .fila a:hover{ text-decoration:underline; }
+  .btn{
+    width:100%; padding:12px; border:none; border-radius:10px;
+    background:var(--accent); color:#04120c; font-size:15px; font-weight:700;
+    cursor:pointer; transition:background .15s;
+  }
+  .btn:hover{ background:var(--accent-dark); }
+  .alerta{
+    margin-bottom:16px; padding:10px 12px; border-radius:10px;
+    background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.45);
+    color:#fca5a5; font-size:13px;
+  }
+  .nota{
+    margin-top:18px; font-size:12px; color:var(--muted);
+    text-align:center; line-height:1.5;
+  }
+  .nota a{ color:var(--accent); text-decoration:none; }
+  footer{ margin-top:20px; font-size:11px; color:#5b6d8a; text-align:center; max-width:420px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo">
+      <div class="logo-badge">AD</div>
+      <div>
+        <h1>ApuestaDB</h1>
+        <p>apuestas deportivas simuladas</p>
+      </div>
+    </div>
+
+    <p class="subtitulo">Inicia sesión para ver los eventos disponibles y gestionar tu saldo ficticio.</p>
+
+    <!-- Ejemplo de mensaje de error (se muestra cuando las credenciales no coinciden) -->
+    <div class="alerta">⚠️ Credenciales incorrectas. Verifica tu correo y contraseña.</div>
+
+    <form action="#" method="post" onsubmit="return false;">
+      <div class="campo">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo" placeholder="estudiante@correo.edu.co" value="jhon@correo.edu.co">
+      </div>
+
+      <div class="campo">
+        <label for="clave">Contraseña</label>
+        <input type="password" id="clave" name="clave" placeholder="••••••••" value="12345678">
+      </div>
+
+      <div class="fila">
+        <label><input type="checkbox"> Recordarme</label>
+        <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button type="submit" class="btn">Ingresar</button>
+    </form>
+
+    <p class="nota">
+      ¿No tienes cuenta? <a href="registrar.html">Regístrate</a>
+    </p>
+  </div>
+
+  <footer>
+    Proyecto académico — Bases de Datos 2 · Tecnológico de Antioquia<br>
+    Saldo ficticio. No se utiliza ni se gestiona dinero real.
+  </footer>
+
+</body>
+</html>
