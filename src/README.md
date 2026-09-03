@@ -7,11 +7,11 @@ académicas; esta carpeta contiene material de aprendizaje funcional.
 ## Estructura
 
 - `frontend/` — Aplicación React (Vite). Pantallas: inicio de sesión, registro,
-  recuperar (maqueta), home (protegida) y exportación a Excel (solo admin).
+  recuperar (maqueta) y home (protegida).
   El login y el registro consultan el backend real (`/api` con proxy de Vite).
 - `backend/` — API Node.js + Express conectada a SQL Server (`ApuestaDB`).
-  Registro con hash bcrypt, sesión por cookie httpOnly, roles desde la BD y
-  exportación de tablas a `.xlsx`. Ver `backend/README.md`.
+  Registro con hash bcrypt, sesión por cookie httpOnly y roles desde la BD.
+  Ver `backend/README.md`.
 
 ## Puesta en marcha (desarrollo)
 

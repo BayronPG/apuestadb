@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import './Home.css'
 
@@ -96,9 +96,6 @@ function Home() {
             <div className="valor">{usuario?.nombre} · <span className={`rol rol-${usuario?.rol}`}>{usuario?.rol}</span></div>
           </div>
           <div className="avatar" title={usuario?.nombre}>{iniciales}</div>
-          {usuario?.rol === 'admin' && (
-            <Link to="/exportar" className="accion-top" title="Exportar datos a Excel">Exportar</Link>
-          )}
           <a href="/" onClick={salir} className="accion-top">Cerrar sesión</a>
         </div>
       </header>

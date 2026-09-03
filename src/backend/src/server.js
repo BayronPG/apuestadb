@@ -2,7 +2,6 @@ import 'dotenv/config'
 import express from 'express'
 import session from 'express-session'
 import authRoutes from './routes/auth.routes.js'
-import exportarRoutes from './routes/exportar.routes.js'
 import { getPool } from './db.js'
 
 const app = express()
@@ -29,7 +28,6 @@ app.use(
 
 // Rutas
 app.use('/api/auth', authRoutes)
-app.use('/api/exportar', exportarRoutes)
 
 // GET /api/health — verifica que el backend responde y que la BD es alcanzable
 app.get('/api/health', async (_req, res) => {

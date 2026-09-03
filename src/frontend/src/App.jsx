@@ -5,7 +5,6 @@ import InicioSesion from './components/InicioSesion.jsx'
 import Registro from './components/Registro.jsx'
 import Recuperar from './components/Recuperar.jsx'
 import Home from './components/Home.jsx'
-import ExportarDatos from './components/ExportarDatos.jsx'
 
 function App() {
   return (
@@ -20,14 +19,6 @@ function App() {
           element={
             <RequisitoSesion>
               <Home />
-            </RequisitoSesion>
-          }
-        />
-        <Route
-          path="/exportar"
-          element={
-            <RequisitoSesion>
-              <ExportarDatos />
             </RequisitoSesion>
           }
         />

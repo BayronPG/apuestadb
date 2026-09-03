@@ -2,11 +2,12 @@
 
 Backend de Node.js + Express para el sandbox técnico del proyecto ApuestaDB.
 Conecta el login/registro del frontend React con la base de datos SQL Server
-real (`ApuestaDB` en la instancia local `SQLEXPRESS01`) y permite exportar las
-tablas a archivos Excel (`.xlsx`).
+real (`ApuestaDB` en la instancia local `SQLEXPRESS01`).
 
 > **Estado:** sandbox técnico y académico autorizado por Jhon (02/sep/2026).
 > No representa el modelo definitivo ni un avance de fase del proyecto.
+> La exportación/generación de Excel fue retirada por decisión de Jhon
+> (02/sep/2026): no existe ninguna conexión Excel↔BD.
 
 ## Requisitos
 
@@ -40,10 +41,8 @@ desarrollo (`npm run dev` en `src/frontend`).
 | GET | `/api/health` | Estado del backend y conexión a BD | — |
 | POST | `/api/auth/registro` | Crea usuario (hash bcrypt, evita duplicados) | — |
 | POST | `/api/auth/login` | Inicia sesión (cookie httpOnly, bitácora en `Login`) | — |
-| GET | `/api/auth/sesion` | Devuelve la sesión activa | — |
+| GET | `/api/auth/sesion` | Devuelve la sesión activa | sesión |
 | POST | `/api/auth/logout` | Cierra la sesión | sesión |
-| GET | `/api/exportar/tablas` | Lista segura de tablas con conteo de filas | admin |
-| GET | `/api/exportar?tablas=A,B` | Genera `.xlsx` (una hoja por tabla) | admin |
 
 ## Estructura
 
@@ -51,13 +50,10 @@ desarrollo (`npm run dev` en `src/frontend`).
 src/
   server.js                 # Express, sesion, rutas
   db.js                     # Pool mssql (config desde .env)
-  middleware/auth.js        # requiereSesion / requiereAdmin
   routes/auth.routes.js     # registro, login, sesion, logout
-  routes/exportar.routes.js # listado y exportacion de tablas
-  services/exportador.js    # generacion .xlsx con ExcelJS (streaming)
 scripts/
   habilitar_tcp_sqlexpress01.ps1  # habilita TCP 1433 (requiere admin, 1 vez)
-  pruebas_api.mjs                  # bateria de pruebas con evidencia
+  pruebas_api.mjs                  # bateria de pruebas automatizadas
 ```
 
 ## Notas técnicas
@@ -67,8 +63,6 @@ scripts/
 - La sesión vive en el servidor (`express-session`); el navegador conserva solo
   la cookie `apuestadb.sid` (httpOnly, sameSite=lax, 8 h). MemoryStore es
   suficiente para el sandbox: reiniciar el backend cierra las sesiones.
-- El exportador valida los nombres de tabla contra `sys.tables` (lista segura),
-  lee con streaming y escribe el `.xlsx` con `ExcelJS.WorkbookWriter`.
 - Los usuarios sembrados por el script de datos usan un hash ficticio inválido;
   `npm run pruebas` reemplaza el del admin (`jhon@apuestadb.com`) con un hash
   real de clave de pruebas para poder demostrar el flujo completo.
