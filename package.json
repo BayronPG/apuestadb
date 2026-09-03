@@ -1,0 +1,14 @@
+{
+  "name": "apuestadb",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scripts auxiliares del workspace ApuestaDB (sin dependencias; los proyectos reales viven en app/backend y app/frontend).",
+  "scripts": {
+    "install:all": "npm --prefix app/backend install && npm --prefix app/frontend install",
+    "dev:backend": "npm --prefix app/backend start",
+    "dev:frontend": "npm --prefix app/frontend run dev",
+    "build:frontend": "npm --prefix app/frontend run build",
+    "lint:frontend": "npm --prefix app/frontend run lint",
+    "pruebas": "npm --prefix app/backend run pruebas"
+  }
+}

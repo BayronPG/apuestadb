@@ -17,8 +17,8 @@
 - Motor de base de datos: SQL Server (decisión de Jhon 24/ago/2026), pendiente de validación del profesor.
 - Saldo por tipos tokens/PSE con reglas R1-R5 (indicación del profesor, aplicada por Jhon).
 - Sandbox técnico autorizado (02/sep/2026):
-  - Backend Node.js + Express en `src/backend` (login/registro reales con hash bcrypt, sesión por cookie httpOnly, roles desde la BD, bitácora en `Login`).
-  - Base de datos local `ApuestaDB` en la instancia `SQLEXPRESS01` con **modelo actual de 29 tablas** (16 del análisis de clase + 13 de la ampliación incorporada al proyecto; script idempotente `src/backend/scripts/script_ampliacion_sandbox_29_tablas.sql`). Cada tabla conserva al menos 5 registros ficticios de demostración.
+  - Backend Node.js + Express en `app/backend` (login/registro reales con hash bcrypt, sesión por cookie httpOnly, roles desde la BD, bitácora en `Login`).
+  - Base de datos local `ApuestaDB` en la instancia `SQLEXPRESS01` con **modelo actual de 29 tablas** (16 del análisis de clase + 13 de la ampliación incorporada al proyecto; script idempotente `app/backend/scripts/script_ampliacion_sandbox_29_tablas.sql`). Cada tabla conserva al menos 5 registros ficticios de demostración.
   - La funcionalidad de exportación a Excel se implementó como práctica y **fue retirada por decisión de Jhon** (02/sep/2026): no existe conexión Excel↔BD.
   - Batería automatizada de pruebas: **15/15 PASS**; build y lint del frontend OK.
   - Revisión manual de aceptación del frontend (registro, login, sesión, rutas, roles, interfaz) validada por Jhon (02/sep/2026).
@@ -44,7 +44,7 @@
 ## Archivos relevantes (02/sep/2026)
 
 - `README.md` (guía de inicio), `PROJECT_CONTEXT.md`, `DECISION_LOG.md` (decisiones 1-14).
-- `src/backend/README.md`, `src/backend/scripts/script_ampliacion_sandbox_29_tablas.sql`, `src/backend/scripts/pruebas_api.mjs`.
+- `app/backend/README.md`, `app/backend/scripts/script_ampliacion_sandbox_29_tablas.sql`, `app/backend/scripts/pruebas_api.mjs`.
 - `docs/pruebas/resumen_pruebas_sandbox.md` (evidencia de pruebas vigente).
 
 ## Pruebas realizadas

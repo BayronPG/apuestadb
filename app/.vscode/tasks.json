@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend (npm start)",
+      "type": "npm",
+      "script": "start",
+      "path": "backend",
+      "problemMatcher": [],
+      "presentation": { "group": "apuestadb", "panel": "dedicated" }
+    },
+    {
+      "label": "Frontend (npm run dev)",
+      "type": "npm",
+      "script": "dev",
+      "path": "frontend",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "group": "apuestadb", "panel": "dedicated" }
+    },
+    {
+      "label": "Pruebas backend (npm run pruebas)",
+      "type": "npm",
+      "script": "pruebas",
+      "path": "backend",
+      "problemMatcher": [],
+      "presentation": { "group": "apuestadb", "panel": "dedicated" }
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 # fallo silenciosamente en v1) y verifica el resultado al final.
 #
 # COMO EJECUTARLO (una sola vez, como Administrador):
-#   powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Proyectos\ApuestaDB\src\backend\scripts\habilitar_tcp_sqlexpress01.ps1"
+#   powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Proyectos\ApuestaDB\app\backend\scripts\habilitar_tcp_sqlexpress01.ps1"
 #
 # Que hace:
 #   1. Habilita TCP (Enabled=1) a nivel de protocolo y por IP.

@@ -19,9 +19,9 @@
 | Modo de autenticación | Mixto SQL + Windows (`IsIntegratedSecurityOnly = 0`) |
 | Base de datos | `ApuestaDB` — **modelo actual de 29 tablas** (16 de clase + 13 de la ampliación), cada tabla con ≥5 registros ficticios |
 | Conexión del backend | `GET /api/health` → `{"ok":true,"bd":"ApuestaDB"}` |
-| Variables de entorno | Leídas desde `src/backend/.env` (valores sensibles nunca impresos) |
+| Variables de entorno | Leídas desde `app/backend/.env` (valores sensibles nunca impresos) |
 
-## 2. Batería automatizada (`src/backend/scripts/pruebas_api.mjs`)
+## 2. Batería automatizada (`app/backend/scripts/pruebas_api.mjs`)
 
 Resultado: **15/15 PASS** (0 fallos).
 

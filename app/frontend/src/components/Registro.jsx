@@ -65,7 +65,7 @@ function Registro() {
       // 400 (validacion), 409 (duplicado), 500 (interno): muestra el mensaje del backend
       setError(d.mensaje || 'No se pudo crear la cuenta. Inténtalo de nuevo.')
     } catch {
-      setError('No se pudo conectar con el servidor. Verifica que el backend esté activo (npm start en src/backend).')
+      setError('No se pudo conectar con el servidor. Verifica que el backend esté activo (npm start en app/backend).')
     } finally {
       setCargando(false)
     }

@@ -29,3 +29,5 @@ Registro de decisiones del proyecto. Cada entrada incluye: fecha, decisión, mot
 
 
 
+
+| 15 | 02/sep/2026 | **Reorganizar la estructura del proyecto**: crear la carpeta `app/` con el código de la aplicación (`app/backend` y `app/frontend`, antes en `src/`), para poder abrir en el editor solo la aplicación sin la documentación académica del agente. Se eliminó la carpeta `src/` y el archivo `apuestadb.code-workspace`; se agregaron `.editorconfig`, `.vscode/` (configuración, extensiones y tareas) y `package.json` raíz con scripts auxiliares sin dependencias; se actualizaron todas las referencias de rutas en código y documentación. El workspace raíz sigue en `C:\Proyectos\ApuestaDB`. | Jhon solicitó una carpeta limpia solo con la aplicación para abrirla en los editores. | Workspace multi-raíz (.code-workspace) — descartado por Jhon; mantener todo en src/. | Jhon Bayron Peláez Guerra (02/sep/2026) | Estructura del repositorio (app/, .vscode/, .editorconfig, package.json raíz), README.md, PROJECT_CONTEXT, SESSION_HANDOFF, rutas en scripts del backend |

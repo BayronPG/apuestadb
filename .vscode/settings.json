@@ -1,0 +1,25 @@
+{
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "AGENTS.md": true,
+    "SOUL.md": true,
+    "IDENTITY.md": true,
+    "USER.md": true,
+    "TOOLS.md": true,
+    "HEARTBEAT.md": true,
+    "openclaw-workspace-state.json": true,
+    "media/inbound": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "docs/mockups/.tmp-profile": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true
+  },
+  "files.eol": "\r\n",
+  "files.encoding": "utf8"
+}

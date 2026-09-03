@@ -44,8 +44,8 @@ Proyecto académico de la asignatura **Bases de Datos 2** (Tecnológico de Antio
 El backend de Node.js se conecta por TCP con un login SQL; la instancia debe tener TCP habilitado y modo mixto. Ejecuta **una vez**, en PowerShell como administrador:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "src\backend\scripts\habilitar_tcp_sqlexpress01.ps1"
-powershell -NoProfile -ExecutionPolicy Bypass -File "src\backend\scripts\habilitar_login_mixto.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "app\backend\scripts\habilitar_tcp_sqlexpress01.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "app\backend\scripts\habilitar_login_mixto.ps1"
 ```
 
 Cada script verifica su propio resultado (servicio, puerto 1433 y modo de autenticación).
@@ -65,22 +65,22 @@ sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i "docs\base_datos\script_datos_prueba_bor
 El **modelo actual del proyecto tiene 29 tablas**: a las 16 de clase se suman 13 de la ampliación incorporada al proyecto. Para dejarlas con sus registros de demostración (mínimo 5 por tabla), ejecuta también el script idempotente de ampliación:
 
 ```powershell
-sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i "src\backend\scripts\script_ampliacion_sandbox_29_tablas.sql"
+sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i "app\backend\scripts\script_ampliacion_sandbox_29_tablas.sql"
 ```
 
 > Puede ejecutarse varias veces sin duplicar datos. Los scripts originales de clase permanecen intactos.
 
 ### Paso 2 — Crear/sincronizar el login SQL de la aplicación
 
-El backend se conecta con el login `apuestadb_app` (la contraseña vive solo en `src/backend/.env`, nunca en el repositorio).
+El backend se conecta con el login `apuestadb_app` (la contraseña vive solo en `app/backend/.env`, nunca en el repositorio).
 
 - **Si el login ya existe** (caso de este equipo): sincroniza su contraseña con el `.env` ejecutando:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "src\backend\scripts\sincronizar_clave_login.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "app\backend\scripts\sincronizar_clave_login.ps1"
 ```
 
-- **Si el login no existe** (máquina nueva): créalo una vez y escribe la misma contraseña en `src/backend/.env` (`DB_PASSWORD`):
+- **Si el login no existe** (máquina nueva): créalo una vez y escribe la misma contraseña en `app/backend/.env` (`DB_PASSWORD`):
 
 ```sql
 -- reemplaza <TU_CLAVE_FUERTE> y ejecuta con sqlcmd -S .\SQLEXPRESS01 -E
@@ -95,7 +95,7 @@ ALTER ROLE db_owner ADD MEMBER apuestadb_app;
 ### Paso 3 — Configurar variables de entorno del backend
 
 ```powershell
-cd src\backend
+cd app\backend
 copy .env.example .env    # o:  Copy-Item .env.example .env
 ```
 
@@ -104,7 +104,7 @@ Edita `.env` con los valores reales (servidor, puerto, base, usuario SQL y secre
 ### Paso 4 — Levantar el backend
 
 ```powershell
-cd src\backend
+cd app\backend
 npm install       # solo la primera vez
 npm start         # http://localhost:3000
 ```
@@ -114,7 +114,7 @@ Comprueba la conexión a la base: abre `http://localhost:3000/api/health` → de
 ### Paso 5 — Levantar el frontend
 
 ```powershell
-cd src\frontend
+cd app\frontend
 npm install       # solo la primera vez
 npm run dev       # http://localhost:5173
 ```
@@ -135,7 +135,7 @@ El frontend reenvía `/api` al backend mediante el proxy de Vite (no requiere co
 Con el backend levantado, ejecuta la batería automatizada (registro, hash, duplicados, login, sesión, logout y roles):
 
 ```powershell
-cd src\backend
+cd app\backend
 npm run pruebas
 ```
 
@@ -164,11 +164,28 @@ ApuestaDB/
 │   ├── mockups/            ← maquetas y capturas
 │   ├── pruebas/            ← resumen de pruebas vigente
 │   └── ...
-└── src/
-    ├── README.md
-    ├── backend/            ← API Node.js/Express + scripts de entorno y de ampliación de BD (29 tablas)
-    └── frontend/           ← React + Vite
+├── app/                    ← código de la aplicación (carpeta recomendada para abrir en el editor)
+│   ├── README.md
+│   ├── backend/            ← API Node.js/Express + scripts de entorno y de ampliación de BD (29 tablas)
+│   └── frontend/           ← React + Vite
+└── .vscode/                ← configuración y tareas del editor
 ```
+
+## Abrir el proyecto en un editor
+
+Para trabajar solo con el código de la aplicación (sin la documentación académica del agente), abre la carpeta:
+
+```
+C:\Proyectos\ApuestaDB\app
+```
+
+- En VS Code / Cursor: **Archivo → Abrir carpeta…** → `C:\Proyectos\ApuestaDB\app`.
+- Dentro verás `backend/` y `frontend/` (y `app/README.md` con las instrucciones rápidas).
+- `.vscode/` de la raíz aplica al abrir `C:\Proyectos\ApuestaDB`; la carpeta `app` incluye su propia `.vscode` con tareas para levantar backend y frontend.
+- Extensiones recomendadas: SQL Server (`ms-mssql.mssql`), PowerShell y Oxlint.
+- Tareas integradas: Terminal > Run Task > Backend / Frontend / Pruebas.
+- Scripts auxiliares desde la raíz del repositorio (sin dependencias): `npm run dev:backend`, `npm run dev:frontend`, `npm run build:frontend`, `npm run pruebas`.
+- `.editorconfig` mantiene codificación UTF-8 y fin de línea consistente en todos los editores.
 
 ## Notas de control
 

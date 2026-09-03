@@ -31,8 +31,8 @@ npm start        # http://localhost:3000
 npm run pruebas  # bateria de pruebas automatizadas (requiere backend activo)
 ```
 
-El frontend (Vite, `src/frontend`) reenvía `/api` al backend mediante proxy de
-desarrollo (`npm run dev` en `src/frontend`).
+El frontend (Vite, `app/frontend`) reenvía `/api` al backend mediante proxy de
+desarrollo (`npm run dev` en `app/frontend`).
 
 ## Endpoints
 

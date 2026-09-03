@@ -23,3 +23,7 @@ AGENT_INSTRUCTIONS.md
 .DS_Store
 Thumbs.db
 *.log
+
+# --- Artefactos locales de trabajo ---
+.tmp/
+media/inbound/

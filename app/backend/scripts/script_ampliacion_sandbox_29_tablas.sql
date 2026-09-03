@@ -15,7 +15,7 @@
    Idempotencia: puede ejecutarse mas de una vez; solo crea tablas que no
                  existan y solo inserta cuando el conteo de la tabla es menor
                  a 5 (no duplica datos).
-   Ejecutar  : sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i src\backend\scripts\script_ampliacion_sandbox_29_tablas.sql
+   Ejecutar  : sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i app\backend\scripts\script_ampliacion_sandbox_29_tablas.sql
    ============================================================================ */
 
 USE ApuestaDB;

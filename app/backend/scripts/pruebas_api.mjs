@@ -2,7 +2,7 @@
  * ApuestaDB - Bateria de pruebas automatizadas del sandbox (registro/login/sesion).
  *
  * Requisitos:
- *   - Backend corriendo en http://localhost:3000 (npm start en src/backend)
+ *   - Backend corriendo en http://localhost:3000 (npm start en app/backend)
  *   - TCP habilitado en SQL Server (puerto 1433) y .env configurado
  *   - BD ApuestaDB creada con script_tablas y datos de clase (seed)
  *
@@ -38,7 +38,7 @@ const dbConfig = {
 const CLAVE_ADMIN =
   process.env.PRUEBA_CLAVE_ADMIN ??
   (() => {
-    console.error('Falta PRUEBA_CLAVE_ADMIN en src/backend/.env (ver .env.example).')
+    console.error('Falta PRUEBA_CLAVE_ADMIN en app/backend/.env (ver .env.example).')
     process.exit(1)
   })()
 
@@ -83,7 +83,7 @@ async function main() {
     registrar('Health backend + BD', r.ok && d.ok === true, d.ok ? 'BD conectada' : d.error)
   } catch (e) {
     registrar('Health backend + BD', false, e.message)
-    console.log('\nEl backend no responde. Inicia src/backend con: npm start')
+    console.log('\nEl backend no responde. Inicia app/backend con: npm start')
     process.exit(1)
   }
 

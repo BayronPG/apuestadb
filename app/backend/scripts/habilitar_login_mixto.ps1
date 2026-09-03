@@ -9,10 +9,10 @@
 #   1. Cambia LoginMode = 2 (SQL Server + Windows) en el registro.
 #   2. Reinicia el servicio MSSQL$SQLEXPRESS01.
 #   3. Verifica el modo mixto y prueba el login SQL por TCP
-#      leyendo la contrasena desde src/backend/.env (sin imprimirla).
+#      leyendo la contrasena desde app/backend/.env (sin imprimirla).
 #
 # EJECUTAR UNA VEZ como Administrador:
-#   powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Proyectos\ApuestaDB\src\backend\scripts\habilitar_login_mixto.ps1"
+#   powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Proyectos\ApuestaDB\app\backend\scripts\habilitar_login_mixto.ps1"
 # ============================================================
 
 $ErrorActionPreference = 'Stop'
@@ -48,7 +48,7 @@ if (Test-Path $envFile) {
     Remove-Item Env:SQLCMDPASSWORD
     Write-Host "    Login SQL apuestadb_app por TCP: $($test -join ' ')"
 } else {
-    Write-Host '    AVISO: no se encontro src/backend/.env para probar el login SQL.'
+    Write-Host '    AVISO: no se encontro app/backend/.env para probar el login SQL.'
 }
 
 Write-Host ''

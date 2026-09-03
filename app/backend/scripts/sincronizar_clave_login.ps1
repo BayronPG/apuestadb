@@ -1,4 +1,4 @@
-# ApuestaDB - sincroniza la clave del login SQL 'apuestadb_app' con src/backend/.env
+# ApuestaDB - sincroniza la clave del login SQL 'apuestadb_app' con app/backend/.env
 # (uso interno; genera clave aleatoria, nunca la imprime)
 $ErrorActionPreference = 'Stop'
 $chars = (48..57) + (65..90) + (97..122)
@@ -15,7 +15,7 @@ try {
 }
 
 # Actualizar .env con la misma clave
-$envPath = 'C:\Proyectos\ApuestaDB\src\backend\.env'
+$envPath = 'C:\Proyectos\ApuestaDB\app\backend\.env'
 $c = Get-Content $envPath
 $out = foreach ($l in $c) { if ($l -like 'DB_PASSWORD=*') { 'DB_PASSWORD=' + $pw } else { $l } }
 [System.IO.File]::WriteAllLines($envPath, $out, (New-Object System.Text.UTF8Encoding($false)))
