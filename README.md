@@ -62,6 +62,14 @@ sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i "docs\base_datos\script_datos_prueba_bor
 > Si `ApuestaDB` ya existe, el primer script fallará en `CREATE DATABASE`; es normal (ya está creada).
 > Estos scripts son el **borrador de clase** (16 tablas + datos ficticios de prueba).
 
+El **modelo actual del proyecto tiene 29 tablas**: a las 16 de clase se suman 13 de la ampliación incorporada al proyecto. Para dejarlas con sus registros de demostración (mínimo 5 por tabla), ejecuta también el script idempotente de ampliación:
+
+```powershell
+sqlcmd -S .\SQLEXPRESS01 -E -f 65001 -i "src\backend\scripts\script_ampliacion_sandbox_29_tablas.sql"
+```
+
+> Puede ejecutarse varias veces sin duplicar datos. Los scripts originales de clase permanecen intactos.
+
 ### Paso 2 — Crear/sincronizar el login SQL de la aplicación
 
 El backend se conecta con el login `apuestadb_app` (la contraseña vive solo en `src/backend/.env`, nunca en el repositorio).
@@ -152,13 +160,13 @@ ApuestaDB/
 ├── PROJECT_CONTEXT.md      ← contexto confirmado, provisional y pendiente
 ├── DECISION_LOG.md         ← registro de decisiones aprobadas
 ├── docs/
-│   ├── base_datos/         ← scripts SQL de clase (borrador, 16 tablas)
+│   ├── base_datos/         ← scripts SQL de clase (16 tablas, borrador; intactos)
 │   ├── mockups/            ← maquetas y capturas
-│   ├── pruebas/            ← resumen de pruebas
+│   ├── pruebas/            ← resumen de pruebas vigente
 │   └── ...
 └── src/
     ├── README.md
-    ├── backend/            ← API Node.js/Express (ver backend/README.md)
+    ├── backend/            ← API Node.js/Express + scripts de entorno y de ampliación de BD (29 tablas)
     └── frontend/           ← React + Vite
 ```
 

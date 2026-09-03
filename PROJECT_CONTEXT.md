@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md — ApuestaDB
 
-**Última actualización:** 24/ago/2026
+**Última actualización:** 02/sep/2026
 
 ## Información confirmada
 
@@ -31,13 +31,10 @@
 
 - Instrucciones del profesor.
 - Aprobación del tema.
-- Validación del profesor sobre el motor SQL Server.
-- Backend: sin decidir. Frontend: React (decisión de Jhon, pendiente validación del profesor).
-- Integrantes del equipo.
-- Entregables.
-- Rúbrica.
-- Fechas de entrega.
+- Validación del profesor: motor SQL Server, frontend React, backend Node.js + Express (sandbox) y el modelo de 29 tablas.
+- Entregables, rúbrica y fechas de entrega.
 - Requisitos funcionales y no funcionales.
+- Dudas de clase abiertas: contenido real de `Servicios` y `Reglas`; confirmar `Apuestas` (oferta) vs `HacerApuesta` (apuesta del cliente) y `Resultado`.
 
 ## Regla de actualización
 
