@@ -149,3 +149,31 @@
 .pagina-registro .app-footer {
   max-width: 440px;
 }
+
+/* Dos campos en la misma fila (tipo + numero de documento) */
+.pagina-registro .fila-campos {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  gap: 12px;
+}
+
+.pagina-registro .campo select {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0e1626;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  appearance: auto;
+}
+
+.pagina-registro .campo select:focus {
+  border-color: var(--accent);
+}
+
+.pagina-registro .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

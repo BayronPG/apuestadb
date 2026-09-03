@@ -1,0 +1,24 @@
+{
+  "name": "apuestadb-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend sandbox academico de ApuestaDB (Node.js + Express + SQL Server). Autenticacion con sesion en cookie httpOnly, registro con bcrypt y exportacion a Excel (.xlsx).",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "pruebas": "node scripts/pruebas_api.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mssql": "^12.7.0"
+  }
+}

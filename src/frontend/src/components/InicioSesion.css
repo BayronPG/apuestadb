@@ -148,3 +148,19 @@
 .pagina-login .app-footer {
   max-width: 420px;
 }
+
+/* Mensaje de exito (p. ej. tras crear la cuenta) */
+.pagina-login .aviso-exito {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+  font-size: 13px;
+}
+
+.pagina-login .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

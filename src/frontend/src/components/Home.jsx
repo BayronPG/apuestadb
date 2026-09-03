@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
 import './Home.css'
 
 // Datos de ejemplo (ficticios) — en una fase posterior vendrán de la base de datos
@@ -54,6 +55,22 @@ const movimientos = [
 ]
 
 function Home() {
+  const { usuario, cerrarSesion } = useAuth()
+  const navigate = useNavigate()
+
+  async function salir(e) {
+    e.preventDefault()
+    await cerrarSesion()
+    navigate('/')
+  }
+
+  const iniciales = (usuario?.nombre ?? 'U')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join('')
+
   return (
     <div className="pagina-home">
       {/* ---------- Barra superior ---------- */}
@@ -74,12 +91,15 @@ function Home() {
         </nav>
 
         <div className="usuario">
-          <div className="saldo">
-            <div className="etiqueta">Saldo ficticio</div>
-            <div className="valor">$ 100.000</div>
+          <div className="saludo">
+            <div className="etiqueta">Sesión</div>
+            <div className="valor">{usuario?.nombre} · <span className={`rol rol-${usuario?.rol}`}>{usuario?.rol}</span></div>
           </div>
-          <div className="avatar">JP</div>
-          <Link to="/" title="Cerrar sesión">Salir</Link>
+          <div className="avatar" title={usuario?.nombre}>{iniciales}</div>
+          {usuario?.rol === 'admin' && (
+            <Link to="/exportar" className="accion-top" title="Exportar datos a Excel">Exportar</Link>
+          )}
+          <a href="/" onClick={salir} className="accion-top">Cerrar sesión</a>
         </div>
       </header>
 

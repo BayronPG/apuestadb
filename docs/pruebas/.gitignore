@@ -1,0 +1,4 @@
+# Exportaciones .xlsx de prueba: contienen datos de la BD (usuarios, correos,
+# hashes, documentos) y NO deben versionarse. Solo se versiona el informe
+# resumen_pruebas_sandbox_login_export.md (sin datos sensibles).
+salidas_xlsx/

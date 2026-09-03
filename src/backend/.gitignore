@@ -1,0 +1,11 @@
+# Dependencias
+node_modules/
+
+# Secretos y configuracion local (nunca versionar)
+.env
+
+# Archivos temporales de exportacion
+tmp/
+
+# Logs
+*.log
