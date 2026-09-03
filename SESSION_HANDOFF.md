@@ -11,7 +11,7 @@
 - Asignatura: Bases de Datos 2 (Tecnológico de Antioquia).
 - Proyecto: sitio web académico de apuestas deportivas simuladas (sin dinero real, saldo y transacciones ficticios).
 - Integrantes del equipo (2): Jhon Bayron Peláez Guerra y Shantal Coneo García (15/ago/2026).
-- Workspace independiente: `C:\Proyectos\ApuestaDB` (separado de MiControlDiDi).
+- Workspace independiente: `C:\Proyectos\ApuestaDB`.
 - Repositorio GitHub privado `BayronPG/apuestadb` (rama `main`; último push: `8620020`).
 - Frontend: React (Vite) — decisión de Jhon (15/ago/2026), pendiente de validación del profesor.
 - Motor de base de datos: SQL Server (decisión de Jhon 24/ago/2026), pendiente de validación del profesor.
