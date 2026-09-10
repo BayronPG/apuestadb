@@ -10,7 +10,7 @@ dist/
 docs/mockups/.tmp-profile/
 
 # --- Archivos internos de OpenClaw (no son parte del proyecto) ---
-openclaw-workspace-state.json
+openclaw-workspace-state.json*
 HEARTBEAT.md
 AGENTS.md
 SOUL.md
@@ -18,6 +18,9 @@ IDENTITY.md
 USER.md
 TOOLS.md
 AGENT_INSTRUCTIONS.md
+MEMORY.md
+DREAMS.md
+memory/
 
 # --- Sistema ---
 .DS_Store

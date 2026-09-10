@@ -9,3 +9,6 @@ tmp/
 
 # Logs
 *.log
+
+# Respaldos locales de base de datos (no versionar)
+backups/

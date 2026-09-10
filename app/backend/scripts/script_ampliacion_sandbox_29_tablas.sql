@@ -220,7 +220,7 @@ BEGIN
             CONSTRAINT FK_Auditoria_Usuario REFERENCES Usuario(id),
         tabla_afectada VARCHAR(60)    NOT NULL,
         operacion      VARCHAR(20)    NOT NULL
-            CHECK (operacion IN ('INSERT', 'UPDATE', 'DELETE', 'LOGIN')),
+            CHECK (operacion IN ('INSERT', 'UPDATE', 'DELETE')),
         detalle        NVARCHAR(500)  NULL,
         fecha          DATETIME2      NOT NULL DEFAULT SYSDATETIME()
     );
@@ -656,20 +656,22 @@ GO
 -- Notificacion
 IF (SELECT COUNT(*) FROM dbo.Notificacion) < 5
 BEGIN
-    INSERT INTO Notificacion (usuario_id, tipo, mensaje, leida, fecha)
-    SELECT u.id, 'resultado', 'Tu apuesta gano: premio abonado a tokens.', 0, '2026-09-01 21:35:00'
+    INSERT INTO Notificacion (usuario_id, tipo, mensaje, leida, fecha, hacer_apuesta_id)
+    SELECT u.id, 'resultado', 'Tu apuesta gano: premio abonado a tokens.', 0, '2026-09-01 21:35:00',
+           (SELECT TOP 1 h.id FROM HacerApuesta h WHERE h.usuario_id = u.id AND h.fecha < '2026-09-01 21:35:00' ORDER BY h.fecha DESC)
     FROM Usuario u WHERE u.correo = 'shantal@apuestadb.com'
     UNION ALL
-    SELECT u.id, 'apuesta', 'Nueva apuesta registrada correctamente.', 1, '2026-09-02 12:01:00'
+    SELECT u.id, 'apuesta', 'Nueva apuesta registrada correctamente.', 1, '2026-09-02 12:01:00',
+           (SELECT TOP 1 h.id FROM HacerApuesta h WHERE h.usuario_id = u.id AND h.fecha < '2026-09-02 12:01:00' ORDER BY h.fecha DESC)
     FROM Usuario u WHERE u.correo = 'shantal@apuestadb.com'
     UNION ALL
-    SELECT u.id, 'sistema', 'Bienvenido al sandbox academico ApuestaDB.', 0, '2026-08-28 09:02:00'
+    SELECT u.id, 'sistema', 'Bienvenido al sandbox academico ApuestaDB.', 0, '2026-08-28 09:02:00', NULL
     FROM Usuario u WHERE u.correo = 'shantal@apuestadb.com'
     UNION ALL
-    SELECT u.id, 'promocion', 'Recarga tokens y recibe bonos ficticios.', 0, '2026-09-02 08:00:00'
+    SELECT u.id, 'promocion', 'Recarga tokens y recibe bonos ficticios.', 0, '2026-09-02 08:00:00', NULL
     FROM Usuario u WHERE u.correo = 'jhon@apuestadb.com'
     UNION ALL
-    SELECT u.id, 'sistema', 'Recuerda: todo el saldo es ficticio.', 1, '2026-08-25 10:00:00'
+    SELECT u.id, 'sistema', 'Recuerda: todo el saldo es ficticio.', 1, '2026-08-25 10:00:00', NULL
     FROM Usuario u WHERE u.correo = 'jhon@apuestadb.com';
 END
 GO
@@ -732,9 +734,6 @@ GO
 IF (SELECT COUNT(*) FROM dbo.Auditoria) < 5
 BEGIN
     INSERT INTO Auditoria (usuario_id, tabla_afectada, operacion, detalle, fecha)
-    SELECT u.id, 'Login', 'LOGIN', 'Inicio de sesion exitoso', '2026-09-02 10:00:00'
-    FROM Usuario u WHERE u.correo = 'jhon@apuestadb.com'
-    UNION ALL
     SELECT u.id, 'Usuario', 'INSERT', 'Registro de usuario desde la web', '2026-08-28 09:00:00'
     FROM Usuario u WHERE u.correo = 'shantal@apuestadb.com'
     UNION ALL

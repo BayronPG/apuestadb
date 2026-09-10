@@ -55,13 +55,25 @@ const movimientos = [
 ]
 
 function Home() {
-  const { usuario, cerrarSesion } = useAuth()
+  const { usuario, cargando, cerrarSesion } = useAuth()
   const navigate = useNavigate()
 
   async function salir(e) {
     e.preventDefault()
     await cerrarSesion()
     navigate('/')
+  }
+
+  // Estado de carga: el guarda de ruta (RequisitoSesion) ya espera la
+  // confirmacion de sesion del backend; esta rama cubre a Home si se
+  // renderiza sin el guarda.
+  if (cargando) {
+    return (
+      <div className="estado-carga" role="status" aria-live="polite">
+        <span className="spinner" aria-hidden="true" />
+        <p>Cargando sesión…</p>
+      </div>
+    )
   }
 
   const iniciales = (usuario?.nombre ?? 'U')
@@ -83,11 +95,10 @@ function Home() {
           </div>
         </div>
 
-        <nav>
+        <nav aria-label="Secciones de la página">
+          {/* Mis apuestas, Historial y Reportes se retiraron temporalmente:
+              no existen secciones funcionales que respalden esos enlaces. */}
           <a href="#eventos" className="activo">Eventos</a>
-          <a href="#apuestas">Mis apuestas</a>
-          <a href="#historial">Historial</a>
-          <a href="#reportes">Reportes</a>
         </nav>
 
         <div className="usuario">
@@ -102,15 +113,21 @@ function Home() {
 
       <main>
         {/* Columna principal: eventos */}
-        <section>
-          <div className="filtros">
+        <section id="eventos">
+          {/* Filtros informativos: requieren datos y logica del backend para operar. */}
+          <div className="filtros" aria-disabled="true">
             <span className="chip activo">Todos</span>
             <span className="chip">Fútbol</span>
             <span className="chip">Próximos</span>
             <span className="chip">En vivo</span>
           </div>
 
-          {eventos.map((evento) => (
+          {eventos.length === 0 ? (
+            <div className="estado-vacio" role="status">
+              <p>No hay eventos disponibles por el momento.</p>
+            </div>
+          ) : (
+            eventos.map((evento) => (
             <div className="evento" key={evento.id}>
               <div>
                 <div className="meta">
@@ -123,7 +140,12 @@ function Home() {
                 </div>
                 <div className="cuotas">
                   {evento.cuotas.map((cuota) => (
-                    <div className="cuota" key={cuota.nombre}>
+                    <div
+                      className="cuota"
+                      key={cuota.nombre}
+                      aria-disabled="true"
+                      title="Cuota de ejemplo, aun no seleccionable"
+                    >
                       <span className="nombre">{cuota.nombre}</span>
                       <span className="valor">{cuota.valor}</span>
                     </div>
@@ -131,7 +153,8 @@ function Home() {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
 
           <p className="nota-evento">
             * Cuotas y equipos de ejemplo. Regla de negocio provisional: no se puede apostar en
@@ -151,15 +174,19 @@ function Home() {
 
             <div className="bloque">
               <h3>Últimos movimientos</h3>
-              {movimientos.map((mov, idx) => (
-                <div className="movimiento" key={idx}>
-                  <div>
-                    <div>{mov.desc}</div>
-                    <div className="detalle">{mov.detalle}</div>
+              {movimientos.length === 0 ? (
+                <p className="estado-vacio-inline">Sin movimientos recientes.</p>
+              ) : (
+                movimientos.map((mov, idx) => (
+                  <div className="movimiento" key={idx}>
+                    <div>
+                      <div>{mov.desc}</div>
+                      <div className="detalle">{mov.detalle}</div>
+                    </div>
+                    <div className={`monto ${mov.tipo}`}>{mov.monto}</div>
                   </div>
-                  <div className={`monto ${mov.tipo}`}>{mov.monto}</div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             <div className="bloque">
@@ -169,10 +196,17 @@ function Home() {
                 <div className="boleto-seleccion">Local (1) @ <b>2.10</b></div>
                 <div className="boleto-fila">
                   <label htmlFor="monto-boleto">Monto</label>
-                  <input type="number" id="monto-boleto" defaultValue="10000" step="1000" min="0" />
+                  <input type="number" id="monto-boleto" defaultValue="10000" step="1000" min="0" disabled />
                 </div>
                 <div className="resumen"><span>Posible ganancia</span><span className="valor ok">$ 21.000</span></div>
-                <button className="btn-boleto" type="button">Confirmar apuesta (simulado)</button>
+                <button
+                  className="btn-boleto"
+                  type="button"
+                  disabled
+                  title="Disponible cuando el backend procese apuestas"
+                >
+                  Confirmar apuesta (simulado)
+                </button>
               </div>
               <p className="nota-boleto">
                 * Reglas provisionales: no se apuesta por más saldo del disponible y la cuota queda
@@ -180,14 +214,8 @@ function Home() {
               </p>
             </div>
 
-            <div className="bloque">
-              <h3>Enlaces</h3>
-              <p className="enlaces">
-                <a href="#apuesta">Registrar apuesta</a><br />
-                <a href="#historial">Ver historial completo</a><br />
-                <a href="#reportes">Consultas y reportes</a>
-              </p>
-            </div>
+            {/* Bloque Enlaces retirado temporalmente: sus vinculos apuntaban a
+                secciones que aun no existen (apuestas, historial, reportes). */}
           </div>
         </aside>
       </main>

@@ -156,6 +156,56 @@ async function main() {
   const d2 = await r.json().catch(() => ({}))
   registrar('Rechazo documento duplicado (409)', r.status === 409, d2.mensaje)
 
+  // 7b) Regla P10: mismo numero de documento con OTRO tipo -> permitido;
+  //      mismo tipo + numero -> rechazado (regla compuesta, mensaje actualizado)
+  const numCompartido = `77${sufijo.slice(-8)}`
+  const cuerpoCC = {
+    ...USUARIO_NUEVO,
+    correo: `p10.cc${sufijo}@apuestadb.com`,
+    numeroDocumento: numCompartido,
+  }
+  r = await api('/api/auth/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cuerpoCC),
+  })
+  const dCC = await r.json().catch(() => ({}))
+  registrar('P10: registro CC con numero N (201)', r.status === 201, dCC.mensaje)
+
+  const cuerpoCE = {
+    ...USUARIO_NUEVO,
+    tipoDocumento: 'CE',
+    correo: `p10.ce${sufijo}@apuestadb.com`,
+    numeroDocumento: numCompartido,
+  }
+  r = await api('/api/auth/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cuerpoCE),
+  })
+  const dCE = await r.json().catch(() => ({}))
+  registrar(
+    'P10: mismo numero N con tipo CE permitido (201)',
+    r.status === 201 && dCE.mensaje,
+    dCE.mensaje,
+  )
+
+  const cuerpoCE2 = {
+    ...cuerpoCE,
+    correo: `p10.ce2${sufijo}@apuestadb.com`,
+  }
+  r = await api('/api/auth/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cuerpoCE2),
+  })
+  const dCE2 = await r.json().catch(() => ({}))
+  registrar(
+    'P10: CE + numero N duplicado (409, mensaje por tipo)',
+    r.status === 409 && String(dCE2.mensaje ?? '').includes('tipo y número de documento'),
+    dCE2.mensaje,
+  )
+
   // 8) Validaciones: correo con formato invalido
   r = await api('/api/auth/registro', {
     method: 'POST',
@@ -232,6 +282,72 @@ async function main() {
   })
   const dAdm = await r.json().catch(() => ({}))
   registrar('Login admin (200)', r.status === 200 && dAdm.usuario?.rol === 'admin', `rol=${dAdm.usuario?.rol}`)
+
+  // 16-20) Integridad estructural P1-P10 (nivel BD)
+  const qAisl = await pool.request().query(
+    `SELECT COUNT(*) AS n FROM sys.tables t
+     WHERE t.name <> 'sysdiagrams'
+       AND NOT EXISTS (SELECT 1 FROM sys.foreign_keys fk WHERE fk.parent_object_id = t.object_id)
+       AND NOT EXISTS (SELECT 1 FROM sys.foreign_keys fk2 WHERE fk2.referenced_object_id = t.object_id)`,
+  )
+  registrar(
+    'P1-P8: ninguna tabla de dominio aislada',
+    Number(qAisl.recordset[0].n) === 0,
+    `aisladas=${qAisl.recordset[0].n}`,
+  )
+
+  const qLogAud = await pool
+    .request()
+    .query("SELECT COUNT(*) AS n FROM dbo.Auditoria WHERE operacion = 'LOGIN'")
+  registrar(
+    'P9: Login no duplicado en Auditoria',
+    Number(qLogAud.recordset[0].n) === 0,
+    `auditoria_login=${qLogAud.recordset[0].n}`,
+  )
+
+  const qNotif = await pool.request().query(
+    `SELECT COUNT(*) AS total,
+            SUM(CASE WHEN hacer_apuesta_id IS NOT NULL OR recarga_id IS NOT NULL THEN 1 ELSE 0 END) AS con_origen,
+            SUM(CASE WHEN hacer_apuesta_id IS NULL AND recarga_id IS NULL THEN 1 ELSE 0 END) AS sin_entidad
+     FROM dbo.Notificacion`,
+  )
+  const qCK = await pool.request().query(
+    `SELECT COUNT(*) AS n FROM sys.check_constraints
+     WHERE name = 'CK_Notificacion_OrigenUnico' AND parent_object_id = OBJECT_ID('dbo.Notificacion')`,
+  )
+  registrar(
+    'P7: notificaciones con y sin entidad de origen',
+    Number(qNotif.recordset[0].con_origen) >= 1 &&
+      Number(qNotif.recordset[0].sin_entidad) >= 1 &&
+      Number(qCK.recordset[0].n) === 1,
+    `con_origen=${qNotif.recordset[0].con_origen} sin_entidad=${qNotif.recordset[0].sin_entidad}`,
+  )
+
+  const qUQ = await pool.request().query(
+    `SELECT
+       (SELECT COUNT(*) FROM sys.objects WHERE name = 'UQ_Usuario_TipoNumeroDoc' AND type = 'UQ') AS compuesta,
+       (SELECT COUNT(*) FROM sys.indexes i
+         WHERE i.object_id = OBJECT_ID('dbo.Usuario') AND i.is_unique_constraint = 1
+           AND EXISTS (SELECT 1 FROM sys.index_columns ic2
+                       JOIN sys.columns c ON c.object_id = ic2.object_id AND c.column_id = ic2.column_id
+                       WHERE ic2.object_id = i.object_id AND ic2.index_id = i.index_id AND c.name = 'numero_documento')
+           AND (SELECT COUNT(*) FROM sys.index_columns ic
+                WHERE ic.object_id = i.object_id AND ic.index_id = i.index_id) = 1) AS simple`,
+  )
+  registrar(
+    'P10: UQ compuesta activa y simple retirada',
+    Number(qUQ.recordset[0].compuesta) === 1 && Number(qUQ.recordset[0].simple) === 0,
+    `compuesta=${qUQ.recordset[0].compuesta} simple=${qUQ.recordset[0].simple}`,
+  )
+
+  const qRec = await pool
+    .request()
+    .query('SELECT COUNT(*) AS n FROM dbo.LogPago WHERE recarga_id IS NOT NULL')
+  registrar(
+    'P6: movimientos de recarga vinculados a su solicitud',
+    Number(qRec.recordset[0].n) >= 1,
+    `vinculados=${qRec.recordset[0].n}`,
+  )
 
   await pool.close()
 

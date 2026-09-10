@@ -91,13 +91,15 @@ router.post('/registro', async (req, res) => {
     await tx.begin()
 
     try {
-      // ---- Evitar duplicados (correo y numero de documento) ----
+      // ---- Evitar duplicados (correo; tipo + numero de documento - regla P10) ----
       const duplicado = await tx
         .request()
         .input('correo', sql.NVarChar(150), mail)
+        .input('tipo', sql.VarChar(10), tipoDoc)
         .input('doc', sql.VarChar(20), numDoc)
         .query(
-          'SELECT correo, numero_documento FROM Usuario WHERE correo = @correo OR numero_documento = @doc',
+          `SELECT correo, tipo_documento, numero_documento FROM Usuario
+           WHERE correo = @correo OR (tipo_documento = @tipo AND numero_documento = @doc)`,
         )
 
       if (duplicado.recordset.some((r) => (r.correo ?? '').toLowerCase() === mail)) {
@@ -106,11 +108,17 @@ router.post('/registro', async (req, res) => {
           .status(409)
           .json({ mensaje: 'Ya existe una cuenta con ese correo electrónico.' })
       }
-      if (duplicado.recordset.some((r) => String(r.numero_documento).trim() === numDoc)) {
+      if (
+        duplicado.recordset.some(
+          (r) =>
+            String(r.tipo_documento).trim() === tipoDoc &&
+            String(r.numero_documento).trim() === numDoc,
+        )
+      ) {
         await tx.rollback()
         return res
           .status(409)
-          .json({ mensaje: 'Ya existe un usuario con ese número de documento.' })
+          .json({ mensaje: 'Ya existe un usuario con ese tipo y número de documento.' })
       }
 
       // ---- Rol por defecto: 'usuario' (obtenido de la BD, nunca hardcodeado el id) ----
