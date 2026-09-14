@@ -4,7 +4,7 @@
    Fecha  : 09/sep/2026
    Autor  : Jhon Bayron Pelaez Guerra (autorizacion explicita 09/sep/2026)
    Estado : APLICADA al sandbox SQLEXPRESS01. Sin commit ni push.
-   Respaldo previo: app/backend/backups/ApuestaDB_bak_20260909_1917.bak
+   Respaldo previo: sandbox/backend/backups/ApuestaDB_bak_20260909_1917.bak
    Rollback: migracion_p1_p10_rollback.sql (reversible por pasos).
    Nota: migracion segun diagnostico real (constraints/mapeos verificados).
    ============================================================================ */

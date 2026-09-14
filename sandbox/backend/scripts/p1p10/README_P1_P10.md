@@ -2,9 +2,9 @@
 
 Fecha: 09/sep/2026 · Autorizacion: Jhon Bayron Pelaez Guerra (explicita)
 Estado: APLICADA y VALIDADA en `SQLEXPRESS01\ApuestaDB`. Sin commit ni push.
-Respaldo previo: `app/backend/backups/ApuestaDB_bak_20260909_1917.bak`.
+Respaldo previo: `sandbox/backend/backups/ApuestaDB_bak_20260909_1917.bak`.
 
-## Archivos de la migracion (app/backend/scripts/p1p10/)
+## Archivos de la migracion (sandbox/backend/scripts/p1p10/)
 - `migracion_p1_p10.sql` — parte A (P1-P5 + columna/FK de P6).
 - `migracion_p1_p10_b.sql` — parte B (P6 corregido, P7, P8, P9, P10 paso 1).
 - `paso_final_p10.sql` — P10 paso 2: retiro de UNIQUE(numero_documento) simple.

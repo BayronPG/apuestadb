@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    Deshace en orden inverso: primero la FK, luego la columna.
    Al eliminar la columna se pierden los valores del backfill; quedan en el
-   backup .bak previo a la migracion (app/backend/backups/).
+   backup .bak previo a la migracion (sandbox/backend/backups/).
    Ejecutar : sqlcmd -S .\SQLEXPRESS01 -E -b -f 65001 -i <este archivo>
    ============================================================================ */
 USE ApuestaDB;

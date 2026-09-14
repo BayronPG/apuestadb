@@ -1,7 +1,7 @@
 /* ============================================================================
    ROLLBACK de la migracion P1-P10 (reversible por pasos, en orden inverso).
    Restauracion completa alternativa: restaurar el backup
-   app/backend/backups/ApuestaDB_bak_20260909_1917.bak
+   sandbox/backend/backups/ApuestaDB_bak_20260909_1917.bak
    ============================================================================ */
 USE ApuestaDB;
 GO

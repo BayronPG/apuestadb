@@ -3,7 +3,7 @@
 Fecha: 09/sep/2026 · Autorizacion: Jhon Bayron Pelaez Guerra ("la que tu creas mejor":
 se eligio `Apuestas.empresa_id -> Empresa.id`).
 Estado: APLICADA y VALIDADA en `SQLEXPRESS01\ApuestaDB`. Sin commit ni push.
-Respaldo previo: `app/backend/backups/ApuestaDB_bak_20260909_2032.bak`.
+Respaldo previo: `sandbox/backend/backups/ApuestaDB_bak_20260909_2032.bak`.
 
 ## Motivo
 

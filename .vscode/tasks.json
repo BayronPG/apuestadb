@@ -5,7 +5,7 @@
       "label": "Backend (npm start)",
       "type": "npm",
       "script": "start",
-      "path": "app/backend",
+      "path": "sandbox/backend",
       "problemMatcher": [],
       "presentation": { "group": "apuestadb", "panel": "dedicated" }
     },
@@ -13,7 +13,7 @@
       "label": "Frontend (npm run dev)",
       "type": "npm",
       "script": "dev",
-      "path": "app/frontend",
+      "path": "sandbox/frontend",
       "isBackground": true,
       "problemMatcher": [],
       "presentation": { "group": "apuestadb", "panel": "dedicated" }
@@ -22,7 +22,7 @@
       "label": "Pruebas backend (npm run pruebas)",
       "type": "npm",
       "script": "pruebas",
-      "path": "app/backend",
+      "path": "sandbox/backend",
       "problemMatcher": [],
       "presentation": { "group": "apuestadb", "panel": "dedicated" }
     }

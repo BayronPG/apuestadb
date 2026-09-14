@@ -6,7 +6,7 @@
  * - El PNG se genera luego con mermaid-cli:
  *     npx @mermaid-js/mermaid-cli -i apuestadb_er.mmd -o apuestadb_er.png -b white -s 2
  *
- * Uso (desde app/backend):  node scripts/generar_diagrama_er.mjs
+ * Uso (desde sandbox/backend):  node scripts/generar_diagrama_er.mjs
  */
 import 'dotenv/config'
 import fs from 'node:fs'

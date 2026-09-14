@@ -15,13 +15,13 @@ app/
 
 **Terminal 1 — Backend:**
 ```powershell
-cd C:\Proyectos\ApuestaDB\app\backend
+cd C:\Proyectos\ApuestaDB\sandbox\backend
 npm start
 ```
 
 **Terminal 2 — Frontend:**
 ```powershell
-cd C:\Proyectos\ApuestaDB\app\frontend
+cd C:\Proyectos\ApuestaDB\sandbox\frontend
 npm run dev
 ```
 
@@ -31,6 +31,6 @@ Abre **http://localhost:5173** en el navegador.
 
 ## En el editor (VS Code / Cursor)
 
-- Abre esta carpeta (`C:\Proyectos\ApuestaDB\app`).
+- Abre esta carpeta (`C:\Proyectos\ApuestaDB\sandbox`).
 - Tareas disponibles en Terminal > Run Task: *Backend (npm start)*, *Frontend (npm run dev)*, *Pruebas backend*.
 - Extensiones recomendadas: SQL Server (`ms-mssql.mssql`), PowerShell, Oxlint.

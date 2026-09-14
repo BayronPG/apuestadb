@@ -36,7 +36,7 @@ function InicioSesion() {
       // Mensajes claros cuando las credenciales son incorrectas
       setError(d.mensaje || 'No se pudo iniciar sesión. Inténtalo de nuevo.')
     } catch {
-      setError('No se pudo conectar con el servidor. Verifica que el backend esté activo (npm start en app/backend).')
+      setError('No se pudo conectar con el servidor. Verifica que el backend esté activo (npm start en sandbox/backend).')
     } finally {
       setCargando(false)
     }
