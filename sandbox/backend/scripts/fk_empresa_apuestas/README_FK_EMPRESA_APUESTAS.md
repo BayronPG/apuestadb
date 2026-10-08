@@ -39,7 +39,7 @@ conectarlos.
 
 ## Diagrama ER
 
-- `docs/base_datos/diagramas_er/apuestadb_er.mmd` regenerado desde la base:
+- `docs/ACTUAL/base_datos/diagramas_er/apuestadb_er.mmd` regenerado desde la base:
   **29 tablas / 43 relaciones**.
 - PNG / SVG / HTML republicados (PNG 8572x7176); los artefactos anteriores se
   movieron a `_obsoletos/`.
@@ -48,7 +48,7 @@ conectarlos.
 
 - Cambio del **sandbox**; NO es requisito confirmado del profesor. El contenido real de
   `Servicios` y `Reglas` sigue pendiente de definicion con el profesor
-  (`docs/profesor/preguntas_clase_tablas.md`).
+  (`docs/ACTUAL/profesor/preguntas_clase_tablas.md`).
 - El diagrama de SSMS (`sysdiagrams`) sigue vacio: se crea desde la GUI de SSMS
   (New Database Diagram + Add de las 29 tablas).
 - Dashboard y backend sin modificar; sin dependencias nuevas en el proyecto;

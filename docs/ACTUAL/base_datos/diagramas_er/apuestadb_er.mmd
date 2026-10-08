@@ -1,0 +1,272 @@
+erDiagram
+    Apuestas {
+        int id PK
+        int calendario_id FK, UK
+        string mercado
+        string opcion UK
+        decimal cuota
+        string estado
+        int empresa_id FK
+    }
+    Arbitro {
+        int id PK
+        string primer_nombre
+        string segundo_nombre
+        string primer_apellido
+        string segundo_apellido
+        string numero_documento UK
+        string estado
+    }
+    Auditoria {
+        int id PK
+        int usuario_id FK
+        string tabla_afectada
+        string operacion
+        string detalle
+        date fecha
+    }
+    Calendario {
+        int id PK
+        int liga_id FK
+        int equipo_local_id FK
+        int equipo_visitante_id FK
+        date fecha_hora
+        string estado
+        int estadio_id FK
+        int temporada_id FK
+    }
+    CalendarioArbitro {
+        int id PK
+        int calendario_id FK, UK
+        int arbitro_id FK, UK
+        string rol
+    }
+    Ciudad {
+        int id PK
+        string nombre
+        int pais_id FK
+        string estado
+    }
+    Deportes {
+        int id PK
+        string nombre UK
+        string estado
+    }
+    Empresa {
+        int id PK
+        string nombre
+        string nit UK
+        string telefono
+        string correo
+        string estado
+    }
+    Equipo {
+        int id PK
+        string nombre
+        int liga_id FK
+        string estado
+        int estadio_id FK
+    }
+    Estadio {
+        int id PK
+        string nombre
+        int ciudad_id FK
+        int capacidad
+        string estado
+    }
+    FavoritoEquipo {
+        int id PK
+        int usuario_id FK, UK
+        int equipo_id FK, UK
+        date fecha_registro
+    }
+    HacerApuesta {
+        int id PK
+        int usuario_id FK
+        int apuesta_id FK
+        int tipo_saldo_id FK
+        decimal monto
+        decimal cuota_aceptada
+        string estado
+        date fecha
+    }
+    HistorialCuota {
+        int id PK
+        int apuesta_id FK
+        int usuario_id FK
+        decimal cuota_anterior
+        decimal cuota_nueva
+        date fecha_cambio
+    }
+    Liga {
+        int id PK
+        string nombre
+        int deporte_id FK
+        string pais
+        string estado
+        int pais_id FK
+    }
+    Login {
+        int id PK
+        int usuario_id FK
+        date fecha
+        string ip
+        bool exitoso
+    }
+    LogPago {
+        int id PK
+        int usuario_id FK
+        int tipo_saldo_id FK
+        string tipo
+        decimal monto
+        decimal saldo_resultante
+        int hacer_apuesta_id FK
+        date fecha
+        int recarga_id FK, UK
+    }
+    Notificacion {
+        int id PK
+        int usuario_id FK
+        string tipo
+        string mensaje
+        bool leida
+        date fecha
+        int hacer_apuesta_id FK
+        int recarga_id FK
+    }
+    Pais {
+        int id PK
+        string nombre UK
+        string codigo_iso
+        string estado
+    }
+    PreguntaSeguridad {
+        int id PK
+        string pregunta UK
+        string estado
+    }
+    Recarga {
+        int id PK
+        int usuario_id FK
+        int tipo_saldo_id FK
+        decimal monto
+        string estado
+        date fecha_solicitud
+        date fecha_aprobacion
+    }
+    Reglas {
+        int id PK
+        string nombre
+        string descripcion
+        string parametro
+        string estado
+        int empresa_id FK
+    }
+    RespuestaSeguridad {
+        int id PK
+        int usuario_id FK, UK
+        int pregunta_id FK, UK
+        string respuesta
+        date fecha_registro
+    }
+    Resultado {
+        int id PK
+        int calendario_id FK, UK
+        int marcador_local
+        int marcador_visitante
+        string ganador
+        date fecha_registro
+    }
+    Rol {
+        int id PK
+        string nombre UK
+        string descripcion
+    }
+    SaldoCuenta {
+        int id PK
+        int usuario_id FK, UK
+        int tipo_saldo_id FK, UK
+        decimal saldo
+        string estado
+        date fecha_actualizacion
+    }
+    Servicios {
+        int id PK
+        string nombre UK
+        string descripcion
+        string estado
+        int empresa_id FK
+    }
+    Temporada {
+        int id PK
+        string nombre
+        int deporte_id FK
+        date fecha_inicio
+        date fecha_fin
+        string estado
+        int liga_id FK
+    }
+    TipoSaldo {
+        int id PK
+        string nombre UK
+        string descripcion
+        string estado
+    }
+    Usuario {
+        int id PK
+        string primer_nombre
+        string segundo_nombre
+        string primer_apellido
+        string segundo_apellido
+        int rol_id FK
+        string tipo_documento UK
+        string numero_documento UK
+        string celular
+        string correo UK
+        date fecha_registro
+        string contrasena_hash
+        string estado
+    }
+    Apuestas ||--o{ HacerApuesta : "apuesta_id"
+    Apuestas ||--o{ HistorialCuota : "apuesta_id"
+    Arbitro ||--o{ CalendarioArbitro : "arbitro_id"
+    Calendario ||--o{ Apuestas : "calendario_id"
+    Calendario ||--o{ CalendarioArbitro : "calendario_id"
+    Calendario ||--o{ Resultado : "calendario_id"
+    Ciudad ||--o{ Estadio : "ciudad_id"
+    Deportes ||--o{ Liga : "deporte_id"
+    Deportes ||--o{ Temporada : "deporte_id"
+    Empresa ||--o{ Apuestas : "empresa_id"
+    Empresa ||--o{ Reglas : "empresa_id"
+    Empresa ||--o{ Servicios : "empresa_id"
+    Equipo ||--o{ Calendario : "equipo_local_id"
+    Equipo ||--o{ Calendario : "equipo_visitante_id"
+    Equipo ||--o{ FavoritoEquipo : "equipo_id"
+    Estadio ||--o{ Calendario : "estadio_id"
+    Estadio ||--o{ Equipo : "estadio_id"
+    HacerApuesta ||--o{ LogPago : "hacer_apuesta_id"
+    HacerApuesta ||--o{ Notificacion : "hacer_apuesta_id"
+    Liga ||--o{ Calendario : "liga_id"
+    Liga ||--o{ Equipo : "liga_id"
+    Liga ||--o{ Temporada : "liga_id"
+    Pais ||--o{ Ciudad : "pais_id"
+    Pais ||--o{ Liga : "pais_id"
+    PreguntaSeguridad ||--o{ RespuestaSeguridad : "pregunta_id"
+    Recarga ||--o{ LogPago : "recarga_id"
+    Recarga ||--o{ Notificacion : "recarga_id"
+    Rol ||--o{ Usuario : "rol_id"
+    Temporada ||--o{ Calendario : "temporada_id"
+    TipoSaldo ||--o{ HacerApuesta : "tipo_saldo_id"
+    TipoSaldo ||--o{ LogPago : "tipo_saldo_id"
+    TipoSaldo ||--o{ Recarga : "tipo_saldo_id"
+    TipoSaldo ||--o{ SaldoCuenta : "tipo_saldo_id"
+    Usuario ||--o{ Auditoria : "usuario_id"
+    Usuario ||--o{ FavoritoEquipo : "usuario_id"
+    Usuario ||--o{ HacerApuesta : "usuario_id"
+    Usuario ||--o{ HistorialCuota : "usuario_id"
+    Usuario ||--o{ Login : "usuario_id"
+    Usuario ||--o{ LogPago : "usuario_id"
+    Usuario ||--o{ Notificacion : "usuario_id"
+    Usuario ||--o{ Recarga : "usuario_id"
+    Usuario ||--o{ RespuestaSeguridad : "usuario_id"
+    Usuario ||--o{ SaldoCuenta : "usuario_id"

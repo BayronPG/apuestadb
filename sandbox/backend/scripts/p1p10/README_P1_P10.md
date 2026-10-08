@@ -39,6 +39,6 @@ Respaldo previo: `sandbox/backend/backups/ApuestaDB_bak_20260909_1917.bak`.
 - LogPago recarga 30000 (jhon, tokens) sin solicitud aprobada correspondiente en seeds.
 
 ## Notas
-- `docs/base_datos/diagramas_er/apuestadb_er.mmd` actualizado con las 10 relaciones P1-P10; el `.png` debe regenerarse desde el `.mmd` cuando se disponga de Mermaid CLI (pendiente).
+- `docs/ACTUAL/base_datos/diagramas_er/apuestadb_er.mmd` actualizado con las 10 relaciones P1-P10; el `.png` debe regenerarse desde el `.mmd` cuando se disponga de Mermaid CLI (pendiente).
 - Dato preexistente documentado (no modificado): Reglas tiene duplicado 'monto_minimo_apuesta' (filas 1-2); su limpieza queda pendiente de decision de Jhon.
 - Dashboard sin modificar; sin dependencias nuevas; sin commit ni push.

@@ -13,7 +13,7 @@ real (`ApuestaDB` en la instancia local `SQLEXPRESS01`).
 
 - Node.js >= 18 (probado con Node 24).
 - SQL Server Express local: instancia `SQLEXPRESS01` con la base `ApuestaDB`
-  creada (scripts en `docs/base_datos/`), **protocolo TCP habilitado**
+  creada (scripts en `docs/HISTORICO/base_datos/`), **protocolo TCP habilitado**
   (puerto 1433) y **modo de autenticación mixto** (SQL + Windows).
   Configuración de una sola vez (requiere PowerShell como administrador):
   - `scripts/habilitar_tcp_sqlexpress01.ps1`

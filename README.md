@@ -30,7 +30,7 @@ Proyecto académico de la asignatura **Bases de Datos 2**: los usuarios registra
 
 | Documento | Contenido |
 |---|---|
-| `docs/entregables/planteamiento_fase1.md` | Planteamiento (Fase 1): nombre, problema, justificación, objetivos, alcance, limitaciones |
+| `docs/ACTUAL/entregables/planteamiento_fase1.md` | Planteamiento (Fase 1): nombre, problema, justificación, objetivos, alcance, limitaciones |
 | `PROJECT_CONTEXT.md` | Contexto confirmado, provisional y pendiente |
 | `DECISION_LOG.md` | Registro de decisiones aprobadas |
 | `SESSION_HANDOFF.md` | Estado de continuidad entre sesiones |

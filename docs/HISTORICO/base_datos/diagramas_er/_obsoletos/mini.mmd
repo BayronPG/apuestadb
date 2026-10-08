@@ -1,0 +1,9 @@
+erDiagram
+    Usuario {
+        int id PK
+        varchar correo
+    }
+    Rol {
+        int id PK
+    }
+    Usuario ||--o{ Rol : "rol_id"
