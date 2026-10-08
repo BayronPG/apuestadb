@@ -1,13 +1,13 @@
 # PROJECT_CONTEXT.md — ApuestaDB
 
-**Última actualización:** 14/sep/2026
+**Última actualización:** 07/oct/2026
 
 ## Información confirmada
 
 - **Asignatura:** Bases de Datos 2 (Tecnológico de Antioquia).
 - **Proyecto:** sitio web académico de apuestas deportivas simuladas.
 - **Dinero real:** no se utilizará. Todo saldo y transacción es ficticio.
-- **Fase actual:** **Fase 11 — Frontend React** (frontend construido y enganchado a la API; pendiente de revisión de Jhon y de ejecutar las pruebas integrales).
+- **Fase actual:** **cerrada** — Fases 0 a 12.1 **completadas** y **Fase 13 completada (07/oct/2026)**; no hay fase abierta ni trabajo pendiente autorizado (coincide con `SESSION_HANDOFF.md`).
 - **Workspace:** `C:\Proyectos\ApuestaDB` (independiente de MiControlDiDi).
 - **Integrantes del equipo (2):** Jhon Bayron Peláez Guerra y Shantal Coneo García (15/ago/2026).
 - **Motor de base de datos: SQL Server** (decisión de Jhon, 24/ago/2026; pendiente de validación del profesor).
@@ -27,6 +27,9 @@
 - **Fase 10 — Backend Node.js + Express construido** (14/sep/2026): `backend/` (23 endpoints, 52 archivos JS, integración de procedimientos y vistas) y `docs/ACTUAL/backend/` (ARQUITECTURA, ENDPOINTS, CONFIGURACION); sin `npm install` ni ejecución.
 - **Fase 10.1 — Ajustes de integración** (14/sep/2026): nuevo `GET /api/eventos/:id/opciones` y `GET /api/saldo` con `idTipoSaldo`/`nombreTipoSaldo` (**24 endpoints**); `docs/ACTUAL/backend/INTEGRACION_FRONTEND.md`.
 - **Fase 11 / 11.1 — Frontend React** (14/sep/2026): `frontend/` (16 páginas, 15 componentes, JWT + Context API + Axios, responsive) y `docs/ACTUAL/frontend/` (5 documentos); Crear Apuesta y recargas enganchados a la API real (sin datos simulados).
+- **Fase 12 — Pruebas integrales reales (CERRADA)**: base recreada desde cero, 38/38 verificaciones de API y flujo completo (recarga → apuesta → resultado → liquidación), con respaldo `.bak`; documentos en `docs/ACTUAL/pruebas/`.
+- **Fase 12.1 — Datos de demostración (CERRADA, 14/sep/2026)**: `database/06_demo_data.sql` (idempotente) y `docs/ACTUAL/pruebas/DATOS_DEMOSTRACION.md`; las 29 tablas pobladas y 12/12 vistas con información.
+- **Fase 13 — Entregable de consultas SQL (COMPLETADA, 07/oct/2026)**: `database/consultas/` con 80 SELECT, 20 INSERT, 20 UPDATE, 20 DELETE y 20 JOIN distintos (los JOIN van aparte), más 4 funciones nuevas hasta completar las **10 del modelo**; verificado ejecutando los 6 archivos con `sqlcmd` contra la base real. Incluye la recuperación de la base tras el borrado accidental del 07/oct/2026 (`docs/ACTUAL/pruebas/RECUPERACION_FASE13.md`) y el mapa requisito → sentencia en `database/consultas/COBERTURA.md`.
 - **Repositorio GitHub privado:** `https://github.com/BayronPG/apuestadb` (rama `main`).
 - **Saldo por tipos tokens/PSE** con reglas R1–R5 (indicación del profesor, aplicada por Jhon, 24/ago/2026).
 - **Tablas del análisis de clase** (24/ago/2026): listado trabajado con el profesor (16 tablas base; borrador en `docs/HISTORICO/base_datos/script_tablas_sqlserver_borrador.sql`).
@@ -57,6 +60,12 @@ El **sandbox técnico** se **conserva en Git** dentro de la carpeta `sandbox/` (
 - Entregables, rúbrica y fechas de entrega.
 - Requisitos funcionales y no funcionales.
 - Dudas de clase abiertas: contenido real de `Servicios` y `Reglas`; confirmar `Apuestas` (oferta) vs `HacerApuesta` (apuesta del cliente) y `Resultado`.
+
+## Próximo paso recomendado (según `SESSION_HANDOFF.md`)
+
+- Revisar `database/consultas/COBERTURA.md` (mapa requisito → sentencia) y `docs/ACTUAL/pruebas/RECUPERACION_FASE13.md` (cadena de recuperación de la base y credencial de la aplicación).
+- Antes de la entrega: revisar `docs/ACTUAL/entregables/CHECKLIST_ENTREGA.md`, ensayar la sustentación con `RESUMEN_SUSTENTACION.md` y usar `docs/ACTUAL/pruebas/DATOS_DEMOSTRACION.md` §5 como guion de la demo.
+- Para la demo en vivo, levantar SQL Server + backend + frontend (los tres servicios verificados).
 
 ## Metodología — MODO EFICIENCIA MÁXIMA (14/sep/2026)
 
