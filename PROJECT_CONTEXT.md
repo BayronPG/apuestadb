@@ -38,7 +38,10 @@
 
 El **sandbox técnico** se **conserva en Git** dentro de la carpeta `sandbox/` (backend, frontend y scripts), renombrado desde `app/` (decisión de Jhon, 14/sep/2026).
 
-- La **base de datos local `ApuestaDB` y el login SQL `apuestadb_app` fueron eliminados**; hay respaldo en `docs/base_datos/backups/` (dos `.bak`).
+- La **base de datos local `ApuestaDB` y el login SQL `apuestadb_app` se eliminaron** al retirar el sandbox (14/sep/2026); hay respaldo en `docs/base_datos/backups/`.
+- En la **Fase 12 (14/sep/2026)** la base se **recreó desde cero** (`database/01_database.sql` a `05_seed_data.sql`, más funciones, vistas, procedimientos y triggers) y se **creó** el login SQL de aplicación (no se restauró desde respaldo).
+- Tras el **borrado accidental del 07/oct/2026** la base se **recuperó desde el respaldo de la Fase 12** (`ApuestaDB_bak_fase12_20260914_191607.bak`); el login **seguía existiendo en el servidor** y solo hubo que volver a mapearlo como usuario de la base. Detalle en `docs/ACTUAL/pruebas/RECUPERACION_FASE13.md`.
+- Respaldos actuales en `docs/base_datos/backups/`: **cuatro `.bak`** (el vigente con datos de demostración es `ApuestaDB_bak_fase13_20261007_191831.bak`).
 - El historial de Git conserva los commits del sandbox (`c0e5736`, `a6f03cc`, `5ba3015`, etc.).
 
 ## Información provisional
@@ -58,7 +61,7 @@ El **sandbox técnico** se **conserva en Git** dentro de la carpeta `sandbox/` (
 - Aprobación del tema.
 - Validación del profesor: motor SQL Server, frontend React y stack del backend.
 - Entregables, rúbrica y fechas de entrega.
-- Requisitos funcionales y no funcionales.
+- **Requisitos funcionales y no funcionales: entregados** (29 RF y 12 RNF en `docs/ACTUAL/requisitos/`); queda pendiente la **validación del profesor**.
 - Dudas de clase abiertas: contenido real de `Servicios` y `Reglas`; confirmar `Apuestas` (oferta) vs `HacerApuesta` (apuesta del cliente) y `Resultado`.
 
 ## Próximo paso recomendado (según `SESSION_HANDOFF.md`)
