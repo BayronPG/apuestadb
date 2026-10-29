@@ -9,17 +9,53 @@
     "TOOLS.md": true,
     "HEARTBEAT.md": true,
     "openclaw-workspace-state.json": true,
-    "media/inbound": true
+    "media/inbound": true,
+    ".tmp": true,
+    "sandbox": true,
+    "docs/HISTORICO": true
   },
   "search.exclude": {
     "**/node_modules": true,
     "**/dist": true,
-    "docs/mockups/.tmp-profile": true
+    "docs/mockups/.tmp-profile": true,
+    ".tmp": true,
+    "sandbox": true,
+    "docs/HISTORICO": true
   },
   "files.watcherExclude": {
     "**/node_modules/**": true,
     "**/dist/**": true
   },
   "files.eol": "\r\n",
-  "files.encoding": "utf8"
+  "files.encoding": "utf8",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#4f829b",
+    "activityBar.activeBorder": "#e7e7e7",
+    "activityBar.background": "#4f829b",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#d4abc6",
+    "activityBarBadge.foreground": "#15202b",
+    "activityBarTop.activeBackground": "#4f829b",
+    "activityBarTop.activeBorder": "#e7e7e7",
+    "activityBarTop.background": "#4f829b",
+    "activityBarTop.foreground": "#e7e7e7",
+    "activityBarTop.inactiveForeground": "#e7e7e799",
+    "commandCenter.border": "#e7e7e799",
+    "commandCenter.foreground": "#e7e7e7",
+    "sash.hoverBorder": "#4f829b",
+    "statusBar.background": "#3e6679",
+    "statusBar.debuggingBackground": "#3e6679",
+    "statusBar.debuggingForeground": "#e7e7e7",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBar.inactiveBackground": "#3e6679",
+    "statusBarItem.hoverBackground": "#4f829b",
+    "statusBarItem.remoteBackground": "#be81aa",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#3e6679",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#3e667999",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#3e6679"
 }
