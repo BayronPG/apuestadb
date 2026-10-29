@@ -1,6 +1,6 @@
 # SESSION_HANDOFF.md — ApuestaDB
 
-**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos**
+**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos** · 28/oct/2026 — versionado del código en `origin/main`
 
 ## Fase actual
 
@@ -55,6 +55,7 @@
 - Validaciones del profesor: motor SQL Server, stack React, backend, entregables, rúbrica y fechas.
 - Dudas de clase abiertas: contenido real de `Servicios` y `Reglas`; `Apuestas` (oferta) vs `HacerApuesta` (apuesta del cliente); `Resultado`.
 - Invitación pendiente de aceptación de `shantal-hue` como colaboradora del repositorio.
+- Decisión pendiente sobre `.vscode/settings.json` (modificado en el árbol de trabajo, sin commitear; fuera del versionado del 28/oct/2026).
 - Recorrido clicable en navegador, responsive real y pruebas de concurrencia (no realizados; ver `docs/ACTUAL/pruebas/RESULTADOS.md` §7).
 
 ## Próximo paso recomendado

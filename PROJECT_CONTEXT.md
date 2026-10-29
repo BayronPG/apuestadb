@@ -31,6 +31,8 @@
 - **Fase 12.1 — Datos de demostración (CERRADA, 14/sep/2026)**: `database/06_demo_data.sql` (idempotente) y `docs/ACTUAL/pruebas/DATOS_DEMOSTRACION.md`; las 29 tablas pobladas y 12/12 vistas con información.
 - **Fase 13 — Entregable de consultas SQL (COMPLETADA, 07/oct/2026)**: `database/consultas/` con 80 SELECT, 20 INSERT, 20 UPDATE, 20 DELETE y 20 JOIN distintos (los JOIN van aparte), más 4 funciones nuevas hasta completar las **10 del modelo**; verificado ejecutando los 6 archivos con `sqlcmd` contra la base real. Incluye la recuperación de la base tras el borrado accidental del 07/oct/2026 (`docs/ACTUAL/pruebas/RECUPERACION_FASE13.md`) y el mapa requisito → sentencia en `database/consultas/COBERTURA.md`.
 - **Repositorio GitHub privado:** `https://github.com/BayronPG/apuestadb` (rama `main`).
+- **Versionado del código (28/oct/2026):** `backend/`, `frontend/`, `database/` (01–06 + functions, views, procedures, triggers) y el esquema de `docs/` se versionaron y subieron a `origin/main` en los commits `b2beabd` y `ec8b27b`; último commit **`ec8b27b`**. `.gitignore` ahora excluye `.env` (y `**/.env`) y `*.bak`, además de `node_modules/`, `dist/` y `docs/base_datos/backups/`.
+- **Pendiente actual:** aceptación de la invitación de `shantal-hue` como colaboradora y decisión sobre `.vscode/settings.json` (modificado, sin commitear).
 - **Saldo por tipos tokens/PSE** con reglas R1–R5 (indicación del profesor, aplicada por Jhon, 24/ago/2026).
 - **Tablas del análisis de clase** (24/ago/2026): listado trabajado con el profesor (16 tablas base; borrador en `docs/HISTORICO/base_datos/script_tablas_sqlserver_borrador.sql`).
 
