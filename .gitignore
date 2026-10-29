@@ -25,6 +25,7 @@ memory/
 # --- Credenciales y respaldos (nunca versionar) ---
 .env
 **/.env
+.env.docker
 *.bak
 docs/base_datos/backups/
 
