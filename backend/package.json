@@ -1,0 +1,32 @@
+{
+  "name": "apuestadb-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST de ApuestaDB (Node.js + Express + SQL Server). Proyecto academico Bases de Datos 2 - Tecnologico de Antioquia.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "apuestadb",
+    "express",
+    "mssql",
+    "rest",
+    "academico"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1"
+  }
+}

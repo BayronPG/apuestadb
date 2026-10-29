@@ -1,0 +1,167 @@
+/* ============================================================================
+   ApuestaDB - variables.css
+   Fuente unica de tokens visuales: color, tipografia, espaciado, radios,
+   sombras y breakpoints. Ningun otro archivo inventa colores "a mano".
+   ============================================================================ */
+
+:root {
+  /* ----- Marca y estado ----- */
+  --color-primario: #10b981;
+  --color-primario-oscuro: #0d9668;
+  --color-primario-claro: #34d399;
+  --color-acento: #3b82f6;
+  --color-acento-oscuro: #2563eb;
+  --color-exito: #34d399;
+  --color-error: #f87171;
+  --color-advertencia: #fbbf24;
+  --color-info: #60a5fa;
+
+  /* ----- Superficies y texto (tema oscuro) ----- */
+  --color-fondo: #0b1220;
+  --color-superficie: #131c2e;
+  --color-superficie-2: #182338;
+  --color-superficie-3: #0e1626;
+  --color-borde: #243450;
+  --color-borde-suave: #1d2b43;
+  --color-texto: #e6edf7;
+  --color-texto-suave: #8fa3bf;
+  --color-texto-inverso: #04120c;
+
+  /* ----- Tipografia ----- */
+  --fuente-base: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --fuente-mono: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --peso-normal: 400;
+  --peso-medio: 600;
+  --peso-fuerte: 700;
+  --interlineado: 1.55;
+
+  /* ----- Espaciado (escala de 4px) ----- */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+  --esp-7: 48px;
+
+  /* ----- Radios ----- */
+  --radio-sm: 6px;
+  --radio-md: 10px;
+  --radio-lg: 14px;
+  --radio-pill: 999px;
+
+  /* ----- Sombras ----- */
+  --sombra-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --sombra-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --sombra-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+
+  /* ----- Foco accesible ----- */
+  --anillo-foco: 0 0 0 3px rgba(16, 185, 129, 0.45);
+  --anillo-foco-error: 0 0 0 3px rgba(248, 113, 113, 0.4);
+
+  /* ----- Estructura ----- */
+  --ancho-contenedor: 1200px;
+  --alto-navbar: 64px;
+  --ancho-sidebar: 240px;
+  --ancho-sidebar-colapsado: 72px;
+
+  /* ----- Movimiento ----- */
+  --transicion: 160ms ease;
+  --transicion-lenta: 260ms ease;
+
+  /* ----- Capas ----- */
+  --z-navbar: 20;
+  --z-sidebar: 30;
+  --z-velo: 40;
+  --z-modal: 60;
+
+  /* ----- Breakpoints (referencia documental; se usan literales en media queries) -----
+     movil  : <= 480px
+     tablet : 481px - 768px
+     escritorio: 769px - 1024px
+     amplio : > 1024px
+  ----- */
+}
+
+/* ============================================================================
+   Ampliacion Fase 11.1 - Rediseno del dashboard.
+   Tokens adicionales: gradientes, elevacion, tintes de estado y tipografia
+   de indicadores. Se declaran en un segundo bloque :root para no alterar los
+   valores ya aprobados en la Fase 11 (los nuevos tokens son aditivos).
+   ============================================================================ */
+:root {
+  /* Gradientes de marca (fondos de panel y barras destacadas) */
+  --grad-marca: linear-gradient(135deg, #10b981 0%, #0d9668 55%, #047857 100%);
+  --grad-acento: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --grad-panel: linear-gradient(160deg, rgba(16, 185, 129, 0.14) 0%, rgba(19, 28, 46, 0) 62%);
+  --grad-panel-acento: linear-gradient(160deg, rgba(59, 130, 246, 0.16) 0%, rgba(19, 28, 46, 0) 62%);
+
+  /* Tintes de estado para tarjetas KPI (fondo suave + borde) */
+  --tinte-exito: rgba(52, 211, 153, 0.12);
+  --tinte-error: rgba(248, 113, 113, 0.12);
+  --tinte-advertencia: rgba(251, 191, 36, 0.12);
+  --tinte-info: rgba(96, 165, 250, 0.12);
+  --tinte-primario: rgba(16, 185, 129, 0.12);
+
+  /* Elevacion y bordes de panel */
+  --sombra-tarjeta: 0 1px 2px rgba(0, 0, 0, 0.28), 0 10px 24px rgba(0, 0, 0, 0.22);
+  --sombra-elevada: 0 18px 44px rgba(0, 0, 0, 0.48);
+  --borde-resalte: rgba(16, 185, 129, 0.35);
+
+  /* Radios y tipografia ampliada */
+  --radio-xl: 20px;
+  --fs-3xl: 34px;
+  --fs-4xl: 42px;
+  --interlineado-titulo: 1.15;
+
+  /* Medidas del dashboard */
+  --ancho-kpi-min: 190px;
+  --alto-hero-min: 190px;
+  --ancho-tarjeta-accion: 210px;
+
+  /* Movimiento adicional */
+  --transicion-rapida: 120ms ease;
+}
+
+/* ============================================================================
+   Ampliacion Fase 11.3 - Rediseno premium de los paneles.
+   Tokens aditivos (no se reescribe ningun valor aprobado en las fases 11 y
+   11.1): fondos de hero, vidrio, elevacion flotante, tipografia display y
+   medidas de las nuevas piezas (graficas, cuotas y eventos destacados).
+   ============================================================================ */
+:root {
+  /* Fondos de hero (panel principal de saldo/sistema) */
+  --grad-hero: linear-gradient(135deg, #0f2f26 0%, #10243a 58%, #131c2e 100%);
+  --grad-hero-acento: linear-gradient(135deg, #10243a 0%, #131c2e 100%);
+  --grad-cuota: linear-gradient(160deg, rgba(16, 185, 129, 0.16) 0%, rgba(24, 35, 56, 0.9) 100%);
+  --grad-cuota-acento: linear-gradient(160deg, rgba(59, 130, 246, 0.18) 0%, rgba(24, 35, 56, 0.9) 100%);
+
+  /* Vidrio y bordes suaves */
+  --velo-vidrio: rgba(11, 18, 32, 0.6);
+  --borde-vidrio: rgba(230, 237, 247, 0.09);
+  --borde-resalte-acento: rgba(59, 130, 246, 0.38);
+
+  /* Elevacion adicional */
+  --brillo-marca: 0 0 0 1px rgba(16, 185, 129, 0.22), 0 24px 60px rgba(4, 20, 14, 0.55);
+  --sombra-flotante: 0 14px 34px rgba(0, 0, 0, 0.42);
+
+  /* Tipografia display y radios ampliados */
+  --fs-display: clamp(30px, 7vw, 46px);
+  --fs-display-sm: clamp(22px, 5vw, 28px);
+  --radio-2xl: 26px;
+
+  /* Medidas de las piezas nuevas */
+  --alto-grafica: 190px;
+  --ancho-cuota-min: 118px;
+  --ancho-evento-min: 280px;
+  --alto-hero-premium: 220px;
+
+  /* Movimiento suave */
+  --transicion-suave: 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}

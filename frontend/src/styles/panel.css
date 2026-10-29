@@ -1,0 +1,648 @@
+/* ============================================================================
+   ApuestaDB - panel.css   (Fase 11.3 - Rediseno premium del dashboard)
+   Estilos EXCLUSIVOS de las piezas nuevas o ampliadas de los paneles:
+   hero principal, franja de eventos destacados, cuotas destacadas, tarjetas
+   KPI premium, graficas de rendimiento y railes de acciones rapidas.
+
+   Se importa DESPUES de dashboard.css en main.jsx: las reglas de aqui
+   amplian el sistema visual existente sin reescribir ninguna regla aprobada
+   en las fases 11 y 11.1. Escritura MOBILE FIRST: la base es el movil y los
+   media queries solo anaden columnas (min-width).
+   ============================================================================ */
+
+/* ==========================================================================
+   1. Hero principal (saldo del usuario / sistema del administrador)
+   ========================================================================== */
+
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: var(--esp-4);
+  grid-template-columns: minmax(0, 1fr);
+  padding: var(--esp-5) var(--esp-4);
+  border: 1px solid var(--borde-resalte);
+  border-radius: var(--radio-2xl);
+  background-color: var(--color-superficie);
+  background-image: var(--grad-hero);
+  box-shadow: var(--brillo-marca);
+  animation: aparecer var(--transicion-lenta);
+}
+
+.hero-panel--acento {
+  border-color: var(--borde-resalte-acento);
+  background-image: var(--grad-hero-acento);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.22), 0 24px 60px rgba(4, 12, 24, 0.55);
+}
+
+/* Halos decorativos (no interfieren con el contenido ni con el foco) */
+.hero-panel::before,
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-panel::before {
+  inset: -120px -80px auto auto;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+.hero-panel::after {
+  inset: auto auto -150px -90px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(59, 130, 246, 0) 70%);
+}
+
+.hero-panel__principal {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  min-width: 0;
+}
+
+.hero-panel__etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-texto-suave);
+}
+
+.hero-panel__valor {
+  font-size: var(--fs-display);
+  font-weight: var(--peso-fuerte);
+  line-height: 1.05;
+  color: var(--color-exito);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.hero-panel--acento .hero-panel__valor {
+  color: var(--color-info);
+}
+
+.hero-panel__detalle {
+  font-size: var(--fs-sm);
+  color: var(--color-texto-suave);
+}
+
+.hero-panel__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  margin-top: var(--esp-2);
+}
+
+/* Stat del hero (indicador compacto dentro del panel principal) */
+.hero-panel__stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--esp-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--esp-3);
+  border: 1px solid var(--borde-vidrio);
+  border-radius: var(--radio-md);
+  background: var(--velo-vidrio);
+  backdrop-filter: blur(6px);
+}
+
+.hero-stat__etiqueta {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-suave);
+}
+
+.hero-stat__valor {
+  font-size: var(--fs-lg);
+  font-weight: var(--peso-fuerte);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.hero-stat__valor--exito {
+  color: var(--color-exito);
+}
+.hero-stat__valor--error {
+  color: var(--color-error);
+}
+.hero-stat__valor--info {
+  color: var(--color-info);
+}
+.hero-stat__valor--advertencia {
+  color: var(--color-advertencia);
+}
+
+/* Pildora de estado operativo (hero del administrador) */
+.hero-panel__pildora {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  align-self: flex-start;
+  padding: 4px var(--esp-3) 4px var(--esp-2);
+  border-radius: var(--radio-pill);
+  border: 1px solid var(--borde-vidrio);
+  background: var(--velo-vidrio);
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+.hero-panel__pildora--exito {
+  border-color: rgba(52, 211, 153, 0.4);
+  color: var(--color-exito);
+}
+.hero-panel__pildora--error {
+  border-color: rgba(248, 113, 113, 0.4);
+  color: var(--color-error);
+}
+.hero-panel__pildora--advertencia {
+  border-color: rgba(251, 191, 36, 0.4);
+  color: var(--color-advertencia);
+}
+
+/* ==========================================================================
+   2. Encabezado de seccion premium
+   ========================================================================== */
+
+.panel-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.panel-seccion__cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  flex-wrap: wrap;
+}
+
+.panel-seccion__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: var(--peso-medio);
+  line-height: var(--interlineado-titulo);
+}
+
+.panel-seccion__titulo .icono {
+  color: var(--color-primario-claro);
+}
+
+.panel-seccion__subtitulo {
+  margin: 2px 0 0;
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+/* ==========================================================================
+   3. Eventos destacados
+   ========================================================================== */
+
+.eventos-destacados {
+  display: grid;
+  gap: var(--esp-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.evento-destacado {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-xl);
+  background-color: var(--color-superficie);
+  background-image: var(--grad-panel);
+  box-shadow: var(--sombra-tarjeta);
+  transition: transform var(--transicion-suave), border-color var(--transicion-suave),
+    box-shadow var(--transicion-suave);
+}
+
+.evento-destacado:hover {
+  transform: translateY(-3px);
+  border-color: var(--borde-resalte);
+  box-shadow: var(--sombra-flotante);
+}
+
+.evento-destacado__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+.evento-destacado__liga {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-suave);
+}
+
+.evento-destacado__equipos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.evento-destacado__equipo {
+  font-size: var(--fs-md);
+  font-weight: var(--peso-medio);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.evento-destacado__equipo--local {
+  text-align: left;
+}
+
+.evento-destacado__equipo--visitante {
+  text-align: right;
+}
+
+.evento-destacado__vs {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-borde);
+  background: var(--color-superficie-3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-texto-suave);
+}
+
+.evento-destacado__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+.evento-destacado__pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   4. Cuotas destacadas
+   ========================================================================== */
+
+.cuotas-destacadas {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(var(--ancho-cuota-min), 1fr);
+  gap: var(--esp-2);
+  overflow-x: auto;
+  padding-bottom: var(--esp-1);
+  scroll-snap-type: x proximity;
+}
+
+.cuota-destacada {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: var(--ancho-cuota-min);
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-md);
+  background-image: var(--grad-cuota);
+  background-color: var(--color-superficie-2);
+  scroll-snap-align: start;
+}
+
+.cuota-destacada--acento {
+  background-image: var(--grad-cuota-acento);
+}
+
+.cuota-destacada--enlace {
+  text-decoration: none;
+  color: var(--color-texto);
+  transition: border-color var(--transicion), transform var(--transicion);
+}
+
+.cuota-destacada--enlace:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  border-color: var(--borde-resalte);
+}
+
+.cuota-destacada--deshabilitada {
+  opacity: 0.62;
+  border-style: dashed;
+}
+
+.cuota-destacada__mercado {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cuota-destacada__etiqueta {
+  font-size: var(--fs-xs);
+  font-weight: var(--peso-medio);
+  overflow-wrap: anywhere;
+}
+
+.cuota-destacada__valor {
+  font-size: var(--fs-lg);
+  font-weight: var(--peso-fuerte);
+  color: var(--color-primario-claro);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.cuota-destacada__valor--acento {
+  color: var(--color-info);
+}
+
+.cuota-destacada__valor--apagado {
+  color: var(--color-texto-suave);
+  font-size: var(--fs-sm);
+  font-weight: var(--peso-medio);
+}
+
+.cuota-destacada__detalle {
+  font-size: 10px;
+  color: var(--color-texto-suave);
+  overflow-wrap: anywhere;
+}
+
+/* Franja completa con desplazamiento horizontal en movil */
+.cuotas-destacadas--franja {
+  grid-auto-columns: minmax(140px, 1fr);
+}
+
+/* ==========================================================================
+   5. Graficas de rendimiento
+   ========================================================================== */
+
+.grafica {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.grafica__lienzo {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--esp-2);
+  min-height: var(--alto-grafica);
+  padding: var(--esp-3) 0 0;
+  border-bottom: 1px solid var(--color-borde-suave);
+}
+
+.grafica__columna {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--esp-1);
+  height: 100%;
+}
+
+.grafica__barras {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 100%;
+  min-height: 24px;
+}
+
+.grafica__barra {
+  width: 100%;
+  max-width: 22px;
+  min-height: 3px;
+  border-radius: var(--radio-sm) var(--radio-sm) 0 0;
+  background: var(--grad-marca);
+  transition: height var(--transicion-lenta);
+}
+
+.grafica__barra--acento {
+  background: var(--grad-acento);
+}
+
+.grafica__barra--advertencia {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+.grafica__barra--error {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.grafica__barra--vacia {
+  background: var(--color-superficie-3);
+  border: 1px dashed var(--color-borde);
+}
+
+.grafica__etiqueta {
+  font-size: 10px;
+  text-align: center;
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grafica__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+.grafica__leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.grafica__punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--grad-marca);
+  flex: 0 0 auto;
+}
+
+.grafica__punto--acento {
+  background: var(--grad-acento);
+}
+.grafica__punto--advertencia {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+.grafica__punto--error {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.grafica__pie {
+  font-size: var(--fs-xs);
+  color: var(--color-texto-suave);
+}
+
+.grafica__maximo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--color-texto-suave);
+}
+
+/* ==========================================================================
+   6. Tarjetas KPI premium
+   ========================================================================== */
+
+.kpi--premium {
+  background-image: var(--grad-panel);
+}
+
+.kpi__barra {
+  height: 4px;
+  border-radius: var(--radio-pill);
+  background: var(--color-superficie-3);
+  overflow: hidden;
+}
+
+.kpi__barra-relleno {
+  height: 100%;
+  border-radius: var(--radio-pill);
+  background: var(--grad-marca);
+  transition: width var(--transicion-lenta);
+}
+
+.kpi__barra-relleno--acento {
+  background: var(--grad-acento);
+}
+.kpi__barra-relleno--error {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+}
+.kpi__barra-relleno--advertencia {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+/* Rail de acciones rapidas (desplazable en movil) */
+.accesos--rail {
+  display: flex;
+  gap: var(--esp-3);
+  overflow-x: auto;
+  padding-bottom: var(--esp-2);
+  scroll-snap-type: x proximity;
+}
+
+.accesos--rail .acceso {
+  flex: 0 0 auto;
+  width: var(--ancho-tarjeta-accion);
+  scroll-snap-align: start;
+}
+
+/* ==========================================================================
+   7. Responsive (mobile first: solo se anaden columnas)
+   ========================================================================== */
+
+@media (min-width: 481px) {
+  .hero-panel {
+    padding: var(--esp-5) var(--esp-5);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-panel__stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .eventos-destacados {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .accesos--rail {
+    display: grid;
+    overflow: visible;
+    grid-template-columns: repeat(auto-fit, minmax(var(--ancho-tarjeta-accion), 1fr));
+  }
+
+  .accesos--rail .acceso {
+    width: auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .hero-panel {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .hero-panel--simple {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .eventos-destacados {
+    grid-template-columns: repeat(auto-fit, minmax(var(--ancho-evento-min), 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-panel {
+    padding: var(--esp-6) var(--esp-6);
+  }
+
+  .eventos-destacados {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Ajustes finos para pantallas muy estrechas */
+@media (max-width: 380px) {
+  .hero-panel__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evento-destacado__equipos {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: var(--esp-1);
+  }
+
+  .evento-destacado__equipo--visitante {
+    text-align: left;
+  }
+
+  .evento-destacado__vs {
+    display: none;
+  }
+}

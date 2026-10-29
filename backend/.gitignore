@@ -1,0 +1,24 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (NUNCA versionar credenciales)
+.env
+.env.*
+!.env.example
+
+# Registros
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cobertura de pruebas
+coverage/
+.nyc_output/
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
