@@ -22,6 +22,12 @@ MEMORY.md
 DREAMS.md
 memory/
 
+# --- Credenciales y respaldos (nunca versionar) ---
+.env
+**/.env
+*.bak
+docs/base_datos/backups/
+
 # --- Sistema ---
 .DS_Store
 Thumbs.db
