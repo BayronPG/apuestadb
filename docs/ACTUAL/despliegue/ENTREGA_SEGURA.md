@@ -56,3 +56,14 @@ cd backend && npm start
 - Entregado: frontend + API en un único App Service, con health y SPA.
 - Demostrable en local: multibase completo, sagas y liquidación.
 - No entregado en Azure: bases administradas, SSO, Drive, Wompi y Firebase (sin cuota/credenciales).
+
+## 7. Checklist de exposición
+
+- [x] App Service F1 público con frontend y backend en un solo paquete.
+- [x] / y /login responden 200; SPA servida por Express.
+- [x] /api/health responde 200 en production (degradado por bases ausentes).
+- [x] Bases administradas no creadas: cuota Compute 0 y política regional.
+- [x] Multibase completo demostrable en local con Docker (health 4/4).
+- [x] Sin secretos versionados; credenciales solo en App Settings/GitHub Secrets.
+- [x] Workflow único zure-backend.yml (sin Static Web Apps).
+- [ ] SSO, Drive, Wompi y Firebase: sin credenciales, no expuestos.
