@@ -12,12 +12,13 @@ const apuestaRepository = require('../repositories/apuesta.repository');
 const ESTADOS_VALIDOS = ['pendiente', 'ganada', 'perdida', 'anulada'];
 
 /** Registra una apuesta simple del usuario autenticado. */
-async function registrarApuesta({ idUsuario, idOpcion, idTipoSaldo, monto }) {
+async function registrarApuesta({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempotencia = null }) {
   const resultado = await apuestaRepository.registrar({
     idUsuario,
     idOpcion,
     idTipoSaldo,
     monto,
+    claveIdempotencia,
   });
 
   return {

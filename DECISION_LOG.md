@@ -67,6 +67,8 @@ Registro de decisiones del proyecto. Cada entrada incluye: fecha, decisión, mot
 
 | 41 | 08/nov/2026 | **Fase 16.1 — escrituras financieras en PostgreSQL**: se implementan `fn_recarga_crear` y `fn_movimiento_saldo` con transacciones, `SELECT ... FOR UPDATE`, `NUMERIC(18,2)`, bloqueo por clave de idempotencia y rollback ante saldo insuficiente o fallo intermedio. `SALDO_MOTOR=postgresql` cubre lecturas y escrituras de saldo; `sqlserver` conserva el comportamiento actual. La orquestación de apuestas con MongoDB (saga) y las notificaciones/auditoría desde PostgreSQL quedan para la Fase 17. | Jhon autorizó completar las escrituras financieras manteniendo el alcance sin ACID global simulado. | Migrar también apuestas y notificaciones en esta fase. | Jhon Bayron Peláez Guerra (08/nov/2026) | `database/postgresql/03_functions.sql`, `backend/repositories/saldo.repository.js`, `docs/ACTUAL/poliglota/MIGRACION_POSTGRESQL_SALDO.md` |
 
+| 42 | 08/nov/2026 | **Fase 17 — dominio documental en MongoDB con saga**: se migran 4 colecciones (108 documentos) conservando IDs; `APUESTAS_MOTOR` permite respaldo SQL Server; la creación de apuesta usa saga PostgreSQL (débito idempotente) + MongoDB con compensación explícita. Liquidación y notificaciones/auditoría permanecen en SQL Server hasta la Fase 17.1. | Jhon autorizó la migración documental manteniendo el respaldo SQL Server. | Migrar también liquidación y notificaciones en esta fase. | Jhon Bayron Peláez Guerra (08/nov/2026) | `database/mongodb/`, `backend/services/apuesta.saga.js`, `backend/repositories/apuesta.mongo.repository.js`, `docs/ACTUAL/poliglota/MIGRACION_MONGODB_DOCUMENTAL.md` |
+
 ## Cierre del proyecto (14/sep/2026)
 
 - Fases 0 a 12.1 **completadas**; no hay fase abierta.

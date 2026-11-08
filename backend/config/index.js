@@ -99,6 +99,11 @@ const config = {
     motor: (process.env.CATALOGO_MOTOR || 'sqlserver').toLowerCase(),
   },
 
+  // Motor del dominio documental de apuestas (Fase 17).
+  apuestas: {
+    motor: (process.env.APUESTAS_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
   // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
   saldo: {
     motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),
@@ -134,6 +139,10 @@ function validarConfiguracion() {
 
   if (!['sqlserver', 'postgresql'].includes(config.saldo.motor)) {
     problemas.push("SALDO_MOTOR debe ser 'sqlserver' o 'postgresql'.");
+  }
+
+  if (!['sqlserver', 'mongodb'].includes(config.apuestas.motor)) {
+    problemas.push("APUESTAS_MOTOR debe ser 'sqlserver' o 'mongodb'.");
   }
 
   if (config.bd.modoAutenticacion === 'windows') {

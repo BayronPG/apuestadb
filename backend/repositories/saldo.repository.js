@@ -71,6 +71,17 @@ function mapearErrorPg(error) {
   }
 }
 
+/** Cuenta de saldo del usuario y tipo (solo PostgreSQL, usada por la saga). */
+async function obtenerCuenta(idUsuario, idTipoSaldo) {
+  const filas = await consultarPg(
+    `SELECT sc.id_saldo_cuenta, sc.id_usuario, sc.id_tipo_saldo, sc.saldo_actual
+       FROM SaldoCuenta sc
+      WHERE sc.id_usuario = $1 AND sc.id_tipo_saldo = $2`,
+    [idUsuario, idTipoSaldo],
+  );
+  return filas[0] || null;
+}
+
 /** Saldo del usuario por tipo (dbo.usp_Saldo_Consultar). */
 async function consultarSaldo(idUsuario) {
   if (usaPostgresql()) {
@@ -181,12 +192,13 @@ async function registrarMovimiento({
   idApuesta = null,
   idRecarga = null,
   referencia = null,
+  claveIdempotencia = null,
 }) {
   if (usaPostgresql()) {
     try {
       const filas = await consultarPg(
         'SELECT * FROM fn_movimiento_saldo($1, $2, $3, $4, $5, $6, $7)',
-        [idSaldoCuenta, nombreMovimiento, monto, idApuesta, idRecarga, referencia, null],
+        [idSaldoCuenta, nombreMovimiento, monto, idApuesta, idRecarga, referencia, claveIdempotencia],
       );
       const fila = filas[0] || {};
       return { idMovimiento: fila.id_movimiento, saldoResultante: fila.saldo_resultante };
@@ -288,6 +300,7 @@ async function listarTipos() {
 }
 
 module.exports = {
+  obtenerCuenta,
   consultarSaldo,
   tiposSaldoPorCuenta,
   listarTipos,

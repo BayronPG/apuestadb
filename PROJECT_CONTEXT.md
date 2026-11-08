@@ -118,3 +118,11 @@ Este documento solo incorpora información como **confirmada** cuando proviene d
 - **\SALDO_MOTOR=postgresql\** cubre lecturas y escrituras de saldo; \SALDO_MOTOR=sqlserver\ conserva el comportamiento actual.
 - **Verificado:** recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia y TOKENS/PSE independientes.
 - **Pendiente (Fase 17):** saga de apuestas con MongoDB, notificaciones/auditoría desde PostgreSQL.
+
+## Fase 17 — Dominio documental en MongoDB (08/nov/2026)
+
+- **Migradas** 4 colecciones (puesta, liquidacion, 
+otificacion, uditoria): **108 documentos**, IDs y fechas conservados.
+- **Backend:** \APUESTAS_MOTOR=sqlserver|mongodb\ (predeterminado \sqlserver\); con \mongodb\ la apuesta se crea con saga PostgreSQL + MongoDB.
+- **Saga:** débito idempotente en PostgreSQL, inserción en MongoDB y **compensación** con crédito de ajuste si falla el documento.
+- **Pendiente (17.1):** liquidación y notificaciones/auditoría desde MongoDB.

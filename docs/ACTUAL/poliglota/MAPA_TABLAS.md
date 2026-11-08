@@ -43,7 +43,7 @@ Distribución de las 29 tablas de ApuestaDB entre cuatro motores. **Estado (08/n
 | MovimientoSaldo | Libro de movimientos |
 | Recarga | Recargas ficticias |
 
-## 4. MongoDB (4) — apuestas y trazas
+## 4. MongoDB (4) — apuestas y trazas (implementado)
 
 | Tabla | Rol |
 |---|---|

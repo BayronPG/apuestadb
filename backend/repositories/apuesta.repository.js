@@ -7,12 +7,22 @@
  */
 
 const { sql, p, ejecutar, consultar } = require('../config/database');
+const config = require('../config');
+const mongo = require('./apuesta.mongo.repository');
+const sagas = require('../services/apuesta.saga');
+
+function usaMongo() {
+  return config.apuestas.motor === 'mongodb';
+}
 
 /**
  * Registra una apuesta simple con cuota congelada y descuento de saldo.
  * Invoca dbo.usp_Apuesta_Registrar.
  */
-async function registrar({ idUsuario, idOpcion, idTipoSaldo, monto }) {
+async function registrar({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempotencia = null }) {
+  if (usaMongo()) {
+    return sagas.registrar({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempotencia });
+  }
   const resultado = await ejecutar(
     'dbo.usp_Apuesta_Registrar',
     {
@@ -53,6 +63,7 @@ async function liquidar({ idApuesta = null, idEvento = null, idAdministrador = n
 
 /** Historial de apuestas del usuario (dbo.usp_Apuesta_Historial). */
 async function historial({ idUsuario, estado = null }) {
+  if (usaMongo()) return mongo.historial({ idUsuario, estado });
   const resultado = await ejecutar('dbo.usp_Apuesta_Historial', {
     id_usuario: p(sql.Int, idUsuario),
     estado: p(sql.VarChar(20), estado),
@@ -62,6 +73,7 @@ async function historial({ idUsuario, estado = null }) {
 
 /** Apuestas pendientes del usuario (vista vw_ApuestasPendientes). */
 async function pendientes(idUsuario) {
+  if (usaMongo()) return mongo.porEstado(idUsuario, 'pendiente');
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_ApuestasPendientes
       WHERE id_usuario = @id_usuario
@@ -73,6 +85,7 @@ async function pendientes(idUsuario) {
 
 /** Apuestas ganadas del usuario (vista vw_ApuestasGanadas). */
 async function ganadas(idUsuario) {
+  if (usaMongo()) return mongo.porEstado(idUsuario, 'ganada');
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_ApuestasGanadas
       WHERE id_usuario = @id_usuario
@@ -84,6 +97,7 @@ async function ganadas(idUsuario) {
 
 /** Apuestas perdidas del usuario (vista vw_ApuestasPerdidas). */
 async function perdidas(idUsuario) {
+  if (usaMongo()) return mongo.porEstado(idUsuario, 'perdida');
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_ApuestasPerdidas
       WHERE id_usuario = @id_usuario

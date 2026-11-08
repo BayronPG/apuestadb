@@ -106,3 +106,11 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Validado:** 10/10 pruebas financieras (recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia, ambos tipos); contratos GET idénticos en ambos motores; health 4/4; datos de prueba restaurados.
 - **Sin cambios:** MySQL, MongoDB, frontend, Azure; \SALDO_MOTOR=sqlserver\ intacto.
 - **Siguiente:** Fase 17 — saga de apuestas con MongoDB y notificaciones/auditoría desde PostgreSQL.
+
+## Fase 17 — MongoDB documental y saga (08/nov/2026)
+
+- **Implementado:** \database/mongodb/\ (01 init, 02 migración, 03 verificación). Colecciones con índices únicos y clave de idempotencia.
+- **Saga:** \ackend/services/apuesta.saga.js\ + \puesta.mongo.repository.js\; débito PG idempotente, documento Mongo, compensación ante fallo.
+- **Validado:** migración 2× idempotente (108 docs), saga 201, duplicado sin segundo débito, insuficiencia 409, compensación con saldo restaurado, lecturas Mongo 200, respaldo SQL Server 7/7.
+- **Datos de prueba restaurados**; health 4/4; contenedores healthy.
+- **Siguiente:** Fase 17.1 — liquidación y notificaciones/auditoría en MongoDB.
