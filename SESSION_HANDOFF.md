@@ -121,3 +121,11 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Validado:** liquidación 1 pago, duplicado 0, premio en mismo tipo, notificación/auditoría en Mongo, compensación con saldo intacto, concurrencia (1 liquidación, 1 premio), respaldo SQL Server 8/8.
 - **Datos restaurados:** PG 1.247.500 / 1.897.500 / 1.110.000; Mongo 108 documentos; MySQL 9/27/7.
 - **Siguiente:** reintentos de saga y outbox, o preparación de despliegue Azure.
+
+## Integración multibase cerrada (08/nov/2026)
+
+- **Estado:** Fases 14–17.1 completadas; integración verificada de punta a punta, sin cambios de código en la auditoría final.
+- **Datos:** MySQL 16 tablas / 167 + 26 jugadores; PostgreSQL 5 tablas con sumas exactas; MongoDB 108 documentos; SQL Server 9 usuarios.
+- **Pruebas:** 10/10 endpoints 200, health 4/4, build Vite correcto, sin secretos versionados.
+- **Pendientes reales:** despliegue Azure (recursos y cuentas), SSO/Drive/Wompi/Firebase sin credenciales, reintentos automáticos de saga y outbox.
+- **Siguiente:** preparación de despliegue y demo pública.

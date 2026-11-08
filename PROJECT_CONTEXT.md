@@ -133,3 +133,10 @@ otificacion, uditoria): **108 documentos**, IDs y fechas conservados.
 - **Liquidación idempotente:** premio en PostgreSQL con el mismo tipo de saldo, documento único por apuesta en MongoDB y compensación si falla la inserción.
 - **Notificaciones y auditoría** se escriben y leen en MongoDB con el motor \mongodb\.
 - **Validado:** liquidación, duplicado, premio, notificación, auditoría, fallo simulado con compensación, concurrencia y lecturas; respaldo SQL Server 8/8.
+
+## Integración multibase cerrada (08/nov/2026)
+
+- **Motores activos:** SQL Server (auth/usuarios), MySQL (catálogo), PostgreSQL (finanzas), MongoDB (apuestas, liquidaciones, notificaciones, auditoría).
+- **Auditoría final:** 16 tablas MySQL (167 filas de catálogo + 26 jugadores), 5 tablas PostgreSQL (sumas 1.247.500 / 1.897.500 / 1.110.000), 108 documentos MongoDB, 9 usuarios y 2 roles en SQL Server.
+- **API:** 10/10 endpoints 200; health operativo 4/4; build de frontend correcto.
+- **Sagas:** débito/recarga/premio idempotentes en PostgreSQL; creación y liquidación con compensación en MongoDB.
