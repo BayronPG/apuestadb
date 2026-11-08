@@ -54,10 +54,147 @@ services:
           echo "Aplicando $$f"
           /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -I -b -i "$$f"
         done
-        echo "Aplicando 06_demo_data.sql (opcional)"
-        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -I -b -i /scripts/06_demo_data.sql \
-          || echo "06_demo_data.sql omitido: falta la credencial demo de referencia"
         echo "SQL Server inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  sqlserver-demo:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-sqlserver-demo
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+    environment:
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: ApuestaDB
+      DB_USER: sa
+      DB_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+      DEMO_EMAIL: "${DEMO_EMAIL:-usuario@apuestadb.local}"
+      DEMO_PASSWORD: "${DEMO_PASSWORD}"
+    command: ["node", "/repo/database/bootstrap/azure-demo-user.js"]
+    restart: "no"
+    networks:
+      - interna
+
+  sqlserver-demo-data:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: apuestadb-azure-sqlserver-demo-data
+    depends_on:
+      sqlserver-demo:
+        condition: service_completed_successfully
+    environment:
+      MSSQL_SA_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+    volumes:
+      - ./database:/scripts:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -I -b -i /scripts/06_demo_data.sql
+    restart: "no"
+    networks:
+      - interna
+
+  mysql-schema-init:
+    image: mysql:8
+    container_name: apuestadb-azure-mysql-init
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_PWD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - ./database/mysql:/sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for f in /sql/01_schema.sql /sql/02_constraints_indexes.sql; do
+          echo "Aplicando $$f"
+          mysql -h mysql -uroot --default-character-set=utf8mb4 < "$$f"
+        done
+        echo "MySQL inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  postgres-schema-init:
+    image: postgres:16
+    container_name: apuestadb-azure-postgres-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      PGUSER: "${POSTGRES_USER}"
+      PGDATABASE: "${POSTGRES_DB}"
+    volumes:
+      - ./database/postgresql:/sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for f in /sql/01_schema.sql /sql/02_constraints_indexes.sql /sql/03_functions.sql; do
+          echo "Aplicando $$f"
+          psql -h postgres -v ON_ERROR_STOP=1 -f "$$f"
+        done
+        echo "PostgreSQL inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  mongo-init:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
+      MONGO_DATABASE: apuestadb
+    entrypoint: ["node", "/repo/database/mongodb/01_init.js"]
+    restart: "no"
+    networks:
+      - interna
+
+  data-init:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-data-init
+    depends_on:
+      sqlserver-demo-data:
+        condition: service_completed_successfully
+      mysql-schema-init:
+        condition: service_completed_successfully
+      postgres-schema-init:
+        condition: service_completed_successfully
+      mongo-init:
+        condition: service_completed_successfully
+    environment:
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: ApuestaDB
+      DB_USER: sa
+      DB_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
+      MONGO_DATABASE: apuestadb
+    command: ["node", "/repo/database/bootstrap/azure-data-init.js"]
     restart: "no"
     networks:
       - interna
@@ -159,7 +296,7 @@ services:
       APUESTAS_MOTOR: "${APUESTAS_MOTOR:-mongodb}"
       DOCUMENTOS_MOTOR: "${DOCUMENTOS_MOTOR:-mongodb}"
     depends_on:
-      sqlserver-init:
+      data-init:
         condition: service_completed_successfully
       mysql:
         condition: service_healthy
