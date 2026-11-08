@@ -65,8 +65,27 @@ diferencias de conteo.
 
 ## 6. Backend
 
-- `SALDO_MOTOR=sqlserver` (predeterminado): procedimientos actuales.
-- `SALDO_MOTOR=postgresql`: lecturas financieras desde PostgreSQL, con el mismo contrato HTTP
-  (DECIMAL y BIGINT se normalizan a `number`).
-- Pendiente para 16.1: trasladar las escrituras (`usp_MovimientoSaldo_Registrar`,
-  `usp_Recarga_Crear`) y sus triggers a PL/pgSQL; hoy siguen en SQL Server.
+- `SALDO_MOTOR=sqlserver` (predeterminado): procedimientos actuales, comportamiento intacto.
+- `SALDO_MOTOR=postgresql`: lecturas y **escrituras** financieras en PostgreSQL, con el mismo contrato HTTP.
+  - `POST /api/recargas` ejecuta `fn_recarga_crear`.
+  - Los movimientos usan `fn_movimiento_saldo` (apuesta, premio, recarga, ajuste).
+  - DECIMAL y BIGINT se normalizan a `number`.
+
+## 7. Escrituras transaccionales (Fase 16.1)
+
+`database/postgresql/03_functions.sql` implementa:
+
+- `fn_movimiento_saldo`: valida monto y tipo, bloquea la cuenta con `SELECT ... FOR UPDATE`,
+  calcula el saldo con `NUMERIC`, inserta el movimiento y actualiza la cuenta en una sola
+  transacción. Saldo insuficiente o cualquier fallo produce rollback completo.
+- `fn_recarga_crear`: valida tipo vigente, localiza la cuenta, crea la recarga y aplica el
+  abono mediante `fn_movimiento_saldo`.
+- **Idempotencia:** tabla `IdempotenciaFinanciera` con clave única y bloqueo de asesoría por clave;
+  una clave repetida devuelve el resultado original sin volver a aplicar el cambio.
+- TOKENS y PSE son cuentas independientes: cada operación afecta solo su `id_tipo_saldo`.
+
+Verificado: recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado,
+rollback, concurrencia (dos débitos simultáneos: uno aplica, otro se rechaza) y ambos tipos.
+
+Pendiente (Fase 17): orquestación de apuestas con MongoDB (saga), notificaciones y auditoría
+desde PostgreSQL, y traslado de `usp_Apuesta_Crear`/liquidación. No se simula ACID global.

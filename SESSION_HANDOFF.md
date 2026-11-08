@@ -99,3 +99,10 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Validado:** DDL y migración idempotentes (2 ejecuciones), conteos y sumas idénticas a SQL Server, 0 huérfanos, FK/CHECK activos, health operativo 4/4.
 - **Backend:** \SALDO_MOTOR\ (predeterminado \sqlserver\); con \postgresql\ las lecturas de saldo devuelven el mismo contrato (tipos numéricos normalizados).
 - **Pendiente:** Fase 16.1 — trasladar escrituras financieras y triggers a PL/pgSQL; después, MongoDB (apuestas).
+
+## Fase 16.1 — Escrituras financieras PostgreSQL (08/nov/2026)
+
+- **Implementado:** \database/postgresql/03_functions.sql\ (\n_recarga_crear\, \n_movimiento_saldo\) + tabla \IdempotenciaFinanciera\; \saldo.repository\ usa estas funciones cuando \SALDO_MOTOR=postgresql\.
+- **Validado:** 10/10 pruebas financieras (recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia, ambos tipos); contratos GET idénticos en ambos motores; health 4/4; datos de prueba restaurados.
+- **Sin cambios:** MySQL, MongoDB, frontend, Azure; \SALDO_MOTOR=sqlserver\ intacto.
+- **Siguiente:** Fase 17 — saga de apuestas con MongoDB y notificaciones/auditoría desde PostgreSQL.

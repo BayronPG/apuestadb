@@ -111,3 +111,10 @@ Este documento solo incorpora información como **confirmada** cuando proviene d
 - **Escrituras financieras** (movimientos y recargas) siguen en SQL Server; su traslado a PL/pgSQL queda para la Fase 16.1.
 - **MySQL, MongoDB y frontend** sin cambios.
 - Scripts y verificación: \database/postgresql/\; detalle en \docs/ACTUAL/poliglota/MIGRACION_POSTGRESQL_SALDO.md\.
+
+## Fase 16.1 — Escrituras financieras en PostgreSQL (08/nov/2026)
+
+- **Implementadas** \n_recarga_crear\ y \n_movimiento_saldo\: transacciones, \SELECT ... FOR UPDATE\, \NUMERIC(18,2)\, rollback ante saldo insuficiente y bloqueo por clave de idempotencia.
+- **\SALDO_MOTOR=postgresql\** cubre lecturas y escrituras de saldo; \SALDO_MOTOR=sqlserver\ conserva el comportamiento actual.
+- **Verificado:** recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia y TOKENS/PSE independientes.
+- **Pendiente (Fase 17):** saga de apuestas con MongoDB, notificaciones/auditoría desde PostgreSQL.

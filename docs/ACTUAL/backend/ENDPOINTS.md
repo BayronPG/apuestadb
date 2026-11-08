@@ -193,3 +193,7 @@ PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 543
 ### Motor de saldo (Fase 16)
 
 \SALDO_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \SALDO_MOTOR=postgresql\ resuelve \GET /api/saldo\, \/api/saldo/tipos\ y \/api/saldo/movimientos\ en PostgreSQL. Las escrituras (\POST /api/recargas\, movimientos) siguen en SQL Server.
+
+### Motor de saldo (Fase 16.1)
+
+\SALDO_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \SALDO_MOTOR=postgresql\ resuelve lecturas y escrituras financieras en PostgreSQL (\n_recarga_crear\, \n_movimiento_saldo\), con idempotencia por clave y rollback ante saldo insuficiente. La orquestación de apuestas con MongoDB queda para la Fase 17.

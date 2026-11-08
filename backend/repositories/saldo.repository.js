@@ -30,6 +30,47 @@ async function existeUsuario(idUsuario) {
   return r.registros.length > 0;
 }
 
+async function usuarioActivo(idUsuario) {
+  const r = await consultar(
+    "SELECT 1 AS existe FROM dbo.Usuario WHERE id_usuario = @id_usuario AND estado = 'activo'",
+    { id_usuario: p(sql.Int, idUsuario) },
+  );
+  return r.registros.length > 0;
+}
+
+async function esAdministrador(idUsuario) {
+  const r = await consultar(
+    `SELECT 1 AS es FROM dbo.Usuario u JOIN dbo.Rol r ON r.id_rol = u.id_rol
+      WHERE u.id_usuario = @id_usuario AND r.nombre = 'administrador'`,
+    { id_usuario: p(sql.Int, idUsuario) },
+  );
+  return r.registros.length > 0;
+}
+
+/** Traduce los errores de las funciones PL/pgSQL al contrato HTTP actual. */
+function mapearErrorPg(error) {
+  const codigo = String(error && error.message ? error.message : '').trim();
+  switch (codigo) {
+    case 'MONTO_INVALIDO':
+      return errores.solicitudInvalida('El monto debe ser mayor que cero.', 'MONTO_INVALIDO');
+    case 'ORIGEN_EXCLUYENTE':
+      return errores.solicitudInvalida(
+        'El movimiento no puede originarse en apuesta y recarga a la vez.',
+        'ORIGEN_EXCLUYENTE',
+      );
+    case 'TIPO_MOVIMIENTO_INVALIDO':
+      return errores.solicitudInvalida('Tipo de movimiento no valido.', 'TIPO_MOVIMIENTO_INVALIDO');
+    case 'TIPO_SALDO_INVALIDO':
+      return errores.solicitudInvalida('El tipo de saldo no es valido.', 'TIPO_SALDO_INVALIDO');
+    case 'CUENTA_NO_ENCONTRADA':
+      return errores.noEncontrado('La cuenta de saldo no existe.', 'CUENTA_NO_ENCONTRADA');
+    case 'SALDO_INSUFICIENTE':
+      return errores.conflicto('Saldo insuficiente para completar la operacion.', 'SALDO_INSUFICIENTE');
+    default:
+      return null;
+  }
+}
+
 /** Saldo del usuario por tipo (dbo.usp_Saldo_Consultar). */
 async function consultarSaldo(idUsuario) {
   if (usaPostgresql()) {
@@ -141,6 +182,21 @@ async function registrarMovimiento({
   idRecarga = null,
   referencia = null,
 }) {
+  if (usaPostgresql()) {
+    try {
+      const filas = await consultarPg(
+        'SELECT * FROM fn_movimiento_saldo($1, $2, $3, $4, $5, $6, $7)',
+        [idSaldoCuenta, nombreMovimiento, monto, idApuesta, idRecarga, referencia, null],
+      );
+      const fila = filas[0] || {};
+      return { idMovimiento: fila.id_movimiento, saldoResultante: fila.saldo_resultante };
+    } catch (error) {
+      const mapeado = mapearErrorPg(error);
+      if (mapeado) throw mapeado;
+      throw error;
+    }
+  }
+
   const resultado = await ejecutar(
     'dbo.usp_MovimientoSaldo_Registrar',
     {
@@ -163,6 +219,31 @@ async function registrarMovimiento({
 
 /** Crea y aplica una recarga ficticia (dbo.usp_Recarga_Crear). */
 async function crearRecarga({ idUsuario, idTipoSaldo, monto, idAdministrador = null, observacion = null }) {
+  if (usaPostgresql()) {
+    if (!(await usuarioActivo(idUsuario))) {
+      throw errores.noEncontrado('El usuario no existe o no esta activo.', 'USUARIO_NO_ACTIVO');
+    }
+    if (idAdministrador !== null && !(await esAdministrador(idAdministrador))) {
+      throw errores.prohibido('El administrador indicado no es valido.', 'ADMINISTRADOR_INVALIDO');
+    }
+    try {
+      const filas = await consultarPg('SELECT * FROM fn_recarga_crear($1, $2, $3, $4, $5, $6)', [
+        idUsuario,
+        idTipoSaldo,
+        monto,
+        idAdministrador,
+        observacion,
+        null,
+      ]);
+      const fila = filas[0] || {};
+      return { idRecarga: fila.id_recarga, mensaje: fila.mensaje || null };
+    } catch (error) {
+      const mapeado = mapearErrorPg(error);
+      if (mapeado) throw mapeado;
+      throw error;
+    }
+  }
+
   const resultado = await ejecutar(
     'dbo.usp_Recarga_Crear',
     {

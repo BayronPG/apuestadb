@@ -55,6 +55,14 @@ CREATE TABLE IF NOT EXISTS MovimientoSaldo (
   referencia         VARCHAR(100) NULL
 );
 
+-- Registro de claves de idempotencia de las escrituras financieras (Fase 16.1).
+CREATE TABLE IF NOT EXISTS IdempotenciaFinanciera (
+  clave          VARCHAR(120) PRIMARY KEY,
+  id_movimiento  BIGINT NULL,
+  id_recarga     INTEGER NULL,
+  creada         TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ------------------------------------------------------------------ vistas --
 CREATE OR REPLACE VIEW vw_SaldoDetalle AS
 SELECT sc.id_saldo_cuenta,

@@ -65,6 +65,8 @@ Registro de decisiones del proyecto. Cada entrada incluye: fecha, decisión, mot
 
 | 40 | 08/nov/2026 | **Fase 16 — migración financiera a PostgreSQL**: se migran las 5 tablas del dominio financiero (`TipoSaldo`, `TipoMovimientoSaldo`, `SaldoCuenta`, `Recarga`, `MovimientoSaldo`, 60 filas) conservando identificadores; el backend puede leer el saldo desde PostgreSQL con `SALDO_MOTOR` (predeterminado `sqlserver`); las **escrituras** financieras siguen en SQL Server y se trasladarán en la Fase 16.1. | Jhon autorizó iniciar la Fase 16 tras cerrar la Fase 15. | Migrar también las escrituras y triggers en esta misma fase. | Jhon Bayron Peláez Guerra (08/nov/2026) | `database/postgresql/`, `backend/config/index.js`, `backend/config/db/postgresql.js`, `backend/repositories/saldo.repository.js`, `docs/ACTUAL/poliglota/` |
 
+| 41 | 08/nov/2026 | **Fase 16.1 — escrituras financieras en PostgreSQL**: se implementan `fn_recarga_crear` y `fn_movimiento_saldo` con transacciones, `SELECT ... FOR UPDATE`, `NUMERIC(18,2)`, bloqueo por clave de idempotencia y rollback ante saldo insuficiente o fallo intermedio. `SALDO_MOTOR=postgresql` cubre lecturas y escrituras de saldo; `sqlserver` conserva el comportamiento actual. La orquestación de apuestas con MongoDB (saga) y las notificaciones/auditoría desde PostgreSQL quedan para la Fase 17. | Jhon autorizó completar las escrituras financieras manteniendo el alcance sin ACID global simulado. | Migrar también apuestas y notificaciones en esta fase. | Jhon Bayron Peláez Guerra (08/nov/2026) | `database/postgresql/03_functions.sql`, `backend/repositories/saldo.repository.js`, `docs/ACTUAL/poliglota/MIGRACION_POSTGRESQL_SALDO.md` |
+
 ## Cierre del proyecto (14/sep/2026)
 
 - Fases 0 a 12.1 **completadas**; no hay fase abierta.
