@@ -37,3 +37,4 @@ Thumbs.db
 # --- Artefactos locales de trabajo ---
 .tmp/
 media/inbound/
+.env.azure
