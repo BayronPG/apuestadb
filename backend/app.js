@@ -13,6 +13,8 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 
 const config = require('./config');
 const rutas = require('./routes');
@@ -54,6 +56,24 @@ app.use((_req, res, next) => {
 
 // Rutas de la API.
 app.use(config.apiPrefijo, rutas);
+
+// Frontend compilado (App Service: backend/public; local: ../frontend/dist).
+const candidatosDist = [
+  path.join(__dirname, 'public'),
+  path.join(__dirname, '..', 'frontend', 'dist'),
+];
+const carpetaDist = candidatosDist.find((carpeta) =>
+  fs.existsSync(path.join(carpeta, 'index.html')),
+);
+
+if (carpetaDist) {
+  app.use(express.static(carpetaDist));
+  // Fallback SPA: cualquier ruta que no sea /api devuelve index.html.
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith(config.apiPrefijo)) return next();
+    return res.sendFile(path.join(carpetaDist, 'index.html'));
+  });
+}
 
 // 404 y manejador central de errores (siempre al final).
 app.use(noEncontrado);

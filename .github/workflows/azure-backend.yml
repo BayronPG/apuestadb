@@ -1,4 +1,4 @@
-name: Deploy backend to Azure App Service
+name: Deploy frontend and backend to Azure App Service
 
 on:
   workflow_dispatch:
@@ -21,10 +21,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
       - name: Install backend dependencies
         run: npm ci --prefix backend --omit=dev
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ''
+        run: npm run build --prefix frontend
+
+      - name: Package backend with frontend build
+        run: |
+          mkdir -p backend/public
+          cp -R frontend/dist/. backend/public/
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
