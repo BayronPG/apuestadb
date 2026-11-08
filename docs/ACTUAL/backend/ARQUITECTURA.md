@@ -160,7 +160,7 @@ entorno real el token solo se enviaría por correo; este supuesto está declarad
 | Inyección SQL | 100 % de las consultas usan parámetros (`request.input`) o procedimientos almacenados. No hay concatenación de valores. |
 | Validación de entrada | `express-validator` en todos los cuerpos y en el parámetro `:id` de resultados. |
 | Cabeceras HTTP | `helmet()` con valores por defecto. |
-| CORS | Lista blanca de orígenes en `CORS_ORIGIN` (el frontend React). `*` solo en local. |
+| CORS | Lista blanca de orígenes en `CORS_ORIGINS` (el frontend React). `*` solo en local. |
 | Identidad del actor | `id_usuario` y `id_administrador` salen **siempre** del token, nunca del cuerpo ni de la URL. |
 | Fuga de información | El manejador de errores envía solo `{ codigo, mensaje }`; las trazas y los mensajes de SQL Server quedan en consola. Las contraseñas no se registran ni se auditan. |
 | Límite de cuerpo | `express.json({ limit: '100kb' })`. |
