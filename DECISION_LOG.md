@@ -69,6 +69,8 @@ Registro de decisiones del proyecto. Cada entrada incluye: fecha, decisión, mot
 
 | 42 | 08/nov/2026 | **Fase 17 — dominio documental en MongoDB con saga**: se migran 4 colecciones (108 documentos) conservando IDs; `APUESTAS_MOTOR` permite respaldo SQL Server; la creación de apuesta usa saga PostgreSQL (débito idempotente) + MongoDB con compensación explícita. Liquidación y notificaciones/auditoría permanecen en SQL Server hasta la Fase 17.1. | Jhon autorizó la migración documental manteniendo el respaldo SQL Server. | Migrar también liquidación y notificaciones en esta fase. | Jhon Bayron Peláez Guerra (08/nov/2026) | `database/mongodb/`, `backend/services/apuesta.saga.js`, `backend/repositories/apuesta.mongo.repository.js`, `docs/ACTUAL/poliglota/MIGRACION_MONGODB_DOCUMENTAL.md` |
 
+| 43 | 08/nov/2026 | **Fase 17.1 — liquidaciones, notificaciones y auditoría en MongoDB**: `DOCUMENTOS_MOTOR` selecciona SQL Server o MongoDB sin cambiar contratos; la liquidación acredita el premio en PostgreSQL con el mismo tipo de saldo y usa un documento único por apuesta con idempotencia (`liquidacion:<id>`), por lo que un duplicado no repite el pago; si falla la inserción se compensa; notificaciones y auditoría se escriben/leen en MongoDB. | Jhon autorizó completar el dominio documental manteniendo el respaldo SQL Server. | Mantener liquidación solo en SQL Server. | Jhon Bayron Peláez Guerra (08/nov/2026) | `backend/services/liquidacion.documental.js`, `backend/repositories/documentos.mongo.repository.js`, `backend/repositories/apuesta.repository.js`, `docs/ACTUAL/poliglota/MIGRACION_MONGODB_DOCUMENTAL.md` |
+
 ## Cierre del proyecto (14/sep/2026)
 
 - Fases 0 a 12.1 **completadas**; no hay fase abierta.

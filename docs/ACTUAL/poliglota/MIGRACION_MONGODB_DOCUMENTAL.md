@@ -50,7 +50,22 @@ motores; la saga Mongo (apuestas) queda implementada con compensación explícit
 | Respaldo `APUESTAS_MOTOR=sqlserver` | 7/7 endpoints 200 |
 | Datos de prueba | restaurados (PG 1.247.500 / 1.897.500; Mongo 108 documentos) |
 
-## 5. Pendiente (Fase 17.1)
+## 5. Fase 17.1 — liquidaciones, notificaciones y auditoría
 
-- Liquidación y notificaciones/auditoría desde MongoDB (hoy siguen en SQL Server).
-- Reintentos automáticos de la saga y outbox para eventos.
+`DOCUMENTOS_MOTOR=sqlserver|mongodb` (predeterminado `sqlserver`) controla estos tres dominios
+sin cambiar los contratos HTTP.
+
+- **Liquidación:** resultado oficial y ganador desde MySQL; premio acreditado en PostgreSQL con el
+  mismo `id_tipo_saldo` de la apuesta; documento en MongoDB con **id_apuesta único** (índice
+  `uq_liquidacion_apuesta`) e **idempotencia** por clave `liquidacion:<id>`. Un duplicado no repite
+  el pago.
+- **Compensación:** si falla la inserción del documento, el premio se revierte con un débito
+  (`apuesta`) y la operación devuelve 503. Si otra ejecución ya reservó la liquidación, no se
+  compensa.
+- **Notificaciones y auditoría:** se escriben y leen en MongoDB cuando el motor es `mongodb`.
+- **Concurrencia:** dos liquidaciones simultáneas producen una sola liquidación y un solo premio.
+
+Verificado: liquidación, duplicado, premio, notificación, auditoría, fallo simulado con
+compensación, concurrencia y lecturas; respaldo SQL Server 8/8 endpoints 200.
+
+Pendiente: reintentos automáticos y outbox de eventos.

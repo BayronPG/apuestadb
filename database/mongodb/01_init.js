@@ -41,7 +41,7 @@ const COLECCIONES = {
   liquidacion: {
     indices: [
       [{ id_liquidacion: 1 }, { unique: true }],
-      [{ id_apuesta: 1 }],
+      [{ id_apuesta: 1 }, { unique: true, name: 'uq_liquidacion_apuesta' }],
       [{ id_resultado: 1 }],
     ],
   },

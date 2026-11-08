@@ -126,3 +126,10 @@ otificacion, uditoria): **108 documentos**, IDs y fechas conservados.
 - **Backend:** \APUESTAS_MOTOR=sqlserver|mongodb\ (predeterminado \sqlserver\); con \mongodb\ la apuesta se crea con saga PostgreSQL + MongoDB.
 - **Saga:** débito idempotente en PostgreSQL, inserción en MongoDB y **compensación** con crédito de ajuste si falla el documento.
 - **Pendiente (17.1):** liquidación y notificaciones/auditoría desde MongoDB.
+
+## Fase 17.1 — Liquidaciones, notificaciones y auditoría (08/nov/2026)
+
+- **\DOCUMENTOS_MOTOR=sqlserver|mongodb\** (predeterminado \sqlserver\) para liquidaciones, notificaciones y auditoría.
+- **Liquidación idempotente:** premio en PostgreSQL con el mismo tipo de saldo, documento único por apuesta en MongoDB y compensación si falla la inserción.
+- **Notificaciones y auditoría** se escriben y leen en MongoDB con el motor \mongodb\.
+- **Validado:** liquidación, duplicado, premio, notificación, auditoría, fallo simulado con compensación, concurrencia y lecturas; respaldo SQL Server 8/8.

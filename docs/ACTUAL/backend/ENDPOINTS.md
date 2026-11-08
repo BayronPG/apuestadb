@@ -201,3 +201,7 @@ PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 543
 ### Motor de apuestas (Fase 17)
 
 \APUESTAS_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \APUESTAS_MOTOR=mongodb\ lee apuestas desde MongoDB y crea con saga PostgreSQL + MongoDB. \POST /api/apuestas\ acepta \claveIdempotencia\ opcional; repetir la clave devuelve la misma apuesta sin segundo débito. La liquidación sigue en SQL Server.
+
+### Motor documental (Fase 17.1)
+
+\DOCUMENTOS_MOTOR=sqlserver\ (predeterminado) mantiene los procedimientos; \DOCUMENTOS_MOTOR=mongodb\ resuelve liquidaciones, notificaciones y auditoría en MongoDB. La liquidación es idempotente: repetirla no vuelve a pagar el premio.

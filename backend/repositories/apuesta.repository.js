@@ -45,6 +45,11 @@ async function registrar({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempot
  * Invoca dbo.usp_Apuesta_Liquidar (exactamente uno de los dos criterios).
  */
 async function liquidar({ idApuesta = null, idEvento = null, idAdministrador = null }) {
+  if (config.documentos.motor === 'mongodb') {
+    const liquidacionDocumental = require('../services/liquidacion.documental');
+    return liquidacionDocumental.liquidar({ idApuesta, idEvento, idAdministrador });
+  }
+
   const resultado = await ejecutar(
     'dbo.usp_Apuesta_Liquidar',
     {

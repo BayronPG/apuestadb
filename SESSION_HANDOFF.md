@@ -114,3 +114,10 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Validado:** migración 2× idempotente (108 docs), saga 201, duplicado sin segundo débito, insuficiencia 409, compensación con saldo restaurado, lecturas Mongo 200, respaldo SQL Server 7/7.
 - **Datos de prueba restaurados**; health 4/4; contenedores healthy.
 - **Siguiente:** Fase 17.1 — liquidación y notificaciones/auditoría en MongoDB.
+
+## Fase 17.1 — Dominio documental completo (08/nov/2026)
+
+- **Implementado:** \liquidacion.documental.js\, \documentos.mongo.repository.js\; ramas Mongo en notificación y auditoría; índice único \uq_liquidacion_apuesta\; contadores por colección.
+- **Validado:** liquidación 1 pago, duplicado 0, premio en mismo tipo, notificación/auditoría en Mongo, compensación con saldo intacto, concurrencia (1 liquidación, 1 premio), respaldo SQL Server 8/8.
+- **Datos restaurados:** PG 1.247.500 / 1.897.500 / 1.110.000; Mongo 108 documentos; MySQL 9/27/7.
+- **Siguiente:** reintentos de saga y outbox, o preparación de despliegue Azure.

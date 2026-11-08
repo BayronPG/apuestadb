@@ -70,6 +70,21 @@ const TABLAS = [
       { $max: { valor: siguiente } },
       { upsert: true },
     );
+
+    const pares = [
+      ['liquidacion', 'id_liquidacion'],
+      ['notificacion', 'id_notificacion'],
+      ['auditoria', 'id_auditoria'],
+    ];
+    for (const [coleccion, campo] of pares) {
+      const ultimo = await db.collection(coleccion).find({}).sort({ [campo]: -1 }).limit(1).toArray();
+      const maximoColeccion = ultimo.length > 0 ? ultimo[0][campo] : 0;
+      await db.collection('contadores').updateOne(
+        { _id: coleccion },
+        { $max: { valor: maximoColeccion } },
+        { upsert: true },
+      );
+    }
   } catch (e) {
     error = e;
   } finally {

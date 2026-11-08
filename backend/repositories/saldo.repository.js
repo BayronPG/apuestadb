@@ -201,7 +201,11 @@ async function registrarMovimiento({
         [idSaldoCuenta, nombreMovimiento, monto, idApuesta, idRecarga, referencia, claveIdempotencia],
       );
       const fila = filas[0] || {};
-      return { idMovimiento: fila.id_movimiento, saldoResultante: fila.saldo_resultante };
+      return {
+        idMovimiento: fila.id_movimiento,
+        saldoResultante: fila.saldo_resultante,
+        idempotente: fila.idempotente === true,
+      };
     } catch (error) {
       const mapeado = mapearErrorPg(error);
       if (mapeado) throw mapeado;
