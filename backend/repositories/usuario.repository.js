@@ -91,6 +91,61 @@ async function listar({ estado = null, rol = null, limite = 200 } = {}) {
   return resultado.registros;
 }
 
+/** Obtiene un perfil sin credenciales ni datos internos. */
+async function obtenerPerfil(idUsuario) {
+  const resultado = await consultar(
+    `SELECT u.id_usuario,
+            u.nombres,
+            u.apellidos,
+            u.correo,
+            u.telefono,
+            r.nombre AS rol
+       FROM dbo.Usuario u
+       JOIN dbo.Rol r ON r.id_rol = u.id_rol
+      WHERE u.id_usuario = @id_usuario`,
+    { id_usuario: p(sql.Int, idUsuario) },
+  );
+  return resultado.registros[0] || null;
+}
+
+/** Actualiza solo los campos permitidos del perfil y devuelve el perfil seguro. */
+async function actualizarPerfil({ idUsuario, cambios }) {
+  const columnas = {
+    nombres: { sql: 'nombres', tipo: sql.NVarChar(100) },
+    apellidos: { sql: 'apellidos', tipo: sql.NVarChar(100) },
+    telefono: { sql: 'telefono', tipo: sql.NVarChar(20) },
+  };
+  const entradas = { id_usuario: p(sql.Int, idUsuario) };
+  const asignaciones = [];
+
+  for (const [campo, definicion] of Object.entries(columnas)) {
+    if (Object.prototype.hasOwnProperty.call(cambios, campo)) {
+      asignaciones.push(`u.${definicion.sql} = @${campo}`);
+      entradas[campo] = p(definicion.tipo, cambios[campo] === '' ? null : cambios[campo]);
+    }
+  }
+
+  const resultado = await consultar(
+    `UPDATE u
+        SET ${asignaciones.join(', ')}
+       FROM dbo.Usuario u
+      WHERE u.id_usuario = @id_usuario;
+
+      SELECT u.id_usuario,
+             u.nombres,
+             u.apellidos,
+             u.correo,
+             u.telefono,
+             r.nombre AS rol
+        FROM dbo.Usuario u
+        JOIN dbo.Rol r ON r.id_rol = u.id_rol
+       WHERE u.id_usuario = @id_usuario;`,
+    entradas,
+  );
+
+  return resultado.registros[0] || null;
+}
+
 /**
  * Solicita un token de recuperacion de contrasena.
  * Invoca dbo.usp_Auth_RecuperarContrasena con @accion = 'solicitar'.
@@ -132,6 +187,8 @@ module.exports = {
   registrar,
   buscarCredencialesPorCorreo,
   listar,
+  obtenerPerfil,
+  actualizarPerfil,
   solicitarTokenRecuperacion,
   restablecerContrasena,
 };

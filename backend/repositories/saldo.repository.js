@@ -100,9 +100,23 @@ async function crearRecarga({ idUsuario, idTipoSaldo, monto, idAdministrador = n
   };
 }
 
+/** Catalogo de tipos de saldo vigentes (dbo.TipoSaldo). */
+async function listarTipos() {
+  const resultado = await consultar(
+    `SELECT ts.id_tipo_saldo,
+            ts.nombre,
+            ts.descripcion
+       FROM dbo.TipoSaldo ts
+      WHERE ts.estado = 'vigente'
+      ORDER BY ts.id_tipo_saldo`,
+  );
+  return resultado.registros;
+}
+
 module.exports = {
   consultarSaldo,
   tiposSaldoPorCuenta,
+  listarTipos,
   historialMovimientos,
   registrarMovimiento,
   crearRecarga,

@@ -1,6 +1,6 @@
 # ApuestaDB — Endpoints de la API
 
-Prefijo base: `/api`. Total: **24 endpoints** (23 + 1 de la Fase 10.1).
+Prefijo base: `/api`. Total: **28 endpoints**.
 
 Formato uniforme de respuesta:
 
@@ -34,6 +34,7 @@ rol autenticado · `admin` solo `administrador`.
 | Método | Ruta | Rol | Cuerpo / Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/saldo` | usuario* | — | `usp_Saldo_Consultar` + consulta parametrizada `SaldoCuenta`⋈`TipoSaldo` | 200 `{ cuentas[], saldoTotal }` · 404 usuario inexistente |
+| GET | `/api/saldo/tipos` | usuario* | — | `TipoSaldo` (consulta parametrizada) | 200 `{ tipos[], total }` |
 | GET | `/api/saldo/movimientos` | usuario* | `idTipoSaldo?`, `desde?`, `hasta?` | `usp_MovimientoSaldo_Historial` | 200 `{ movimientos[], total }` · 400 rango inválido |
 
 El `id_usuario` se toma siempre del token; no se acepta por parámetro.
@@ -102,6 +103,7 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 | Método | Ruta | Rol | Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/notificaciones` | usuario* | `estado?`, `limite?` | `Notificacion` (consulta parametrizada) | 200 `{ notificaciones[], total }` |
+| PATCH | `/api/notificaciones/:id` | usuario* | `estado` = `no_leida` \| `leida` | `Notificacion` (UPDATE parametrizado por usuario) | 200 `{ idNotificacion, estado, mensaje }` · 400 datos inválidos · 404 inexistente o ajena |
 
 > No existe vista ni procedimiento de consulta de notificaciones (solo el de
 > creación); ver `ARQUITECTURA.md` §7.
@@ -133,6 +135,8 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 | Método | Ruta | Rol | Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/usuarios` | admin | `estado?`, `rol?`, `limite?` | `Usuario` + `Rol` + `vw_SaldoConsolidado` | 200 `{ usuarios[], total }` |
+| GET | `/api/usuarios/perfil` | usuario* | — | `Usuario` + `Rol` (solo usuario del token) | 200 `{ idUsuario, nombres, apellidos, correo, telefono, rol }` · 404 usuario inexistente |
+| PUT | `/api/usuarios/perfil` | usuario* | `nombres?`, `apellidos?`, `telefono?` | `Usuario` (UPDATE parametrizado por usuario) | 200 perfil actualizado · 400 campos inválidos · 404 usuario inexistente |
 
 ---
 
@@ -152,14 +156,14 @@ El endpoint responde 200 aunque la base no esté disponible (la API sigue viva).
 | Grupo | Endpoints |
 |---|---|
 | Autenticación | 4 |
-| Saldo | 2 |
+| Saldo | 3 |
 | Recargas | 1 |
 | Apuestas | 5 |
 | Eventos | 4 |
 | Liquidaciones | 1 |
-| Notificaciones | 1 |
+| Notificaciones | 2 |
 | Reportes | 3 |
 | Auditoría | 1 |
-| Usuarios | 1 |
+| Usuarios | 3 |
 | Sistema | 1 |
-| **Total** | **24** |
+| **Total** | **28** |

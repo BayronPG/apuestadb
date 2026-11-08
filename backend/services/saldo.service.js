@@ -80,4 +80,10 @@ async function crearRecarga({ idUsuario, idTipoSaldo, monto, idAdministrador = n
   };
 }
 
-module.exports = { consultarSaldo, historialMovimientos, crearRecarga };
+/** Catalogo de tipos de saldo vigentes. */
+async function listarTiposSaldo() {
+  const tipos = await saldoRepository.listarTipos();
+  return { tipos, total: tipos.length };
+}
+
+module.exports = { consultarSaldo, historialMovimientos, crearRecarga, listarTiposSaldo };
