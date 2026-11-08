@@ -26,10 +26,17 @@ app.disable('x-powered-by');
 // Cabeceras de seguridad HTTP (helmet con sus valores por defecto).
 app.use(helmet());
 
-// CORS para el frontend React. Con "*" se permite cualquier origen (solo local).
+// CORS configurable por lista CSV; el wildcard se limita a entornos no productivos.
 app.use(
   cors({
-    origin: config.cors.origenes.includes('*') ? true : config.cors.origenes,
+    origin: (origen, callback) => {
+      if (!origen || (config.entorno !== 'production' && config.cors.origenes.includes('*'))) {
+        return callback(null, true);
+      }
+
+      return callback(null, config.cors.origenes.includes(origen));
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),

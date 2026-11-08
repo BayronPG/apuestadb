@@ -52,6 +52,11 @@ Proyecto académico de la asignatura **Bases de Datos 2**: los usuarios registra
 | `SESSION_HANDOFF.md` | Estado de continuidad entre sesiones |
 | `AGENT_INSTRUCTIONS.md` | Instrucciones vigentes del asistente ApuestaDB |
 
+### Despliegue en Azure
+
+Consulte [docs/ACTUAL/despliegue/AZURE_DESPLIEGUE.md](docs/ACTUAL/despliegue/AZURE_DESPLIEGUE.md)
+para preparar el despliegue manual del backend y frontend sin incluir secretos.
+
 ## Notas de control
 
 - Este proyecto es independiente de `C:\Proyectos\MiControlDiDi`; no comparten archivos.

@@ -41,7 +41,7 @@ const config = {
   apiPrefijo: process.env.API_PREFIX || '/api',
 
   cors: {
-    origenes: aLista(process.env.CORS_ORIGIN, ['http://localhost:5173']),
+    origenes: aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']),
   },
 
   jwt: {
@@ -137,6 +137,10 @@ function validarConfiguracion() {
   }
 
   if (!config.bd.baseDatos) problemas.push('DB_NAME no esta definido.');
+
+  if (config.entorno === 'production' && config.cors.origenes.includes('*')) {
+    problemas.push('CORS_ORIGINS no debe incluir * en produccion.');
+  }
 
   if (!['sqlserver', 'mysql'].includes(config.catalogo.motor)) {
     problemas.push("CATALOGO_MOTOR debe ser 'sqlserver' o 'mysql'.");
