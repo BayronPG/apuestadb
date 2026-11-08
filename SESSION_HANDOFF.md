@@ -92,3 +92,10 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Alcance:** Estadio representa la cancha; no existe tabla Cancha; Jugador no interviene en apuestas.
 - **Sin cambios:** SQL Server sigue siendo la fuente funcional; PostgreSQL y MongoDB intactos; sin migraciones de escritura.
 - **Siguiente tarea:** Fase 16 — migrar escrituras del catálogo o preparar PostgreSQL (saldo) y MongoDB (apuestas), según autorización de Jhon.
+
+## Fase 16 — Dominio financiero en PostgreSQL (08/nov/2026)
+
+- **Implementado:** \database/postgresql/\ (01 esquema, 02 restricciones e índices, 04 migración, 05 verificación). 5 tablas, 60 filas, 2 vistas.
+- **Validado:** DDL y migración idempotentes (2 ejecuciones), conteos y sumas idénticas a SQL Server, 0 huérfanos, FK/CHECK activos, health operativo 4/4.
+- **Backend:** \SALDO_MOTOR\ (predeterminado \sqlserver\); con \postgresql\ las lecturas de saldo devuelven el mismo contrato (tipos numéricos normalizados).
+- **Pendiente:** Fase 16.1 — trasladar escrituras financieras y triggers a PL/pgSQL; después, MongoDB (apuestas).

@@ -103,3 +103,11 @@ Este documento solo incorpora información como **confirmada** cuando proviene d
 - **SQL Server conserva el sistema funcional**; el backend lee el catálogo de SQL Server o MySQL según CATALOGO_MOTOR (predeterminado sqlserver).
 - **PostgreSQL y MongoDB** no se modificaron; su migración queda pendiente.
 - Scripts y verificación: database/mysql/; detalle en docs/ACTUAL/poliglota/MIGRACION_MYSQL_CATALOGO.md.
+
+## Fase 16 — Migración financiera a PostgreSQL (08/nov/2026)
+
+- **Migradas a PostgreSQL** las 5 tablas del dominio financiero (TipoSaldo, TipoMovimientoSaldo, SaldoCuenta, Recarga, MovimientoSaldo): **60 filas**, IDs y montos conservados.
+- **Backend:** \SALDO_MOTOR=sqlserver|postgresql\ (predeterminado \sqlserver\) para las lecturas de saldo, tipos e historial.
+- **Escrituras financieras** (movimientos y recargas) siguen en SQL Server; su traslado a PL/pgSQL queda para la Fase 16.1.
+- **MySQL, MongoDB y frontend** sin cambios.
+- Scripts y verificación: \database/postgresql/\; detalle en \docs/ACTUAL/poliglota/MIGRACION_POSTGRESQL_SALDO.md\.

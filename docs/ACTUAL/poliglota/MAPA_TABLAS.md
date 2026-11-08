@@ -33,7 +33,7 @@ Distribución de las 29 tablas de ApuestaDB entre cuatro motores. **Estado (08/n
 | FavoritoEquipo | Equipos favoritos del usuario |
 | **Jugador (nueva)** | Jugadores del equipo; no interviene en apuestas |
 
-## 3. PostgreSQL (5) — saldo ficticio
+## 3. PostgreSQL (5) — saldo ficticio (implementado)
 
 | Tabla | Rol |
 |---|---|

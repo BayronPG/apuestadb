@@ -99,6 +99,11 @@ const config = {
     motor: (process.env.CATALOGO_MOTOR || 'sqlserver').toLowerCase(),
   },
 
+  // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
+  saldo: {
+    motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
   auditoria: {
     registrarAccesos: aBooleano(process.env.AUDIT_ACCESS, true),
   },
@@ -125,6 +130,10 @@ function validarConfiguracion() {
 
   if (!['sqlserver', 'mysql'].includes(config.catalogo.motor)) {
     problemas.push("CATALOGO_MOTOR debe ser 'sqlserver' o 'mysql'.");
+  }
+
+  if (!['sqlserver', 'postgresql'].includes(config.saldo.motor)) {
+    problemas.push("SALDO_MOTOR debe ser 'sqlserver' o 'postgresql'.");
   }
 
   if (config.bd.modoAutenticacion === 'windows') {

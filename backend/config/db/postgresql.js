@@ -7,8 +7,13 @@
  * permitir reconexion posterior. No registra ni expone credenciales.
  */
 
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const config = require('../index');
+
+// Conservar los tipos numericos que devuelve SQL Server (mssql): DECIMAL y
+// BIGINT como number, para no romper los contratos HTTP existentes.
+types.setTypeParser(1700, (valor) => (valor === null ? null : Number.parseFloat(valor)));
+types.setTypeParser(20, (valor) => (valor === null ? null : Number.parseInt(valor, 10)));
 
 const cfg = config.postgresql;
 
