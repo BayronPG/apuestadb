@@ -73,5 +73,5 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 
 - Servicios levantados y verificados: MSSQL + SQL Server :1433, backend :4000 (aseDatos: conectada), frontend :5173 con proxy /api funcionando.
 - Cadena probada: registro → login (JWT) → /api/saldo, /api/eventos/activos, /api/apuestas, /api/notificaciones (200); rutas de administrador con token de usuario → 403; sin token → 401.
-- Hallazgo: el entorno de Windows define DB_USER=root y DB_PASSWORD, que dotenv no sobrescribe; el backend se arranca limpiando esas variables (ver docs/ACTUAL/pruebas/CORRECCIONES.md C-11).
+- Hallazgo: el entorno de Windows puede definir variables DB_* que dotenv no sobrescribe; `backend/config/index.js` carga `backend/.env` con precedencia solo fuera de producción (ver docs/ACTUAL/pruebas/CORRECCIONES.md C-11).
 - Usuario de prueba remanente: smoke_211412@apuestadb.co (no se pudo borrar por FK).

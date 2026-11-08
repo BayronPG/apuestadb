@@ -96,7 +96,7 @@ DB_PORT=1433             (la instancia escucha en 1433 y en un puerto dinamico)
 
 **Problema:** al levantar `backend/`, `GET /api/health` respondía `Login failed for user 'root'` aunque `backend/.env` declara `DB_USER=apuestadb_app`.
 **Causa:** el equipo tiene `DB_USER=root` y `DB_PASSWORD` definidos en el entorno del usuario de Windows; `dotenv` no sobrescribe variables ya existentes, así que el proceso ignoraba `.env`.
-**Solución aplicada (sin cambiar código):** iniciar el backend limpiando esas variables en la sesión:
+**Solución temporal anterior:** iniciar el backend limpiando esas variables en la sesión:
 
 ```powershell
 cd backend
@@ -105,7 +105,7 @@ node server.js
 ```
 
 **Verificación:** `/api/health` → `baseDatos.estado = conectada`; registro + login + 4 consultas OK; rutas de administrador devuelven 403 con token de usuario; sin token, 401.
-**Pendiente de decisión:** fijar la corrección de forma permanente (`dotenv` con `override: true` en `config/index.js`); requiere autorización porque modifica código.
+**Solución permanente aplicada:** `backend/config/index.js` carga `backend/.env` mediante ruta absoluta y usa `override: true` únicamente fuera de producción, evitando que variables heredadas de Windows sustituyan la configuración local de desarrollo.
 **Nota:** el usuario de prueba `smoke_211412@apuestadb.co` ("Smoke Test") quedó en la base; no se pudo borrar por las FK de `SaldoCuenta` y la auditoría de login.
 
 ---
