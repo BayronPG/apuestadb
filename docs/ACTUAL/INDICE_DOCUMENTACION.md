@@ -17,6 +17,10 @@ base de datos, backend, frontend, SQL ni configuración de OpenClaw.
 
 ## 1. Documentación vigente (`docs/ACTUAL/`)
 
+| Documento | Contenido |
+|---|---|
+| [Estructura del proyecto](ESTRUCTURA_PROYECTO.md) | mapa de carpetas, archivos de gestión, contenido activo, legado y reglas de organización |
+
 ### 1.1 Entregables y cierre
 | Documento | Contenido |
 |---|---|
