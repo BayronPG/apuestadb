@@ -129,3 +129,10 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Pruebas:** 10/10 endpoints 200, health 4/4, build Vite correcto, sin secretos versionados.
 - **Pendientes reales:** despliegue Azure (recursos y cuentas), SSO/Drive/Wompi/Firebase sin credenciales, reintentos automáticos de saga y outbox.
 - **Siguiente:** preparación de despliegue y demo pública.
+
+## Entrega segura Azure (08/nov/2026)
+
+- **Publicado:** App Service F1 con SPA + API; URL hostname con sufijo de Azure (ver ENTREGA_SEGURA.md).
+- **Verificado en vivo:** / 200, /login 200, /api/health 200 (production, degradado).
+- **Limitación:** cuota Compute 0 y política regional impiden bases administradas en Azure; multibase se demuestra local con Docker.
+- **Pendiente:** SSO, Drive, Wompi y Firebase siguen sin credenciales; plan F1 solo para demostración.

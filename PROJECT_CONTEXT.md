@@ -140,3 +140,10 @@ otificacion, uditoria): **108 documentos**, IDs y fechas conservados.
 - **Auditoría final:** 16 tablas MySQL (167 filas de catálogo + 26 jugadores), 5 tablas PostgreSQL (sumas 1.247.500 / 1.897.500 / 1.110.000), 108 documentos MongoDB, 9 usuarios y 2 roles en SQL Server.
 - **API:** 10/10 endpoints 200; health operativo 4/4; build de frontend correcto.
 - **Sagas:** débito/recarga/premio idempotentes en PostgreSQL; creación y liquidación con compensación en MongoDB.
+
+## Entrega segura Azure (08/nov/2026)
+
+- **App Service F1 público** con frontend y backend: https://app-apuestadb-bayron-hkgefxhpfhasbfcu.brazilsouth-01.azurewebsites.net
+- / 200, /login 200 y /api/health 200 en production/degradado.
+- **Bases no disponibles en Azure** por cuota Compute 0 y política regional; la arquitectura multibase completa se demuestra **localmente con Docker** (health operativo 4/4).
+- Detalle en docs/ACTUAL/despliegue/ENTREGA_SEGURA.md.
