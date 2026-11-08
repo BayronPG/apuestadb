@@ -69,6 +69,31 @@ const config = {
     tiempoPeticion: aEntero(process.env.DB_REQUEST_TIMEOUT, 30000),
   },
 
+  // Motores auxiliares (Fase 14.5). SQL Server sigue siendo el motor funcional.
+  mysql: {
+    host: process.env.MYSQL_HOST || '',
+    puerto: aEntero(process.env.MYSQL_PORT, 3307),
+    baseDatos: process.env.MYSQL_DATABASE || '',
+    usuario: process.env.MYSQL_USER || '',
+    contrasena: process.env.MYSQL_PASSWORD || '',
+    tiempoConexion: aEntero(process.env.MYSQL_CONNECT_TIMEOUT, 5000),
+  },
+
+  postgresql: {
+    host: process.env.POSTGRES_HOST || '',
+    puerto: aEntero(process.env.POSTGRES_PORT, 5433),
+    baseDatos: process.env.POSTGRES_DB || '',
+    usuario: process.env.POSTGRES_USER || '',
+    contrasena: process.env.POSTGRES_PASSWORD || '',
+    tiempoConexion: aEntero(process.env.POSTGRES_CONNECT_TIMEOUT, 5000),
+  },
+
+  mongodb: {
+    uri: process.env.MONGO_URI || '',
+    baseDatos: process.env.MONGO_DATABASE || '',
+    tiempoConexion: aEntero(process.env.MONGO_CONNECT_TIMEOUT, 5000),
+  },
+
   auditoria: {
     registrarAccesos: aBooleano(process.env.AUDIT_ACCESS, true),
   },

@@ -1,10 +1,10 @@
 # SESSION_HANDOFF.md — ApuestaDB
 
-**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos** · 28/oct/2026 — versionado del código en `origin/main`
+**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos** · 28/oct/2026 — versionado del código en `origin/main` · 08/nov/2026 — Fase 14.5–14.6 (cuatro motores + health)
 
 ## Fase actual
 
-**FASES 0 a 12.1 COMPLETADAS; FASE 13 COMPLETADA (07/oct/2026).** El proyecto está cerrado como **funcional, documentado y listo para entrega y sustentación académica**. No hay fase abierta ni trabajo pendiente autorizado. Cualquier cambio nuevo (funcionalidad, alcance, base de datos, backend, frontend o documentación) requiere autorización explícita de Jhon.
+**FASES 0 a 13 COMPLETADAS; FASE 14 EN CURSO.** **Fase 14.4 cerrada** y **Fases 14.5 y 14.6 implementadas (08/nov/2026)**: capa de conexión independiente para SQL Server, MySQL, PostgreSQL y MongoDB, más `GET /api/health` con el estado de los cuatro motores. SQL Server sigue siendo la fuente funcional de todos los repositorios; MySQL, PostgreSQL y MongoDB solo tienen conexión y health, y **no se ejecutaron migraciones**. Rama de trabajo: `poliglota` (sin push).
 
 ## Información confirmada
 
@@ -75,3 +75,11 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - Cadena probada: registro → login (JWT) → /api/saldo, /api/eventos/activos, /api/apuestas, /api/notificaciones (200); rutas de administrador con token de usuario → 403; sin token → 401.
 - Hallazgo: el entorno de Windows puede definir variables DB_* que dotenv no sobrescribe; `backend/config/index.js` carga `backend/.env` con precedencia solo fuera de producción (ver docs/ACTUAL/pruebas/CORRECCIONES.md C-11).
 - Usuario de prueba remanente: smoke_211412@apuestadb.co (no se pudo borrar por FK).
+## Fase 14.5–14.6 (08/nov/2026)
+
+- **Implementado:** `backend/config/db/` con módulos independientes por motor (SQL Server, MySQL, PostgreSQL, MongoDB), `ping()`/`cerrar()`, pools reutilizados y cierre ordenado en `SIGINT`/`SIGTERM`.
+- **Health:** `GET /api/health` informa `data.estado` (`operativo`/`degradado`), `data.motores` (4) y conserva `data.baseDatos.estado` para SQL Server; responde 200 aunque un auxiliar esté caído.
+- **Puertos Docker:** SQL Server 1434→1433, MySQL 3307→3306, PostgreSQL **5433→5432**, MongoDB 27017→27017. El 5432 del host pertenece al PostgreSQL 18 nativo y no se modifica.
+- **Validado:** 4/4 conectados; modo degradado con MongoDB detenido (`degradado`) y restauración a `operativo`; regresión mínima 7/7.
+- **Sin migraciones:** SQL Server sigue siendo la fuente funcional; los auxiliares solo tienen conexión y health.
+- **Siguiente tarea:** Fase 14.7 (indicadores de motor en la interfaz) o scripts mínimos por motor, según autorización posterior de Jhon.

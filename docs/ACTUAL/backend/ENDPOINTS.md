@@ -144,10 +144,14 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 
 | Método | Ruta | Rol | Objeto de BD | Respuestas |
 |---|---|---|---|---|
-| GET | `/api/health` | — | `SELECT 1` (verificación de conectividad) | 200 `{ servicio, version, entorno, hora, uptimeSegundos, baseDatos{...} }` |
+| GET | `/api/health` | — | `SELECT 1` en SQL Server + ping a MySQL, PostgreSQL y MongoDB | 200 `{ servicio, version, entorno, hora, uptimeSegundos, estado, baseDatos{...}, motores{...} }` |
 
-`data.baseDatos.estado` ∈ `conectada` | `sin_respuesta` | `no_disponible`.
-El endpoint responde 200 aunque la base no esté disponible (la API sigue viva).
+`data.baseDatos.estado` ∈ `conectada` | `no_disponible` (**SQL Server**; contrato anterior conservado).
+`data.motores.{sqlserver,mysql,postgresql,mongodb}.estado` ∈ `conectada` | `no_disponible`.
+`data.estado` ∈ `operativo` (4/4 conectados) | `degradado` (alguno no disponible).
+El endpoint responde 200 mientras la API esté viva, aunque un motor auxiliar esté caído.
+No expone host, puerto, base, usuario, URI ni errores internos. Los pings se ejecutan en paralelo con `Promise.allSettled` y timeout de 5 s, reutilizando un pool por motor.
+PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 5432 del host lo ocupa el PostgreSQL 18 nativo de Windows).
 
 ---
 

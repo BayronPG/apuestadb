@@ -7,7 +7,7 @@
 - **Asignatura:** Bases de Datos 2 (Tecnológico de Antioquia).
 - **Proyecto:** sitio web académico de apuestas deportivas simuladas.
 - **Dinero real:** no se utilizará. Todo saldo y transacción es ficticio.
-- **Fase actual:** **cerrada** — Fases 0 a 12.1 **completadas** y **Fase 13 completada (07/oct/2026)**; no hay fase abierta ni trabajo pendiente autorizado (coincide con `SESSION_HANDOFF.md`).
+- **Fase actual:** **Fase 14 en curso** — Fases 0 a 13 **completadas**; **Fase 14.4 cerrada** y **Fases 14.5 y 14.6 implementadas (08/nov/2026)**: capa de conexión multibase y `GET /api/health` con estado de los cuatro motores. **SQL Server sigue siendo la fuente funcional**; MySQL, PostgreSQL y MongoDB solo tienen conexión y health; **no se ejecutaron migraciones**.
 - **Workspace:** `C:\Proyectos\ApuestaDB` (independiente de MiControlDiDi).
 - **Integrantes del equipo (2):** Jhon Bayron Peláez Guerra y Shantal Coneo García (15/ago/2026).
 - **Motor de base de datos: SQL Server** (decisión de Jhon, 24/ago/2026; pendiente de validación del profesor).
@@ -85,3 +85,12 @@ Política permanente de respuesta autorizada por Jhon (v1.2 de `AGENT_INSTRUCTIO
 ## Regla de actualización
 
 Este documento solo incorpora información como **confirmada** cuando proviene del profesor o de una decisión explícitamente aprobada por Jhon. Todo lo demás permanece como provisional o pendiente.
+
+## Fase 14 — Multimotor (08/nov/2026)
+
+- **Fase 14.4 cerrada:** `docker-compose.yml` levanta SQL Server (host 1434), MySQL (host 3307), PostgreSQL (host 5433) y MongoDB (host 27017); las cuatro imágenes son linux/amd64.
+- **Fases 14.5 y 14.6 implementadas:** capa `backend/config/db/` con conexión perezosa, `ping()` y `cerrar()` por motor; `GET /api/health` informa `data.estado`, `data.motores` y conserva `data.baseDatos.estado`.
+- **SQL Server sigue siendo la fuente funcional** de todos los repositorios; MySQL, PostgreSQL y MongoDB solo tienen conexión y health.
+- **No se ejecutaron migraciones** ni se crearon tablas o colecciones en los motores auxiliares.
+- **PostgreSQL Docker usa host 5433 → contenedor 5432**; el puerto 5432 del host pertenece al PostgreSQL 18 nativo y no se modifica.
+- **Próximo paso:** Fase 14.7 (indicadores de motor) o scripts mínimos por motor, previa autorización de Jhon.

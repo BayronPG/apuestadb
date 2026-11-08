@@ -11,6 +11,7 @@
 const app = require('./app');
 const config = require('./config');
 const { probarConexion, cerrarPool } = require('./config/database');
+const { cerrarTodos } = require('./config/db');
 
 async function iniciar() {
   const problemas = config.validarConfiguracion();
@@ -41,7 +42,7 @@ async function iniciar() {
   const apagar = (senal) => {
     console.log(`[proceso] Senal ${senal}: cerrando servidor...`);
     servidor.close(async () => {
-      await cerrarPool();
+      await Promise.allSettled([cerrarPool(), cerrarTodos()]);
       process.exit(0);
     });
   };
