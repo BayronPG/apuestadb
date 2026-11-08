@@ -94,6 +94,11 @@ const config = {
     tiempoConexion: aEntero(process.env.MONGO_CONNECT_TIMEOUT, 5000),
   },
 
+  // Motor que resuelve las consultas de catalogo y eventos (Fase 15).
+  catalogo: {
+    motor: (process.env.CATALOGO_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
   auditoria: {
     registrarAccesos: aBooleano(process.env.AUDIT_ACCESS, true),
   },
@@ -117,6 +122,10 @@ function validarConfiguracion() {
   }
 
   if (!config.bd.baseDatos) problemas.push('DB_NAME no esta definido.');
+
+  if (!['sqlserver', 'mysql'].includes(config.catalogo.motor)) {
+    problemas.push("CATALOGO_MOTOR debe ser 'sqlserver' o 'mysql'.");
+  }
 
   if (config.bd.modoAutenticacion === 'windows') {
     problemas.push(

@@ -7,9 +7,25 @@
  */
 
 const { sql, p, ejecutar, consultar } = require('../config/database');
+const config = require('../config');
+const mysql = require('../config/db/mysql');
+
+/** Con CATALOGO_MOTOR=mysql las lecturas de catalogo/eventos salen de MySQL. */
+function usaMysql() {
+  return config.catalogo.motor === 'mysql';
+}
+
+async function consultarMysql(texto, parametros = []) {
+  const pool = await mysql.obtenerPool();
+  const [filas] = await pool.query(texto, parametros);
+  return filas;
+}
 
 /** Eventos programados o en curso (vista vw_EventosActivos). */
 async function listarActivos() {
+  if (usaMysql()) {
+    return consultarMysql('SELECT * FROM vw_EventosActivos ORDER BY fecha_hora_inicio ASC');
+  }
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_EventosActivos ORDER BY fecha_hora_inicio ASC`,
   );
@@ -18,6 +34,9 @@ async function listarActivos() {
 
 /** Eventos finalizados con su resultado (vista vw_EventosFinalizados). */
 async function listarFinalizados() {
+  if (usaMysql()) {
+    return consultarMysql('SELECT * FROM vw_EventosFinalizados ORDER BY fecha_hora_inicio DESC');
+  }
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_EventosFinalizados ORDER BY fecha_hora_inicio DESC`,
   );
@@ -31,6 +50,30 @@ async function listarFinalizados() {
  * para deshabilitarlos. Devuelve null si el evento no existe.
  */
 async function obtenerPorId(idEvento) {
+  if (usaMysql()) {
+    const filas = await consultarMysql(
+      `SELECT e.id_evento,
+              d.nombre   AS deporte,
+              l.nombre   AS liga,
+              t.etiqueta AS temporada,
+              el.nombre  AS equipo_local,
+              ev.nombre  AS equipo_visitante,
+              es.nombre  AS estadio,
+              e.fecha_hora_inicio,
+              e.estado
+         FROM Evento e
+         JOIN Temporada t ON t.id_temporada = e.id_temporada
+         JOIN Liga l      ON l.id_liga = t.id_liga
+         JOIN Deporte d   ON d.id_deporte = l.id_deporte
+         JOIN Equipo el   ON el.id_equipo = e.id_equipo_local
+         JOIN Equipo ev   ON ev.id_equipo = e.id_equipo_visitante
+         JOIN Estadio es  ON es.id_estadio = e.id_estadio
+        WHERE e.id_evento = ?`,
+      [idEvento],
+    );
+    return filas[0] || null;
+  }
+
   const resultado = await consultar(
     `SELECT e.id_evento,
             d.nombre   AS deporte,
@@ -63,6 +106,26 @@ async function obtenerPorId(idEvento) {
  * las columnas de opcion en NULL); el agrupamiento se hace en el servicio.
  */
 async function listarMercadosConOpciones(idEvento) {
+  if (usaMysql()) {
+    return consultarMysql(
+      `SELECT m.id_mercado,
+              m.nombre,
+              m.descripcion,
+              m.fecha_apertura,
+              m.fecha_cierre,
+              m.estado,
+              o.id_opcion,
+              o.etiqueta,
+              o.cuota_vigente,
+              o.estado AS estado_opcion
+         FROM Mercado m
+         LEFT JOIN OpcionApuesta o ON o.id_mercado = m.id_mercado
+        WHERE m.id_evento = ?
+        ORDER BY m.fecha_cierre ASC, m.id_mercado ASC, o.id_opcion ASC`,
+      [idEvento],
+    );
+  }
+
   const resultado = await consultar(
     `SELECT m.id_mercado,
             m.nombre,

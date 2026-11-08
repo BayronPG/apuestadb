@@ -1,6 +1,6 @@
-# Mapa de tablas por motor (Fase 14)
+# Mapa de tablas por motor (Fase 14–15)
 
-Distribución propuesta de las 29 tablas de ApuestaDB entre cuatro motores. Sin cambios en la base actual: es un mapa de trabajo para la Fase 14.
+Distribución de las 29 tablas de ApuestaDB entre cuatro motores. **Estado (08/nov/2026):** el catálogo deportivo ya está implementado en MySQL (15 tablas + `Jugador` = 16); SQL Server conserva el sistema funcional y el resto de motores sigue pendiente de migración.
 
 ## 1. SQL Server (5) — seguridad y usuarios
 
@@ -12,7 +12,7 @@ Distribución propuesta de las 29 tablas de ApuestaDB entre cuatro motores. Sin 
 | RespuestaSeguridad | Respuestas por usuario |
 | TokenRecuperacion | Tokens de recuperación |
 
-## 2. MySQL (15) — catálogo deportivo y operación
+## 2. MySQL (16) — catálogo deportivo y operación
 
 | Tabla | Rol |
 |---|---|
@@ -31,6 +31,7 @@ Distribución propuesta de las 29 tablas de ApuestaDB entre cuatro motores. Sin 
 | HistorialCuota | Cambios de cuota |
 | Resultado | Marcador oficial |
 | FavoritoEquipo | Equipos favoritos del usuario |
+| **Jugador (nueva)** | Jugadores del equipo; no interviene en apuestas |
 
 ## 3. PostgreSQL (5) — saldo ficticio
 

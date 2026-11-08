@@ -94,3 +94,12 @@ Este documento solo incorpora información como **confirmada** cuando proviene d
 - **No se ejecutaron migraciones** ni se crearon tablas o colecciones en los motores auxiliares.
 - **PostgreSQL Docker usa host 5433 → contenedor 5432**; el puerto 5432 del host pertenece al PostgreSQL 18 nativo y no se modifica.
 - **Próximo paso:** Fase 14.7 (indicadores de motor) o scripts mínimos por motor, previa autorización de Jhon.
+
+## Fase 15 — Catálogo en MySQL y tabla Jugador (08/nov/2026)
+
+- **Migradas a MySQL** las 15 tablas del catálogo deportivo (167 filas) conservando identificadores; total **16 tablas MySQL** con la nueva Jugador.
+- **Jugador** pertenece a Equipo, es un registro de catálogo y **no** interviene en apuestas, mercados, resultados ni saldos.
+- **Estadio = cancha** (decisión confirmada); **no** se creó la tabla Cancha.
+- **SQL Server conserva el sistema funcional**; el backend lee el catálogo de SQL Server o MySQL según CATALOGO_MOTOR (predeterminado sqlserver).
+- **PostgreSQL y MongoDB** no se modificaron; su migración queda pendiente.
+- Scripts y verificación: database/mysql/; detalle en docs/ACTUAL/poliglota/MIGRACION_MYSQL_CATALOGO.md.

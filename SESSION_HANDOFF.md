@@ -83,3 +83,12 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - **Validado:** 4/4 conectados; modo degradado con MongoDB detenido (`degradado`) y restauración a `operativo`; regresión mínima 7/7.
 - **Sin migraciones:** SQL Server sigue siendo la fuente funcional; los auxiliares solo tienen conexión y health.
 - **Siguiente tarea:** Fase 14.7 (indicadores de motor en la interfaz) o scripts mínimos por motor, según autorización posterior de Jhon.
+
+## Fase 15 — Catálogo MySQL y Jugador (08/nov/2026)
+
+- **Implementado:** database/mysql/ (01 esquema, 02 restricciones e índices, 03 semilla de Jugador, 04 migración, 05 verificación, README).
+- **Datos:** 15 tablas migradas (167 filas) con IDs, cuotas y fechas conservados; 26 jugadores ficticios (2 por equipo); cero huérfanos y RN-16 sin violaciones.
+- **Backend:** CATALOGO_MOTOR=sqlserver|mysql (predeterminado sqlserver); endpoints nuevos GET /api/jugadores, GET /api/equipos/:id/jugadores y POST /api/jugadores (administrador).
+- **Alcance:** Estadio representa la cancha; no existe tabla Cancha; Jugador no interviene en apuestas.
+- **Sin cambios:** SQL Server sigue siendo la fuente funcional; PostgreSQL y MongoDB intactos; sin migraciones de escritura.
+- **Siguiente tarea:** Fase 16 — migrar escrituras del catálogo o preparar PostgreSQL (saldo) y MongoDB (apuestas), según autorización de Jhon.

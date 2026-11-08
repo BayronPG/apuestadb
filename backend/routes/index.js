@@ -16,6 +16,8 @@ router.use('/recargas', require('./recarga.routes'));
 router.use('/apuestas', require('./apuesta.routes'));
 router.use('/liquidaciones', require('./liquidacion.routes'));
 router.use('/eventos', require('./evento.routes'));
+router.use('/jugadores', require('./jugador.routes'));
+router.use('/equipos', require('./equipo.routes'));
 router.use('/notificaciones', require('./notificacion.routes'));
 router.use('/reportes', require('./reporte.routes'));
 router.use('/auditoria', require('./auditoria.routes'));

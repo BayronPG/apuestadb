@@ -124,3 +124,20 @@ Este diccionario documenta de forma oficial las **29 tablas** del proyecto: qué
 - **Relaciones N:M:** resueltas por RespuestaSeguridad, CalendarioArbitro, FavoritoEquipo, SaldoCuenta y Liquidacion.
 - **Snapshots controlados:** `OpcionApuesta.cuota_vigente`, `SaldoCuenta.saldo_actual`, `MovimientoSaldo.saldo_resultante`, `Liquidacion.monto_premio`, `Liquidacion.resultado_liquidacion`.
 - **Derivados no almacenados:** `Usuario.nombre_completo`, opción ganadora de `Resultado` (derivada del marcador).
+
+## 7. Tabla nueva Jugador (Fase 15, MySQL)
+
+| Campo | Tipo MySQL | Nulo | Restricción |
+|---|---|---|---|
+| id_jugador | BIGINT AUTO_INCREMENT | No | PK |
+| id_equipo | INT | No | FK → Equipo.id_equipo |
+| nombres | VARCHAR(100) | No | — |
+| apellidos | VARCHAR(100) | No | índice (apellidos, nombres) |
+| numero_camiseta | INT | Sí | UNIQUE (id_equipo, numero_camiseta); CHECK 1–99 |
+| posicion | VARCHAR(50) | Sí | — |
+| fecha_nacimiento | DATE | Sí | — |
+| nacionalidad | VARCHAR(100) | Sí | — |
+| estado | VARCHAR(20) | No | DEFAULT 'activo'; CHECK ('activo','inactivo') |
+| fecha_creacion | DATETIME(6) | No | DEFAULT CURRENT_TIMESTAMP(6) |
+
+Jugador es un registro de catálogo: depende de Equipo, no se relaciona con Usuario y no interviene en apuestas, mercados, resultados ni saldos.

@@ -1,6 +1,6 @@
 # ApuestaDB — Endpoints de la API
 
-Prefijo base: `/api`. Total: **28 endpoints**.
+Prefijo base: `/api`. Total: **31 endpoints**.
 
 Formato uniforme de respuesta:
 
@@ -155,7 +155,24 @@ PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 543
 
 ---
 
-## 12. Resumen de conteo
+## 12. Jugadores (catálogo MySQL, Fase 15)
+
+| Método | Ruta | Rol | Cuerpo | Objeto de BD | Respuestas |
+|---|---|---|---|---|---|
+| GET | `/api/jugadores` | usuario | - | `Jugador` + `Equipo` (MySQL) | 200 `{ jugadores, total }` |
+| GET | `/api/jugadores?idEquipo=N` | usuario | - | `Jugador` filtrado por equipo | 200 lista filtrada |
+| GET | `/api/equipos/:id/jugadores` | usuario | - | `Jugador` + `Equipo` | 200 `{ jugadores, total }` · 404 equipo inexistente |
+| POST | `/api/jugadores` | admin | `idEquipo`, `nombres`, `apellidos`, `numeroCamiseta?`, `posicion?`, `fechaNacimiento?`, `nacionalidad?`, `estado?` | `INSERT` en `Jugador` (MySQL) | 201 `{ jugador }` · 400 · 401 · 403 · 404 · 409 camiseta duplicada |
+
+`Jugador` es una tabla nueva del catálogo: pertenece a `Equipo` y no participa todavía en apuestas, mercados, resultados ni saldos.
+
+### Motor de catálogo
+
+`CATALOGO_MOTOR=sqlserver` (predeterminado) mantiene las consultas actuales; `CATALOGO_MOTOR=mysql` resuelve catálogo y eventos en MySQL. Los contratos HTTP no cambian.
+
+---
+
+## 13. Resumen de conteo
 
 | Grupo | Endpoints |
 |---|---|
@@ -169,5 +186,6 @@ PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 543
 | Reportes | 3 |
 | Auditoría | 1 |
 | Usuarios | 3 |
+| Jugadores | 3 |
 | Sistema | 1 |
-| **Total** | **28** |
+| **Total** | **31** |
