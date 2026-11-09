@@ -9,8 +9,24 @@ import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
 import { usePeticion } from '../hooks/usePeticion.js';
 import { listarEventosActivos, obtenerOpcionesEvento } from '../services/eventoService.js';
+import { listarEquipos } from '../services/equipoService.js';
 import { fechaHora, textoEstado, tipoBadgeEstado } from '../utils/formato.js';
 import { ESTADOS_OPERABLES } from '../utils/constantes.js';
+
+function LogoEquipo({ nombre, logos }) {
+  const url = logos.get(nombre) || '/assets/logo-equipo-default.svg';
+  return (
+    <img
+      className="team-logo"
+      src={url}
+      alt=""
+      loading="lazy"
+      onError={(evento) => {
+        evento.currentTarget.src = '/assets/logo-equipo-default.svg';
+      }}
+    />
+  );
+}
 
 /**
  * Cuotas reales de un evento (GET /api/eventos/:id/opciones).
@@ -101,6 +117,13 @@ export default function EventosActivos() {
   const { datos, cargando, error, recargar } = usePeticion(cargar, []);
 
   const eventos = datos?.eventos || [];
+
+  const cargarEquipos = useCallback(() => listarEquipos(), []);
+  const { datos: datosEquipos } = usePeticion(cargarEquipos, []);
+  const logos = useMemo(
+    () => new Map((datosEquipos?.equipos || []).map((equipo) => [equipo.nombre, equipo.logoUrl])),
+    [datosEquipos],
+  );
 
   const deportes = useMemo(
     () => Array.from(new Set(eventos.map((evento) => evento.deporte).filter(Boolean))).sort(),
@@ -221,7 +244,10 @@ export default function EventosActivos() {
                   </div>
 
                   <div className="evento__equipos">
-                    {evento.equipo_local} <span className="vs">vs</span> {evento.equipo_visitante}
+                    <LogoEquipo nombre={evento.equipo_local} logos={logos} />{' '}
+                {evento.equipo_local} <span className="vs">vs</span>{' '}
+                <LogoEquipo nombre={evento.equipo_visitante} logos={logos} />{' '}
+                {evento.equipo_visitante}
                   </div>
 
                   <div className="evento__datos">

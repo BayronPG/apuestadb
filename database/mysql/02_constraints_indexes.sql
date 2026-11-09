@@ -13,6 +13,8 @@ DROP PROCEDURE IF EXISTS sp_add_check;
 DROP PROCEDURE IF EXISTS sp_add_fk;
 DROP PROCEDURE IF EXISTS sp_add_index;
 
+DROP PROCEDURE IF EXISTS sp_add_column;
+
 DELIMITER //
 
 CREATE PROCEDURE sp_add_unique(IN p_tabla VARCHAR(64), IN p_nombre VARCHAR(64), IN p_ddl TEXT)
@@ -75,7 +77,28 @@ BEGIN
   END IF;
 END //
 
+CREATE PROCEDURE sp_add_column(IN p_tabla VARCHAR(64), IN p_columna VARCHAR(64), IN p_ddl TEXT)
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = p_tabla
+       AND COLUMN_NAME = p_columna
+  ) THEN
+    SET @ddl = p_ddl;
+    PREPARE st FROM @ddl;
+    EXECUTE st;
+    DEALLOCATE PREPARE st;
+  END IF;
+END //
+
 DELIMITER ;
+
+-- ------------------------------------------------------------- COLUMNAS ----
+CALL sp_add_column('Equipo', 'logo_file_id',
+  'ALTER TABLE Equipo ADD COLUMN logo_file_id VARCHAR(100) NULL');
+CALL sp_add_column('Equipo', 'logo_url',
+  'ALTER TABLE Equipo ADD COLUMN logo_url VARCHAR(500) NULL');
 
 -- --------------------------------------------------------------- UNIQUE -----
 CALL sp_add_unique('Pais', 'UQ_Pais_nombre',

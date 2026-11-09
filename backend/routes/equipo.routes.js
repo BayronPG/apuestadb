@@ -30,6 +30,8 @@ function cargarLogo(req, res, next) {
   });
 }
 
+router.get('/', autenticar, equipoController.listar);
+
 router.post(
   '/:id/logo',
   autenticar,

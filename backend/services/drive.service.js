@@ -169,7 +169,7 @@ async function asociarLogos({ driveApi, repository = equipoRepository } = {}) {
     lista.push(equipo);
     porNombre.set(clave, lista);
   }
-  const reporte = { asociados: 0, omitidos: [] };
+  const reporte = { encontrados: (respuesta.data.files || []).length, asociados: 0, omitidos: [] };
   for (const archivoDrive of respuesta.data.files || []) {
     if (!TIPOS_PERMITIDOS.has(archivoDrive.mimeType)) continue;
     const clave = normalizarNombre(archivoDrive.name);
@@ -192,6 +192,7 @@ async function asociarLogos({ driveApi, repository = equipoRepository } = {}) {
     });
     reporte.asociados += 1;
   }
+  reporte.ambiguos = reporte.omitidos.filter((o) => o.razon === 'COINCIDENCIA_AMBIGUA').length;
   return reporte;
 }
 
