@@ -141,6 +141,23 @@ async function subirLogo(idEquipo, file, { driveApi, repository = equipoReposito
   return { idEquipo: equipo.id_equipo, nombre: equipo.nombre, url: equipo.logo_url };
 }
 
+async function descargarLogo(fileId, { driveApi } = {}) {
+  if (!fileId) throw errores.noEncontrado('El equipo no tiene logo.', 'LOGO_NO_ENCONTRADO');
+  const drive = driveApi || google.drive({ version: 'v3', auth: crearCliente() });
+  try {
+    const respuesta = await drive.files.get(
+      { fileId, alt: 'media' },
+      { responseType: 'stream' },
+    );
+    return {
+      stream: respuesta.data,
+      mimeType: (respuesta.headers && respuesta.headers['content-type']) || 'image/png',
+    };
+  } catch (_error) {
+    throw errores.noEncontrado('El logo no esta disponible.', 'LOGO_NO_ENCONTRADO');
+  }
+}
+
 function logoUrl(equipo) {
   return (equipo && equipo.logo_url) || config.google.defaultTeamLogoUrl;
 }
@@ -207,4 +224,5 @@ module.exports = {
   subirLogo,
   asociarLogos,
   logoUrl,
+  descargarLogo,
 };

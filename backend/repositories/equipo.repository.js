@@ -10,8 +10,17 @@ async function listarParaAsociar() {
 
 async function listar() {
   const pool = await mysql.obtenerPool();
-  const [filas] = await pool.query('SELECT id_equipo, nombre, logo_url FROM Equipo ORDER BY nombre');
+  const [filas] = await pool.query('SELECT id_equipo, nombre, logo_file_id, logo_url FROM Equipo ORDER BY nombre');
   return filas;
+}
+
+async function obtener(idEquipo) {
+  const pool = await mysql.obtenerPool();
+  const [filas] = await pool.query(
+    'SELECT id_equipo, nombre, logo_file_id, logo_url FROM Equipo WHERE id_equipo = ?',
+    [idEquipo],
+  );
+  return filas[0] || null;
 }
 
 async function actualizarLogo(idEquipo, { fileId, url }) {
@@ -28,4 +37,4 @@ async function actualizarLogo(idEquipo, { fileId, url }) {
   return filas[0] || null;
 }
 
-module.exports = { listar, listarParaAsociar, actualizarLogo };
+module.exports = { listar, obtener, listarParaAsociar, actualizarLogo };

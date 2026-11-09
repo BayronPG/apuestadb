@@ -32,6 +32,13 @@ function cargarLogo(req, res, next) {
 
 router.get('/', autenticar, equipoController.listar);
 
+router.get(
+  '/:id/logo',
+  [param('id').isInt({ min: 1 }).withMessage('El identificador del equipo no es valido.')],
+  validar,
+  equipoController.obtenerLogo,
+);
+
 router.post(
   '/:id/logo',
   autenticar,
