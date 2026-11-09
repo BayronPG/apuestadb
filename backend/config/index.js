@@ -54,10 +54,14 @@ const config = {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackUrl: process.env.GOOGLE_CALLBACK_URL || '',
+    driveCallbackUrl: process.env.GOOGLE_DRIVE_CALLBACK_URL || '',
     stateSecret: process.env.GOOGLE_STATE_SECRET || process.env.JWT_SECRET || '',
     frontendOrigin: (aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']).find((origen) =>
       /^https?:\/\/[^*]+$/i.test(origen),
     ) || 'http://localhost:5173').replace(/\/$/, ''),
+    driveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID || '',
+    driveRefreshToken: process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '',
+    defaultTeamLogoUrl: process.env.DEFAULT_TEAM_LOGO_URL || '/assets/logo-equipo-default.svg',
   },
 
   bcrypt: {

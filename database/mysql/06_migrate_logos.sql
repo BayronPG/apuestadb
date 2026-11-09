@@ -1,0 +1,26 @@
+-- Idempotent migration for Google Drive team logos.
+USE apuestadb;
+
+SET @sql = IF(
+  EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Equipo' AND COLUMN_NAME = 'logo_file_id'
+  ),
+  'SELECT 1',
+  'ALTER TABLE Equipo ADD COLUMN logo_file_id VARCHAR(128) NULL'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = IF(
+  EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Equipo' AND COLUMN_NAME = 'logo_url'
+  ),
+  'SELECT 1',
+  'ALTER TABLE Equipo ADD COLUMN logo_url VARCHAR(512) NULL'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;

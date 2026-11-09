@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.use('/health', require('./health.routes'));
 router.use('/auth', require('./auth.routes'));
+router.use('/integraciones', require('./integraciones.routes'));
 router.use('/usuarios', require('./usuario.routes'));
 router.use('/saldo', require('./saldo.routes'));
 router.use('/recargas', require('./recarga.routes'));

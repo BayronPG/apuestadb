@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Logo predeterminado">
+  <rect width="128" height="128" rx="20" fill="#0f766e"/>
+  <path d="M64 18 98 30v28c0 25-15 42-34 52C45 100 30 83 30 58V30l34-12Z" fill="#fff"/>
+  <path d="M64 33 45 40v18c0 15 8 26 19 34 11-8 19-19 19-34V40l-19-7Z" fill="#0f766e"/>
+</svg>

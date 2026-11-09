@@ -42,6 +42,10 @@ notepad .env
 | `GOOGLE_CLIENT_SECRET` | (vacío) | Secreto OAuth 2.0 de Google. |
 | `GOOGLE_CALLBACK_URL` | (vacío) | URL registrada para `/api/auth/google/callback`. |
 | `GOOGLE_STATE_SECRET` | `JWT_SECRET` | Clave estable para firmar `state`; no se genera automáticamente. |
+| `GOOGLE_DRIVE_FOLDER_ID` | (vacío) | Carpeta de Drive para logos de equipos. |
+| `GOOGLE_DRIVE_CALLBACK_URL` | (vacío) | Callback OAuth de Drive local/Azure. |
+| `GOOGLE_DRIVE_REFRESH_TOKEN` | (vacío) | Refresh token solo en el entorno; nunca se registra ni retorna. |
+| `DEFAULT_TEAM_LOGO_URL` | `/assets/logo-equipo-default.svg` | Logo de fallback cuando no existe uno en Drive. |
 | `JWT_EXPIRES_IN` | `2h` | Vigencia del token (`15m`, `2h`, `7d`, ...). |
 | `JWT_ISSUER` | `apuestadb-api` | Emisor (`iss`) que se exige al verificar. |
 | `BCRYPT_ROUNDS` | `10` | Rondas de costo de bcrypt (decisión del proyecto: 10). |
