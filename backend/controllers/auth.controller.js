@@ -67,7 +67,7 @@ const restablecerContrasena = manejarAsync(async (req, res) => {
 const iniciarGoogle = manejarAsync(async (_req, res) => {
   if (!googleService.habilitado()) return res.status(404).json({ ok: false, error: { codigo: 'GOOGLE_DESHABILITADO', mensaje: 'Inicio con Google no configurado.' } });
   const state = googleService.crearState();
-  res.setHeader('Set-Cookie', `google_oauth_state=${encodeURIComponent(state)}; HttpOnly; SameSite=Lax; Max-Age=600; Path=/api/auth/google${config.entorno === 'production' ? '; Secure' : ''}`);
+  res.setHeader('Set-Cookie', `google_oauth_state=${encodeURIComponent(state)}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/api/auth/google`);
   return res.redirect(302, googleService.urlAutorizacion(state));
 });
 
@@ -83,7 +83,7 @@ const callbackGoogle = manejarAsync(async (req, res) => {
   if (!googleService.validarState(req.query.state, esperado)) {
     throw errores.solicitudInvalida('La validacion de seguridad de Google fallo.', 'GOOGLE_STATE_INVALIDO');
   }
-  res.setHeader('Set-Cookie', 'google_oauth_state=; HttpOnly; SameSite=Lax; Max-Age=0; Path=/api/auth/google');
+  res.setHeader('Set-Cookie', 'google_oauth_state=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/api/auth/google');
   const datos = await googleService.autenticarGoogle(req.query.code);
   const destino = `${config.google.frontendOrigin}/login#google_token=${encodeURIComponent(datos.token)}`;
   return res.redirect(302, destino);

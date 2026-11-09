@@ -9,7 +9,6 @@
  */
 
 const path = require('path');
-const crypto = require('crypto');
 const dotenv = require('dotenv');
 
 dotenv.config({
@@ -55,10 +54,7 @@ const config = {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackUrl: process.env.GOOGLE_CALLBACK_URL || '',
-    stateSecret:
-      process.env.GOOGLE_STATE_SECRET ||
-      process.env.JWT_SECRET ||
-      crypto.randomBytes(32).toString('hex'),
+    stateSecret: process.env.GOOGLE_STATE_SECRET || process.env.JWT_SECRET || '',
     frontendOrigin: (aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']).find((origen) =>
       /^https?:\/\/[^*]+$/i.test(origen),
     ) || 'http://localhost:5173').replace(/\/$/, ''),
