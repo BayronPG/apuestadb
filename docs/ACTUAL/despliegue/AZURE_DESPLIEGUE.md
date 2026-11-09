@@ -26,6 +26,15 @@ ejecutan manualmente (`workflow_dispatch`).
 No se incluyen URLs, perfiles de publicación, IDs de suscripción/tenant ni
 otros valores reales en el repositorio.
 
+## Microsoft SSO — BLOQUEADO
+
+El tenant institucional impide registrar aplicaciones y Microsoft Entra
+devuelve `401 Sin acceso`. Un administrador debe crear **ApuestaDB** o
+habilitar el registro de aplicaciones antes de continuar. No se usan
+simulaciones ni credenciales falsas. Los callbacks documentados son
+`http://localhost:4000/api/auth/microsoft/callback` (local) y
+`https://<app-service>/api/auth/microsoft/callback` (Azure).
+
 ## Validación local
 
 ```powershell

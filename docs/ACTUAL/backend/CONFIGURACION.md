@@ -47,6 +47,15 @@ notepad .env
 | `BCRYPT_ROUNDS` | `10` | Rondas de costo de bcrypt (decisión del proyecto: 10). |
 | `AUDIT_ACCESS` | `true` | Registra en `Auditoria` los accesos correctos del login. |
 
+### Microsoft SSO — BLOQUEADO
+
+Microsoft Entra devuelve `401 Sin acceso` y el tenant institucional impide
+registrar aplicaciones. No se implementan simulaciones ni credenciales falsas.
+Para habilitarlo, un administrador debe crear la aplicación **ApuestaDB** o
+habilitar el registro de aplicaciones. Callbacks previstos:
+`http://localhost:4000/api/auth/microsoft/callback` (local) y
+`https://<app-service>/api/auth/microsoft/callback` (Azure).
+
 ### SQL Server
 
 | Variable | Por defecto | Descripción |
