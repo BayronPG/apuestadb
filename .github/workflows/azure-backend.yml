@@ -38,12 +38,26 @@ jobs:
 
       - name: Package backend with frontend build
         run: |
-          mkdir -p backend/public
-          cp -R frontend/dist/. backend/public/
+          rm -rf deploy backend.zip
+          mkdir -p deploy/public
+          rsync -a backend/ deploy/ \
+            --exclude node_modules \
+            --exclude .env \
+            --exclude .tmp \
+            --exclude public
+          cp -R frontend/dist/. deploy/public/
+          test -f deploy/package.json
+          test -f deploy/package-lock.json
+          test -f deploy/server.js
+          test -f deploy/app.js
+          test -f deploy/public/index.html
+          ! find deploy -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' \) | grep -q .
+          ! find deploy -type d -name node_modules | grep -q .
+          (cd deploy && zip -qr ../backend.zip .)
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: backend
+          package: backend.zip
