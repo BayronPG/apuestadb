@@ -3,7 +3,7 @@ name: Deploy frontend and backend to Azure App Service
 on:
   workflow_dispatch:
   push:
-    branches: [poliglota]
+    branches: [main]
 
 env:
   NODE_VERSION: '20.x'
