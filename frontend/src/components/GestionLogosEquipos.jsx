@@ -10,27 +10,13 @@ import { mensajeDeError } from '../utils/errores.js';
 const TAMANO_MAXIMO = 5 * 1024 * 1024;
 const TIPOS_PERMITIDOS = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
-function iniciales(nombre) {
-  return String(nombre || 'Equipo')
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0])
-    .join('')
-    .toUpperCase();
-}
-
 function LogoEquipo({ equipo }) {
   const [fallo, setFallo] = useState(false);
 
   useEffect(() => setFallo(false), [equipo.logoUrl]);
 
   if (!equipo.logoUrl || fallo) {
-    return (
-      <span className="logos-equipos__fallback" aria-label={`Logo de ${equipo.nombre}`}>
-        {iniciales(equipo.nombre)}
-      </span>
-    );
+    return <img className="logos-equipos__imagen" src="/assets/logo-equipo-default.svg" alt={`Logo de ${equipo.nombre}`} />;
   }
 
   return (

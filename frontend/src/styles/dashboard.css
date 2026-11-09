@@ -79,18 +79,6 @@
   object-fit: contain;
 }
 
-.logos-equipos__fallback {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--tinte-primario);
-  color: var(--color-primario-claro);
-  font-size: var(--fs-lg);
-  font-weight: var(--peso-fuerte);
-}
-
 .logos-equipos__nombre {
   width: 100%;
   margin: 0;
