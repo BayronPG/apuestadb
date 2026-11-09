@@ -1,0 +1,49 @@
+name: Deploy frontend and backend to Azure App Service
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [poliglota]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend --omit=dev
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ''
+        run: npm run build --prefix frontend
+
+      - name: Package backend with frontend build
+        run: |
+          mkdir -p backend/public
+          cp -R frontend/dist/. backend/public/
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend

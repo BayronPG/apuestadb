@@ -5,6 +5,7 @@
  */
 
 const notificacionRepository = require('../repositories/notificacion.repository');
+const { errores } = require('../utils/errors');
 
 /**
  * Lista las notificaciones del usuario.
@@ -15,4 +16,26 @@ async function listar({ idUsuario, estado = null, limite = 100 }) {
   return { notificaciones, total: notificaciones.length };
 }
 
-module.exports = { listar };
+/**
+ * Cambia el estado de una notificacion del usuario autenticado.
+ * Una notificacion ajena o inexistente responde igual: 404.
+ * @param {{idNotificacion:number, idUsuario:number, estado:string}} datos
+ */
+async function actualizarEstado({ idNotificacion, idUsuario, estado }) {
+  const actualizada = await notificacionRepository.actualizarEstado({
+    idNotificacion,
+    idUsuario,
+    estado,
+  });
+
+  if (!actualizada) {
+    throw errores.noEncontrado(
+      'La notificacion no existe o no pertenece al usuario autenticado.',
+      'NOTIFICACION_NO_ENCONTRADA',
+    );
+  }
+
+  return { idNotificacion, estado, mensaje: 'Notificacion actualizada.' };
+}
+
+module.exports = { listar, actualizarEstado };

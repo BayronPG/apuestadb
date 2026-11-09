@@ -1,0 +1,348 @@
+# ============================================================================
+# APUESTADB - docker-compose.azure.yml
+# Despliegue completo para una VM de Azure: Nginx + backend + cuatro motores.
+# Las bases de datos NO publican puertos: solo existen en la red interna.
+# Uso: docker compose -f docker-compose.azure.yml --env-file .env.azure up -d --build
+# ============================================================================
+
+name: apuestadb-azure
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: apuestadb-azure-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+      MSSQL_SA_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - interna
+
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: apuestadb-azure-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+    volumes:
+      - ./database:/scripts:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+        ESTADO=$$(/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -h -1 -W \
+          -Q "SET NOCOUNT ON; IF DB_ID('ApuestaDB') IS NOT NULL AND OBJECT_ID('ApuestaDB.dbo.Rol') IS NOT NULL SELECT 'READY' ELSE SELECT 'NUEVA'" | tr -d '\r')
+        if [ "$$ESTADO" = "READY" ]; then
+          echo "SQL Server ya inicializado; se omite la carga"
+          exit 0
+        fi
+        for f in /scripts/01_database.sql /scripts/02_tables.sql /scripts/03_constraints.sql \
+                 /scripts/04_indexes.sql /scripts/05_seed_data.sql \
+                 /scripts/functions/*.sql /scripts/views/*.sql /scripts/procedures/*.sql \
+                 /scripts/triggers/*.sql; do
+          echo "Aplicando $$f"
+          /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -I -b -i "$$f"
+        done
+        echo "SQL Server inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  sqlserver-demo:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-sqlserver-demo
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+    environment:
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: ApuestaDB
+      DB_USER: sa
+      DB_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+      DEMO_EMAIL: "${DEMO_EMAIL:-usuario@apuestadb.local}"
+      DEMO_PASSWORD: "${DEMO_PASSWORD}"
+    command: ["node", "/repo/database/bootstrap/azure-demo-user.js"]
+    restart: "no"
+    networks:
+      - interna
+
+  sqlserver-demo-data:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: apuestadb-azure-sqlserver-demo-data
+    depends_on:
+      sqlserver-demo:
+        condition: service_completed_successfully
+    environment:
+      MSSQL_SA_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+    volumes:
+      - ./database:/scripts:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -I -b -i /scripts/06_demo_data.sql
+    restart: "no"
+    networks:
+      - interna
+
+  mysql-schema-init:
+    image: mysql:8
+    container_name: apuestadb-azure-mysql-init
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_PWD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - ./database/mysql:/sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for f in /sql/01_schema.sql /sql/02_constraints_indexes.sql; do
+          echo "Aplicando $$f"
+          mysql -h mysql -uroot --default-character-set=utf8mb4 < "$$f"
+        done
+        echo "MySQL inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  postgres-schema-init:
+    image: postgres:16
+    container_name: apuestadb-azure-postgres-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      PGUSER: "${POSTGRES_USER}"
+      PGDATABASE: "${POSTGRES_DB}"
+    volumes:
+      - ./database/postgresql:/sql:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for f in /sql/01_schema.sql /sql/02_constraints_indexes.sql /sql/03_functions.sql; do
+          echo "Aplicando $$f"
+          psql -h postgres -v ON_ERROR_STOP=1 -f "$$f"
+        done
+        echo "PostgreSQL inicializado"
+    restart: "no"
+    networks:
+      - interna
+
+  mongo-init:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
+      MONGO_DATABASE: apuestadb
+    entrypoint: ["node", "/repo/database/mongodb/01_init.js"]
+    restart: "no"
+    networks:
+      - interna
+
+  data-init:
+    build:
+      context: .
+      dockerfile: database/bootstrap/Dockerfile
+    container_name: apuestadb-azure-data-init
+    depends_on:
+      sqlserver-demo-data:
+        condition: service_completed_successfully
+      mysql-schema-init:
+        condition: service_completed_successfully
+      postgres-schema-init:
+        condition: service_completed_successfully
+      mongo-init:
+        condition: service_completed_successfully
+    environment:
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: ApuestaDB
+      DB_USER: sa
+      DB_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
+      MONGO_DATABASE: apuestadb
+    command: ["node", "/repo/database/bootstrap/azure-data-init.js"]
+    restart: "no"
+    networks:
+      - interna
+
+  mysql:
+    image: mysql:8
+    container_name: apuestadb-azure-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - interna
+
+  postgres:
+    image: postgres:16
+    container_name: apuestadb-azure-postgres
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - interna
+
+  mongo:
+    image: mongo:7
+    container_name: apuestadb-azure-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD}"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'quit(db.adminCommand({ping:1}).ok ? 0 : 1)'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - interna
+
+  backend:
+    build:
+      context: ./backend
+    container_name: apuestadb-azure-backend
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      API_PREFIX: /api
+      CORS_ORIGINS: "${CORS_ORIGINS}"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-2h}"
+      JWT_ISSUER: apuestadb-api
+      BCRYPT_ROUNDS: "10"
+      AUDIT_ACCESS: "true"
+      DB_SERVER: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: ApuestaDB
+      DB_USER: sa
+      DB_PASSWORD: "${SQLSERVER_SA_PASSWORD}"
+      DB_AUTH_MODE: sql
+      DB_ENCRYPT: "true"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/?authSource=admin"
+      MONGO_DATABASE: apuestadb
+      CATALOGO_MOTOR: "${CATALOGO_MOTOR:-mysql}"
+      SALDO_MOTOR: "${SALDO_MOTOR:-postgresql}"
+      APUESTAS_MOTOR: "${APUESTAS_MOTOR:-mongodb}"
+      DOCUMENTOS_MOTOR: "${DOCUMENTOS_MOTOR:-mongodb}"
+    depends_on:
+      data-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - interna
+      - web
+
+  nginx:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    container_name: apuestadb-azure-nginx
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - web
+
+volumes:
+  sqlserver_data:
+  mysql_data:
+  postgres_data:
+  mongo_data:
+
+networks:
+  interna:
+    internal: true
+  web:

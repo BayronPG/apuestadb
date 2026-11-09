@@ -6,6 +6,11 @@
  */
 
 const { sql, p, ejecutar } = require('../config/database');
+const config = require('../config');
+
+function usaMongo() {
+  return config.documentos.motor === 'mongodb';
+}
 
 /**
  * Inserta un registro de auditoria (dbo.usp_Auditoria_Registrar).
@@ -20,6 +25,18 @@ async function registrar({
   descripcion = null,
   direccionOrigen = null,
 }) {
+  if (usaMongo()) {
+    const docs = require('./documentos.mongo.repository');
+    return docs.registrarAuditoria({
+      operacion,
+      entidadAfectada,
+      resultado,
+      idUsuario,
+      descripcion,
+      direccionOrigen,
+    });
+  }
+
   await ejecutar('dbo.usp_Auditoria_Registrar', {
     operacion: p(sql.NVarChar(50), operacion),
     entidad_afectada: p(sql.NVarChar(50), entidadAfectada),
@@ -35,6 +52,10 @@ async function registrar({
  * `top` se limita a 1000 dentro del procedimiento.
  */
 async function consultar({ idUsuario = null, operacion = null, desde = null, hasta = null, top = 100 }) {
+  if (usaMongo()) {
+    const docs = require('./documentos.mongo.repository');
+    return docs.consultarAuditoria({ idUsuario, operacion, desde, hasta, top });
+  }
   const resultado = await ejecutar('dbo.usp_Auditoria_Consultar', {
     id_usuario: p(sql.Int, idUsuario),
     operacion: p(sql.NVarChar(50), operacion),

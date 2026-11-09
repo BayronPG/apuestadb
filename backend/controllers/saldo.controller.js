@@ -28,4 +28,10 @@ const historialMovimientos = manejarAsync(async (req, res) => {
   return res.status(200).json({ ok: true, data: datos });
 });
 
-module.exports = { consultar, historialMovimientos };
+/** GET /api/saldo/tipos */
+const listarTipos = manejarAsync(async (req, res) => {
+  const datos = await saldoService.listarTiposSaldo();
+  return res.status(200).json({ ok: true, data: datos });
+});
+
+module.exports = { consultar, historialMovimientos, listarTipos };

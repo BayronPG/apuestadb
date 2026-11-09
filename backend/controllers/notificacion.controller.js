@@ -20,4 +20,18 @@ const listar = manejarAsync(async (req, res) => {
   return res.status(200).json({ ok: true, data: datos });
 });
 
-module.exports = { listar };
+/** PATCH /api/notificaciones/:id */
+const actualizar = manejarAsync(async (req, res) => {
+  const idNotificacion = Number.parseInt(req.params.id, 10);
+  const { estado } = req.body;
+
+  const datos = await notificacionService.actualizarEstado({
+    idNotificacion,
+    idUsuario: req.usuario.id,
+    estado,
+  });
+
+  return res.status(200).json({ ok: true, data: datos });
+});
+
+module.exports = { listar, actualizar };

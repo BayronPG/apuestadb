@@ -7,7 +7,7 @@
 - **Asignatura:** Bases de Datos 2 (Tecnológico de Antioquia).
 - **Proyecto:** sitio web académico de apuestas deportivas simuladas.
 - **Dinero real:** no se utilizará. Todo saldo y transacción es ficticio.
-- **Fase actual:** **cerrada** — Fases 0 a 12.1 **completadas** y **Fase 13 completada (07/oct/2026)**; no hay fase abierta ni trabajo pendiente autorizado (coincide con `SESSION_HANDOFF.md`).
+- **Fase actual:** **Fase 14 en curso** — Fases 0 a 13 **completadas**; **Fase 14.4 cerrada** y **Fases 14.5 y 14.6 implementadas (08/nov/2026)**: capa de conexión multibase y `GET /api/health` con estado de los cuatro motores. **SQL Server sigue siendo la fuente funcional**; MySQL, PostgreSQL y MongoDB solo tienen conexión y health; **no se ejecutaron migraciones**.
 - **Workspace:** `C:\Proyectos\ApuestaDB` (independiente de MiControlDiDi).
 - **Integrantes del equipo (2):** Jhon Bayron Peláez Guerra y Shantal Coneo García (15/ago/2026).
 - **Motor de base de datos: SQL Server** (decisión de Jhon, 24/ago/2026; pendiente de validación del profesor).
@@ -85,3 +85,65 @@ Política permanente de respuesta autorizada por Jhon (v1.2 de `AGENT_INSTRUCTIO
 ## Regla de actualización
 
 Este documento solo incorpora información como **confirmada** cuando proviene del profesor o de una decisión explícitamente aprobada por Jhon. Todo lo demás permanece como provisional o pendiente.
+
+## Fase 14 — Multimotor (08/nov/2026)
+
+- **Fase 14.4 cerrada:** `docker-compose.yml` levanta SQL Server (host 1434), MySQL (host 3307), PostgreSQL (host 5433) y MongoDB (host 27017); las cuatro imágenes son linux/amd64.
+- **Fases 14.5 y 14.6 implementadas:** capa `backend/config/db/` con conexión perezosa, `ping()` y `cerrar()` por motor; `GET /api/health` informa `data.estado`, `data.motores` y conserva `data.baseDatos.estado`.
+- **SQL Server sigue siendo la fuente funcional** de todos los repositorios; MySQL, PostgreSQL y MongoDB solo tienen conexión y health.
+- **No se ejecutaron migraciones** ni se crearon tablas o colecciones en los motores auxiliares.
+- **PostgreSQL Docker usa host 5433 → contenedor 5432**; el puerto 5432 del host pertenece al PostgreSQL 18 nativo y no se modifica.
+- **Próximo paso:** Fase 14.7 (indicadores de motor) o scripts mínimos por motor, previa autorización de Jhon.
+
+## Fase 15 — Catálogo en MySQL y tabla Jugador (08/nov/2026)
+
+- **Migradas a MySQL** las 15 tablas del catálogo deportivo (167 filas) conservando identificadores; total **16 tablas MySQL** con la nueva Jugador.
+- **Jugador** pertenece a Equipo, es un registro de catálogo y **no** interviene en apuestas, mercados, resultados ni saldos.
+- **Estadio = cancha** (decisión confirmada); **no** se creó la tabla Cancha.
+- **SQL Server conserva el sistema funcional**; el backend lee el catálogo de SQL Server o MySQL según CATALOGO_MOTOR (predeterminado sqlserver).
+- **PostgreSQL y MongoDB** no se modificaron; su migración queda pendiente.
+- Scripts y verificación: database/mysql/; detalle en docs/ACTUAL/poliglota/MIGRACION_MYSQL_CATALOGO.md.
+
+## Fase 16 — Migración financiera a PostgreSQL (08/nov/2026)
+
+- **Migradas a PostgreSQL** las 5 tablas del dominio financiero (TipoSaldo, TipoMovimientoSaldo, SaldoCuenta, Recarga, MovimientoSaldo): **60 filas**, IDs y montos conservados.
+- **Backend:** \SALDO_MOTOR=sqlserver|postgresql\ (predeterminado \sqlserver\) para las lecturas de saldo, tipos e historial.
+- **Escrituras financieras** (movimientos y recargas) siguen en SQL Server; su traslado a PL/pgSQL queda para la Fase 16.1.
+- **MySQL, MongoDB y frontend** sin cambios.
+- Scripts y verificación: \database/postgresql/\; detalle en \docs/ACTUAL/poliglota/MIGRACION_POSTGRESQL_SALDO.md\.
+
+## Fase 16.1 — Escrituras financieras en PostgreSQL (08/nov/2026)
+
+- **Implementadas** \n_recarga_crear\ y \n_movimiento_saldo\: transacciones, \SELECT ... FOR UPDATE\, \NUMERIC(18,2)\, rollback ante saldo insuficiente y bloqueo por clave de idempotencia.
+- **\SALDO_MOTOR=postgresql\** cubre lecturas y escrituras de saldo; \SALDO_MOTOR=sqlserver\ conserva el comportamiento actual.
+- **Verificado:** recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia y TOKENS/PSE independientes.
+- **Pendiente (Fase 17):** saga de apuestas con MongoDB, notificaciones/auditoría desde PostgreSQL.
+
+## Fase 17 — Dominio documental en MongoDB (08/nov/2026)
+
+- **Migradas** 4 colecciones (puesta, liquidacion, 
+otificacion, uditoria): **108 documentos**, IDs y fechas conservados.
+- **Backend:** \APUESTAS_MOTOR=sqlserver|mongodb\ (predeterminado \sqlserver\); con \mongodb\ la apuesta se crea con saga PostgreSQL + MongoDB.
+- **Saga:** débito idempotente en PostgreSQL, inserción en MongoDB y **compensación** con crédito de ajuste si falla el documento.
+- **Pendiente (17.1):** liquidación y notificaciones/auditoría desde MongoDB.
+
+## Fase 17.1 — Liquidaciones, notificaciones y auditoría (08/nov/2026)
+
+- **\DOCUMENTOS_MOTOR=sqlserver|mongodb\** (predeterminado \sqlserver\) para liquidaciones, notificaciones y auditoría.
+- **Liquidación idempotente:** premio en PostgreSQL con el mismo tipo de saldo, documento único por apuesta en MongoDB y compensación si falla la inserción.
+- **Notificaciones y auditoría** se escriben y leen en MongoDB con el motor \mongodb\.
+- **Validado:** liquidación, duplicado, premio, notificación, auditoría, fallo simulado con compensación, concurrencia y lecturas; respaldo SQL Server 8/8.
+
+## Integración multibase cerrada (08/nov/2026)
+
+- **Motores activos:** SQL Server (auth/usuarios), MySQL (catálogo), PostgreSQL (finanzas), MongoDB (apuestas, liquidaciones, notificaciones, auditoría).
+- **Auditoría final:** 16 tablas MySQL (167 filas de catálogo + 26 jugadores), 5 tablas PostgreSQL (sumas 1.247.500 / 1.897.500 / 1.110.000), 108 documentos MongoDB, 9 usuarios y 2 roles en SQL Server.
+- **API:** 10/10 endpoints 200; health operativo 4/4; build de frontend correcto.
+- **Sagas:** débito/recarga/premio idempotentes en PostgreSQL; creación y liquidación con compensación en MongoDB.
+
+## Entrega segura Azure (08/nov/2026)
+
+- **App Service F1 público** con frontend y backend: https://app-apuestadb-bayron-hkgefxhpfhasbfcu.brazilsouth-01.azurewebsites.net
+- / 200, /login 200 y /api/health 200 en production/degradado.
+- **Bases no disponibles en Azure** por cuota Compute 0 y política regional; la arquitectura multibase completa se demuestra **localmente con Docker** (health operativo 4/4).
+- Detalle en docs/ACTUAL/despliegue/ENTREGA_SEGURA.md.

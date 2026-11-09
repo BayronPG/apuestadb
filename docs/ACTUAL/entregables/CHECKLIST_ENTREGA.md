@@ -85,3 +85,16 @@
 | 2 | Aceptación de la invitación al repositorio | Compañera `shantal-hue` |
 | 3 | Validación del profesor sobre motor, stack y alcance | Profesor |
 | 4 | Recorrido clicable en navegador / responsive / concurrencia | Autorización para una sesión de pruebas adicional |
+
+## Integración multibase (08/nov/2026)
+
+- [x] Catálogo en MySQL (16 tablas, 167 filas migradas + 26 jugadores).
+- [x] Finanzas en PostgreSQL (5 tablas, escrituras idempotentes con compensación).
+- [x] Documentos en MongoDB (108 documentos, liquidación única por apuesta).
+- [x] Auth/usuarios en SQL Server (9 usuarios, 2 roles).
+- [x] Health 4/4 y 10/10 endpoints de integración.
+- [x] Build de frontend (`vite build`) sin errores.
+- [x] Login final y ruta autenticada verificados localmente (HTTP 200).
+- [x] Sin secretos versionados.
+- [x] Despliegue Azure: App Service F1 público con frontend/backend y health degradado documentado.
+- [ ] Cuentas externas (SSO, Drive, Wompi, Firebase): pendiente de credenciales.

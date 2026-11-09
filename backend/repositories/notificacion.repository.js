@@ -10,12 +10,21 @@
  */
 
 const { sql, p, consultar } = require('../config/database');
+const config = require('../config');
+
+function usaMongo() {
+  return config.documentos.motor === 'mongodb';
+}
 
 /**
  * Lista las notificaciones del usuario.
  * @param {{idUsuario:number, estado?:string|null, limite?:number}} filtros
  */
 async function listar({ idUsuario, estado = null, limite = 100 }) {
+  if (usaMongo()) {
+    const docs = require('./documentos.mongo.repository');
+    return docs.listarNotificaciones({ idUsuario, estado, limite });
+  }
   const resultado = await consultar(
     `SELECT TOP (@limite)
             n.id_notificacion,
@@ -38,4 +47,31 @@ async function listar({ idUsuario, estado = null, limite = 100 }) {
   return resultado.registros;
 }
 
-module.exports = { listar };
+/**
+ * Actualiza el estado de una notificacion que pertenece al usuario.
+ * Devuelve `true` solo si se modifico una fila (0 = no existe o es ajena).
+ * @param {{idNotificacion:number, idUsuario:number, estado:string}} datos
+ */
+async function actualizarEstado({ idNotificacion, idUsuario, estado }) {
+  if (usaMongo()) {
+    const docs = require('./documentos.mongo.repository');
+    const actualizado = await docs.actualizarNotificacion(idNotificacion, idUsuario, estado);
+    return actualizado ? [{ actualizado: 1 }] : [];
+  }
+  const resultado = await consultar(
+    `UPDATE dbo.Notificacion
+        SET estado = @estado
+      WHERE id_notificacion = @id_notificacion
+        AND id_usuario = @id_usuario`,
+    {
+      id_notificacion: p(sql.BigInt, idNotificacion),
+      id_usuario: p(sql.Int, idUsuario),
+      estado: p(sql.VarChar(20), estado),
+    },
+  );
+
+  const [filas] = resultado.filasAfectadas;
+  return filas > 0;
+}
+
+module.exports = { listar, actualizarEstado };

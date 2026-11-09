@@ -8,7 +8,13 @@
  * capas importa `config` y nunca lee variables de entorno directamente.
  */
 
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({
+  path: path.resolve(__dirname, '..', '.env'),
+  override: process.env.NODE_ENV !== 'production',
+});
 
 function aEntero(valor, porDefecto) {
   const numero = Number.parseInt(valor, 10);
@@ -35,7 +41,7 @@ const config = {
   apiPrefijo: process.env.API_PREFIX || '/api',
 
   cors: {
-    origenes: aLista(process.env.CORS_ORIGIN, ['http://localhost:5173']),
+    origenes: aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']),
   },
 
   jwt: {
@@ -63,6 +69,51 @@ const config = {
     tiempoPeticion: aEntero(process.env.DB_REQUEST_TIMEOUT, 30000),
   },
 
+  // Motores auxiliares (Fase 14.5). SQL Server sigue siendo el motor funcional.
+  mysql: {
+    host: process.env.MYSQL_HOST || '',
+    puerto: aEntero(process.env.MYSQL_PORT, 3307),
+    baseDatos: process.env.MYSQL_DATABASE || '',
+    usuario: process.env.MYSQL_USER || '',
+    contrasena: process.env.MYSQL_PASSWORD || '',
+    tiempoConexion: aEntero(process.env.MYSQL_CONNECT_TIMEOUT, 5000),
+  },
+
+  postgresql: {
+    host: process.env.POSTGRES_HOST || '',
+    puerto: aEntero(process.env.POSTGRES_PORT, 5433),
+    baseDatos: process.env.POSTGRES_DB || '',
+    usuario: process.env.POSTGRES_USER || '',
+    contrasena: process.env.POSTGRES_PASSWORD || '',
+    tiempoConexion: aEntero(process.env.POSTGRES_CONNECT_TIMEOUT, 5000),
+  },
+
+  mongodb: {
+    uri: process.env.MONGO_URI || '',
+    baseDatos: process.env.MONGO_DATABASE || '',
+    tiempoConexion: aEntero(process.env.MONGO_CONNECT_TIMEOUT, 5000),
+  },
+
+  // Motor que resuelve las consultas de catalogo y eventos (Fase 15).
+  catalogo: {
+    motor: (process.env.CATALOGO_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
+  // Motor del dominio documental de apuestas (Fase 17).
+  apuestas: {
+    motor: (process.env.APUESTAS_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
+  // Motor de liquidaciones, notificaciones y auditoria (Fase 17.1).
+  documentos: {
+    motor: (process.env.DOCUMENTOS_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
+  // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
+  saldo: {
+    motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),
+  },
+
   auditoria: {
     registrarAccesos: aBooleano(process.env.AUDIT_ACCESS, true),
   },
@@ -86,6 +137,26 @@ function validarConfiguracion() {
   }
 
   if (!config.bd.baseDatos) problemas.push('DB_NAME no esta definido.');
+
+  if (config.entorno === 'production' && config.cors.origenes.includes('*')) {
+    problemas.push('CORS_ORIGINS no debe incluir * en produccion.');
+  }
+
+  if (!['sqlserver', 'mysql'].includes(config.catalogo.motor)) {
+    problemas.push("CATALOGO_MOTOR debe ser 'sqlserver' o 'mysql'.");
+  }
+
+  if (!['sqlserver', 'postgresql'].includes(config.saldo.motor)) {
+    problemas.push("SALDO_MOTOR debe ser 'sqlserver' o 'postgresql'.");
+  }
+
+  if (!['sqlserver', 'mongodb'].includes(config.apuestas.motor)) {
+    problemas.push("APUESTAS_MOTOR debe ser 'sqlserver' o 'mongodb'.");
+  }
+
+  if (!['sqlserver', 'mongodb'].includes(config.documentos.motor)) {
+    problemas.push("DOCUMENTOS_MOTOR debe ser 'sqlserver' o 'mongodb'.");
+  }
 
   if (config.bd.modoAutenticacion === 'windows') {
     problemas.push(

@@ -9,13 +9,14 @@ const apuestaService = require('../services/apuesta.service');
 
 /** POST /api/apuestas */
 const registrar = manejarAsync(async (req, res) => {
-  const { idOpcion, idTipoSaldo, monto } = req.body;
+  const { idOpcion, idTipoSaldo, monto, claveIdempotencia = null } = req.body;
 
   const datos = await apuestaService.registrarApuesta({
     idUsuario: req.usuario.id,
     idOpcion,
     idTipoSaldo,
     monto,
+    claveIdempotencia,
   });
 
   return res.status(201).json({ ok: true, data: datos });

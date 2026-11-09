@@ -1,10 +1,10 @@
 # SESSION_HANDOFF.md — ApuestaDB
 
-**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos** · 28/oct/2026 — versionado del código en `origin/main`
+**Última actualización:** 07/oct/2026 — **Fase 13 (entregable de consultas SQL) y recuperación de la base de datos** · 28/oct/2026 — versionado del código en `origin/main` · 08/nov/2026 — Fase 14.5–14.6 (cuatro motores + health)
 
 ## Fase actual
 
-**FASES 0 a 12.1 COMPLETADAS; FASE 13 COMPLETADA (07/oct/2026).** El proyecto está cerrado como **funcional, documentado y listo para entrega y sustentación académica**. No hay fase abierta ni trabajo pendiente autorizado. Cualquier cambio nuevo (funcionalidad, alcance, base de datos, backend, frontend o documentación) requiere autorización explícita de Jhon.
+**FASES 0 a 13 COMPLETADAS; FASE 14 EN CURSO.** **Fase 14.4 cerrada** y **Fases 14.5 y 14.6 implementadas (08/nov/2026)**: capa de conexión independiente para SQL Server, MySQL, PostgreSQL y MongoDB, más `GET /api/health` con el estado de los cuatro motores. SQL Server sigue siendo la fuente funcional de todos los repositorios; MySQL, PostgreSQL y MongoDB solo tienen conexión y health, y **no se ejecutaron migraciones**. Rama de trabajo: `poliglota` (sin push).
 
 ## Información confirmada
 
@@ -68,3 +68,71 @@ Para la Fase 13: revisar `database/consultas/COBERTURA.md` (mapa requisito → s
 - Cualquier cambio de código, base de datos, alcance o contrato de la API.
 - Reabrir una fase o incorporar archivos externos al workspace.
 - Publicar el repositorio o compartir credenciales.
+
+## Verificación en vivo (04/nov/2026)
+
+- Servicios levantados y verificados: MSSQL + SQL Server :1433, backend :4000 (aseDatos: conectada), frontend :5173 con proxy /api funcionando.
+- Cadena probada: registro → login (JWT) → /api/saldo, /api/eventos/activos, /api/apuestas, /api/notificaciones (200); rutas de administrador con token de usuario → 403; sin token → 401.
+- Hallazgo: el entorno de Windows puede definir variables DB_* que dotenv no sobrescribe; `backend/config/index.js` carga `backend/.env` con precedencia solo fuera de producción (ver docs/ACTUAL/pruebas/CORRECCIONES.md C-11).
+- Usuario de prueba remanente: smoke_211412@apuestadb.co (no se pudo borrar por FK).
+## Fase 14.5–14.6 (08/nov/2026)
+
+- **Implementado:** `backend/config/db/` con módulos independientes por motor (SQL Server, MySQL, PostgreSQL, MongoDB), `ping()`/`cerrar()`, pools reutilizados y cierre ordenado en `SIGINT`/`SIGTERM`.
+- **Health:** `GET /api/health` informa `data.estado` (`operativo`/`degradado`), `data.motores` (4) y conserva `data.baseDatos.estado` para SQL Server; responde 200 aunque un auxiliar esté caído.
+- **Puertos Docker:** SQL Server 1434→1433, MySQL 3307→3306, PostgreSQL **5433→5432**, MongoDB 27017→27017. El 5432 del host pertenece al PostgreSQL 18 nativo y no se modifica.
+- **Validado:** 4/4 conectados; modo degradado con MongoDB detenido (`degradado`) y restauración a `operativo`; regresión mínima 7/7.
+- **Sin migraciones:** SQL Server sigue siendo la fuente funcional; los auxiliares solo tienen conexión y health.
+- **Siguiente tarea:** Fase 14.7 (indicadores de motor en la interfaz) o scripts mínimos por motor, según autorización posterior de Jhon.
+
+## Fase 15 — Catálogo MySQL y Jugador (08/nov/2026)
+
+- **Implementado:** database/mysql/ (01 esquema, 02 restricciones e índices, 03 semilla de Jugador, 04 migración, 05 verificación, README).
+- **Datos:** 15 tablas migradas (167 filas) con IDs, cuotas y fechas conservados; 26 jugadores ficticios (2 por equipo); cero huérfanos y RN-16 sin violaciones.
+- **Backend:** CATALOGO_MOTOR=sqlserver|mysql (predeterminado sqlserver); endpoints nuevos GET /api/jugadores, GET /api/equipos/:id/jugadores y POST /api/jugadores (administrador).
+- **Alcance:** Estadio representa la cancha; no existe tabla Cancha; Jugador no interviene en apuestas.
+- **Sin cambios:** SQL Server sigue siendo la fuente funcional; PostgreSQL y MongoDB intactos; sin migraciones de escritura.
+- **Siguiente tarea:** Fase 16 — migrar escrituras del catálogo o preparar PostgreSQL (saldo) y MongoDB (apuestas), según autorización de Jhon.
+
+## Fase 16 — Dominio financiero en PostgreSQL (08/nov/2026)
+
+- **Implementado:** \database/postgresql/\ (01 esquema, 02 restricciones e índices, 04 migración, 05 verificación). 5 tablas, 60 filas, 2 vistas.
+- **Validado:** DDL y migración idempotentes (2 ejecuciones), conteos y sumas idénticas a SQL Server, 0 huérfanos, FK/CHECK activos, health operativo 4/4.
+- **Backend:** \SALDO_MOTOR\ (predeterminado \sqlserver\); con \postgresql\ las lecturas de saldo devuelven el mismo contrato (tipos numéricos normalizados).
+- **Pendiente:** Fase 16.1 — trasladar escrituras financieras y triggers a PL/pgSQL; después, MongoDB (apuestas).
+
+## Fase 16.1 — Escrituras financieras PostgreSQL (08/nov/2026)
+
+- **Implementado:** \database/postgresql/03_functions.sql\ (\n_recarga_crear\, \n_movimiento_saldo\) + tabla \IdempotenciaFinanciera\; \saldo.repository\ usa estas funciones cuando \SALDO_MOTOR=postgresql\.
+- **Validado:** 10/10 pruebas financieras (recarga, duplicado, monto inválido, descuento, insuficiencia, premio, premio duplicado, rollback, concurrencia, ambos tipos); contratos GET idénticos en ambos motores; health 4/4; datos de prueba restaurados.
+- **Sin cambios:** MySQL, MongoDB, frontend, Azure; \SALDO_MOTOR=sqlserver\ intacto.
+- **Siguiente:** Fase 17 — saga de apuestas con MongoDB y notificaciones/auditoría desde PostgreSQL.
+
+## Fase 17 — MongoDB documental y saga (08/nov/2026)
+
+- **Implementado:** \database/mongodb/\ (01 init, 02 migración, 03 verificación). Colecciones con índices únicos y clave de idempotencia.
+- **Saga:** \ackend/services/apuesta.saga.js\ + \puesta.mongo.repository.js\; débito PG idempotente, documento Mongo, compensación ante fallo.
+- **Validado:** migración 2× idempotente (108 docs), saga 201, duplicado sin segundo débito, insuficiencia 409, compensación con saldo restaurado, lecturas Mongo 200, respaldo SQL Server 7/7.
+- **Datos de prueba restaurados**; health 4/4; contenedores healthy.
+- **Siguiente:** Fase 17.1 — liquidación y notificaciones/auditoría en MongoDB.
+
+## Fase 17.1 — Dominio documental completo (08/nov/2026)
+
+- **Implementado:** \liquidacion.documental.js\, \documentos.mongo.repository.js\; ramas Mongo en notificación y auditoría; índice único \uq_liquidacion_apuesta\; contadores por colección.
+- **Validado:** liquidación 1 pago, duplicado 0, premio en mismo tipo, notificación/auditoría en Mongo, compensación con saldo intacto, concurrencia (1 liquidación, 1 premio), respaldo SQL Server 8/8.
+- **Datos restaurados:** PG 1.247.500 / 1.897.500 / 1.110.000; Mongo 108 documentos; MySQL 9/27/7.
+- **Siguiente:** reintentos de saga y outbox, o preparación de despliegue Azure.
+
+## Integración multibase cerrada (08/nov/2026)
+
+- **Estado:** Fases 14–17.1 completadas; integración verificada de punta a punta, sin cambios de código en la auditoría final.
+- **Datos:** MySQL 16 tablas / 167 + 26 jugadores; PostgreSQL 5 tablas con sumas exactas; MongoDB 108 documentos; SQL Server 9 usuarios.
+- **Pruebas:** 10/10 endpoints 200, health 4/4, build Vite correcto, sin secretos versionados.
+- **Pendientes reales:** despliegue Azure (recursos y cuentas), SSO/Drive/Wompi/Firebase sin credenciales, reintentos automáticos de saga y outbox.
+- **Siguiente:** preparación de despliegue y demo pública.
+
+## Entrega segura Azure (08/nov/2026)
+
+- **Publicado:** App Service F1 con SPA + API; URL hostname con sufijo de Azure (ver ENTREGA_SEGURA.md).
+- **Verificado en vivo:** / 200, /login 200, /api/health 200 (production, degradado).
+- **Limitación:** cuota Compute 0 y política regional impiden bases administradas en Azure; multibase se demuestra local con Docker.
+- **Pendiente:** SSO, Drive, Wompi y Firebase siguen sin credenciales; plan F1 solo para demostración.

@@ -1,6 +1,6 @@
 # ApuestaDB — Endpoints de la API
 
-Prefijo base: `/api`. Total: **24 endpoints** (23 + 1 de la Fase 10.1).
+Prefijo base: `/api`. Total: **31 endpoints**.
 
 Formato uniforme de respuesta:
 
@@ -34,6 +34,7 @@ rol autenticado · `admin` solo `administrador`.
 | Método | Ruta | Rol | Cuerpo / Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/saldo` | usuario* | — | `usp_Saldo_Consultar` + consulta parametrizada `SaldoCuenta`⋈`TipoSaldo` | 200 `{ cuentas[], saldoTotal }` · 404 usuario inexistente |
+| GET | `/api/saldo/tipos` | usuario* | — | `TipoSaldo` (consulta parametrizada) | 200 `{ tipos[], total }` |
 | GET | `/api/saldo/movimientos` | usuario* | `idTipoSaldo?`, `desde?`, `hasta?` | `usp_MovimientoSaldo_Historial` | 200 `{ movimientos[], total }` · 400 rango inválido |
 
 El `id_usuario` se toma siempre del token; no se acepta por parámetro.
@@ -102,6 +103,7 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 | Método | Ruta | Rol | Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/notificaciones` | usuario* | `estado?`, `limite?` | `Notificacion` (consulta parametrizada) | 200 `{ notificaciones[], total }` |
+| PATCH | `/api/notificaciones/:id` | usuario* | `estado` = `no_leida` \| `leida` | `Notificacion` (UPDATE parametrizado por usuario) | 200 `{ idNotificacion, estado, mensaje }` · 400 datos inválidos · 404 inexistente o ajena |
 
 > No existe vista ni procedimiento de consulta de notificaciones (solo el de
 > creación); ver `ARQUITECTURA.md` §7.
@@ -133,6 +135,8 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 | Método | Ruta | Rol | Query | Objeto de BD | Respuestas |
 |---|---|---|---|---|---|
 | GET | `/api/usuarios` | admin | `estado?`, `rol?`, `limite?` | `Usuario` + `Rol` + `vw_SaldoConsolidado` | 200 `{ usuarios[], total }` |
+| GET | `/api/usuarios/perfil` | usuario* | — | `Usuario` + `Rol` (solo usuario del token) | 200 `{ idUsuario, nombres, apellidos, correo, telefono, rol }` · 404 usuario inexistente |
+| PUT | `/api/usuarios/perfil` | usuario* | `nombres?`, `apellidos?`, `telefono?` | `Usuario` (UPDATE parametrizado por usuario) | 200 perfil actualizado · 400 campos inválidos · 404 usuario inexistente |
 
 ---
 
@@ -140,26 +144,64 @@ Si `estado` no pertenece al dominio, se responde 200 con lista vacía (filtro no
 
 | Método | Ruta | Rol | Objeto de BD | Respuestas |
 |---|---|---|---|---|
-| GET | `/api/health` | — | `SELECT 1` (verificación de conectividad) | 200 `{ servicio, version, entorno, hora, uptimeSegundos, baseDatos{...} }` |
+| GET | `/api/health` | — | `SELECT 1` en SQL Server + ping a MySQL, PostgreSQL y MongoDB | 200 `{ servicio, version, entorno, hora, uptimeSegundos, estado, baseDatos{...}, motores{...} }` |
 
-`data.baseDatos.estado` ∈ `conectada` | `sin_respuesta` | `no_disponible`.
-El endpoint responde 200 aunque la base no esté disponible (la API sigue viva).
+`data.baseDatos.estado` ∈ `conectada` | `no_disponible` (**SQL Server**; contrato anterior conservado).
+`data.motores.{sqlserver,mysql,postgresql,mongodb}.estado` ∈ `conectada` | `no_disponible`.
+`data.estado` ∈ `operativo` (4/4 conectados) | `degradado` (alguno no disponible).
+El endpoint responde 200 mientras la API esté viva, aunque un motor auxiliar esté caído.
+No expone host, puerto, base, usuario, URI ni errores internos. Los pings se ejecutan en paralelo con `Promise.allSettled` y timeout de 5 s, reutilizando un pool por motor.
+PostgreSQL Docker se publica en **host 5433 → contenedor 5432** (el puerto 5432 del host lo ocupa el PostgreSQL 18 nativo de Windows).
 
 ---
 
-## 12. Resumen de conteo
+## 12. Jugadores (catálogo MySQL, Fase 15)
+
+| Método | Ruta | Rol | Cuerpo | Objeto de BD | Respuestas |
+|---|---|---|---|---|---|
+| GET | `/api/jugadores` | usuario | - | `Jugador` + `Equipo` (MySQL) | 200 `{ jugadores, total }` |
+| GET | `/api/jugadores?idEquipo=N` | usuario | - | `Jugador` filtrado por equipo | 200 lista filtrada |
+| GET | `/api/equipos/:id/jugadores` | usuario | - | `Jugador` + `Equipo` | 200 `{ jugadores, total }` · 404 equipo inexistente |
+| POST | `/api/jugadores` | admin | `idEquipo`, `nombres`, `apellidos`, `numeroCamiseta?`, `posicion?`, `fechaNacimiento?`, `nacionalidad?`, `estado?` | `INSERT` en `Jugador` (MySQL) | 201 `{ jugador }` · 400 · 401 · 403 · 404 · 409 camiseta duplicada |
+
+`Jugador` es una tabla nueva del catálogo: pertenece a `Equipo` y no participa todavía en apuestas, mercados, resultados ni saldos.
+
+### Motor de catálogo
+
+`CATALOGO_MOTOR=sqlserver` (predeterminado) mantiene las consultas actuales; `CATALOGO_MOTOR=mysql` resuelve catálogo y eventos en MySQL. Los contratos HTTP no cambian.
+
+---
+
+## 13. Resumen de conteo
 
 | Grupo | Endpoints |
 |---|---|
 | Autenticación | 4 |
-| Saldo | 2 |
+| Saldo | 3 |
 | Recargas | 1 |
 | Apuestas | 5 |
 | Eventos | 4 |
 | Liquidaciones | 1 |
-| Notificaciones | 1 |
+| Notificaciones | 2 |
 | Reportes | 3 |
 | Auditoría | 1 |
-| Usuarios | 1 |
+| Usuarios | 3 |
+| Jugadores | 3 |
 | Sistema | 1 |
-| **Total** | **24** |
+| **Total** | **31** |
+
+### Motor de saldo (Fase 16)
+
+\SALDO_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \SALDO_MOTOR=postgresql\ resuelve \GET /api/saldo\, \/api/saldo/tipos\ y \/api/saldo/movimientos\ en PostgreSQL. Las escrituras (\POST /api/recargas\, movimientos) siguen en SQL Server.
+
+### Motor de saldo (Fase 16.1)
+
+\SALDO_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \SALDO_MOTOR=postgresql\ resuelve lecturas y escrituras financieras en PostgreSQL (\n_recarga_crear\, \n_movimiento_saldo\), con idempotencia por clave y rollback ante saldo insuficiente. La orquestación de apuestas con MongoDB queda para la Fase 17.
+
+### Motor de apuestas (Fase 17)
+
+\APUESTAS_MOTOR=sqlserver\ (predeterminado) usa los procedimientos actuales; \APUESTAS_MOTOR=mongodb\ lee apuestas desde MongoDB y crea con saga PostgreSQL + MongoDB. \POST /api/apuestas\ acepta \claveIdempotencia\ opcional; repetir la clave devuelve la misma apuesta sin segundo débito. La liquidación sigue en SQL Server.
+
+### Motor documental (Fase 17.1)
+
+\DOCUMENTOS_MOTOR=sqlserver\ (predeterminado) mantiene los procedimientos; \DOCUMENTOS_MOTOR=mongodb\ resuelve liquidaciones, notificaciones y auditoría en MongoDB. La liquidación es idempotente: repetirla no vuelve a pagar el premio.

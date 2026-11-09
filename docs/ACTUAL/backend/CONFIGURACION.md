@@ -31,7 +31,7 @@ notepad .env
 | `NODE_ENV` | `development` | `development` \| `production` \| `test`. |
 | `PORT` | `4000` | Puerto HTTP de la API. |
 | `API_PREFIX` | `/api` | Prefijo de montaje de las rutas. |
-| `CORS_ORIGIN` | `http://localhost:5173` | Orígenes permitidos, separados por coma. `*` permite todos (solo local). |
+| `CORS_ORIGINS` | `http://localhost:5173` | Orígenes permitidos, separados por coma. `*` permite todos (solo local). |
 
 ### Seguridad
 
