@@ -94,6 +94,7 @@
 - [x] Auth/usuarios en SQL Server (9 usuarios, 2 roles).
 - [x] Health 4/4 y 10/10 endpoints de integración.
 - [x] Build de frontend (`vite build`) sin errores.
+- [x] Login final y ruta autenticada verificados localmente (HTTP 200).
 - [x] Sin secretos versionados.
 - [x] Despliegue Azure: App Service F1 público con frontend/backend y health degradado documentado.
 - [ ] Cuentas externas (SSO, Drive, Wompi, Firebase): pendiente de credenciales.

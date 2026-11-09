@@ -64,6 +64,7 @@ cd backend && npm start
 - [x] /api/health responde 200 en production (degradado por bases ausentes).
 - [x] Bases administradas no creadas: cuota Compute 0 y política regional.
 - [x] Multibase completo demostrable en local con Docker (health 4/4).
+- [x] Cuenta demo aislada creada por `usp_Usuario_Registrar`; login y `/api/saldo` responden 200.
 - [x] Sin secretos versionados; credenciales solo en App Settings/GitHub Secrets.
 - [x] Workflow único `.github/workflows/azure-backend.yml` (sin Static Web Apps).
 - [ ] SSO, Drive, Wompi y Firebase: sin credenciales, no expuestos.
