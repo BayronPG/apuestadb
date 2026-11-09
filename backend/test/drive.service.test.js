@@ -31,6 +31,16 @@ test('OAuth Drive usa state y proveedor mock', async () => {
   assert.equal(await service.completarAutorizacion('codigo', { oauthClient }), true);
 });
 
+test('callback guarda refresh token solo en configuracion de entorno', async () => {
+  const anterior = process.env.GOOGLE_DRIVE_REFRESH_TOKEN;
+  const oauthClient = {
+    getToken: async () => ({ tokens: { refresh_token: 'refresh-only-runtime' } }),
+  };
+  await service.completarAutorizacion('codigo', { oauthClient });
+  assert.equal(process.env.GOOGLE_DRIVE_REFRESH_TOKEN, 'refresh-only-runtime');
+  process.env.GOOGLE_DRIVE_REFRESH_TOKEN = anterior;
+});
+
 test('sube logo, guarda fileId/url y no retorna tokens', async () => {
   const llamadas = [];
   const driveApi = {

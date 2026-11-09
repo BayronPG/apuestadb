@@ -24,6 +24,7 @@ import {
   crearRecarga,
   liquidarApuestas,
   consultarAuditoria,
+  autorizarGoogleDrive,
 } from '../services/adminService.js';
 import {
   registrarResultado,
@@ -328,6 +329,7 @@ export default function DashboardAdministrador() {
   const [errorRecarga, setErrorRecarga] = useState(null);
   const [exitoRecarga, setExitoRecarga] = useState(null);
   const [enviandoRecarga, setEnviandoRecarga] = useState(false);
+  const [autorizandoDrive, setAutorizandoDrive] = useState(false);
 
   const abrirRecarga = (idUsuario = '') => {
     setRecarga({
@@ -385,6 +387,16 @@ export default function DashboardAdministrador() {
     }
   };
 
+  const autorizarDrive = async () => {
+    setAutorizandoDrive(true);
+    try {
+      const { authorizationUrl } = await autorizarGoogleDrive();
+      window.location.assign(authorizationUrl);
+    } finally {
+      setAutorizandoDrive(false);
+    }
+  };
+
   return (
     <div className="pila">
       <header className="pagina__cabecera">
@@ -401,6 +413,9 @@ export default function DashboardAdministrador() {
               <Icono nombre="mas" tamano={17} />
             </span>
             Nueva recarga
+          </button>
+          <button type="button" className="btn btn--secundario" onClick={autorizarDrive} disabled={autorizandoDrive}>
+            Autorizar Google Drive
           </button>
           <Link className="btn btn--primario" to="/admin/reportes">
             <span className="btn__icono">

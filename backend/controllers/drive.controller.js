@@ -26,7 +26,7 @@ const autorizar = manejarAsync(async (_req, res) => {
     'Set-Cookie',
     `drive_oauth_state=${encodeURIComponent(state)}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/api/integraciones/drive`,
   );
-  return res.redirect(302, driveService.urlAutorizacion(state));
+  return res.status(200).json({ ok: true, data: { authorizationUrl: driveService.urlAutorizacion(state) } });
 });
 
 const callback = manejarAsync(async (req, res) => {

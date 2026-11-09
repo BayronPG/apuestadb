@@ -81,7 +81,12 @@ function urlAutorizacion(state) {
 async function completarAutorizacion(code, { oauthClient = crearCliente() } = {}) {
   if (!code) throw errores.solicitudInvalida('El codigo de Drive es obligatorio.', 'DRIVE_CODE_INVALIDO');
   try {
-    await oauthClient.getToken(code);
+    const respuesta = await oauthClient.getToken(code);
+    const refreshToken = respuesta && respuesta.tokens && respuesta.tokens.refresh_token;
+    if (refreshToken) {
+      process.env.GOOGLE_DRIVE_REFRESH_TOKEN = refreshToken;
+      config.google.driveRefreshToken = refreshToken;
+    }
     return true;
   } catch (_error) {
     throw errores.noDisponible('Google Drive no esta disponible.', 'DRIVE_PROVEEDOR_NO_DISPONIBLE');
