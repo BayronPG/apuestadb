@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { google } = require('googleapis');
 const config = require('../config');
 const equipoRepository = require('../repositories/equipo.repository');
+const { actualizarVariable } = require('../utils/envFile');
 const { errores } = require('../utils/errors');
 
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
@@ -78,17 +79,24 @@ function urlAutorizacion(state) {
   });
 }
 
-async function completarAutorizacion(code, { oauthClient = crearCliente() } = {}) {
+async function completarAutorizacion(code, { oauthClient = crearCliente(), rutaEnv } = {}) {
   if (!code) throw errores.solicitudInvalida('El codigo de Drive es obligatorio.', 'DRIVE_CODE_INVALIDO');
   try {
     const respuesta = await oauthClient.getToken(code);
     const refreshToken = respuesta && respuesta.tokens && respuesta.tokens.refresh_token;
     if (refreshToken) {
+      // Persistencia local: sin URL, sin logs y sin pasar por Git.
+      actualizarVariable(
+        rutaEnv || require('path').resolve(__dirname, '..', '.env'),
+        'GOOGLE_DRIVE_REFRESH_TOKEN',
+        refreshToken,
+      );
       process.env.GOOGLE_DRIVE_REFRESH_TOKEN = refreshToken;
       config.google.driveRefreshToken = refreshToken;
     }
     return true;
-  } catch (_error) {
+  } catch (error) {
+    if (error && error.codigo) throw error;
     throw errores.noDisponible('Google Drive no esta disponible.', 'DRIVE_PROVEEDOR_NO_DISPONIBLE');
   }
 }

@@ -31,14 +31,25 @@ test('OAuth Drive usa state y proveedor mock', async () => {
   assert.equal(await service.completarAutorizacion('codigo', { oauthClient }), true);
 });
 
-test('callback guarda refresh token solo en configuracion de entorno', async () => {
+test('callback persiste refresh token en archivo local sin exponerlo', async () => {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const archivoEnv = path.join(os.tmpdir(), `apuestadb-drive-${process.pid}.env`);
+  fs.writeFileSync(archivoEnv, 'OTRA=1\n', 'utf8');
+
   const anterior = process.env.GOOGLE_DRIVE_REFRESH_TOKEN;
   const oauthClient = {
-    getToken: async () => ({ tokens: { refresh_token: 'refresh-only-runtime' } }),
+    getToken: async () => ({ tokens: { refresh_token: 'refresh-persistido' } }),
   };
-  await service.completarAutorizacion('codigo', { oauthClient });
-  assert.equal(process.env.GOOGLE_DRIVE_REFRESH_TOKEN, 'refresh-only-runtime');
+  await service.completarAutorizacion('codigo', { oauthClient, rutaEnv: archivoEnv });
+
+  const contenido = fs.readFileSync(archivoEnv, 'utf8');
+  assert.match(contenido, /^GOOGLE_DRIVE_REFRESH_TOKEN=refresh-persistido$/m);
+  assert.equal(process.env.GOOGLE_DRIVE_REFRESH_TOKEN, 'refresh-persistido');
+
   process.env.GOOGLE_DRIVE_REFRESH_TOKEN = anterior;
+  fs.rmSync(archivoEnv, { force: true });
 });
 
 test('sube logo, guarda fileId/url y no retorna tokens', async () => {
