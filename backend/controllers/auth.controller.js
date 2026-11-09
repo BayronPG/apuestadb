@@ -7,6 +7,9 @@
 
 const { manejarAsync } = require('../utils/asyncHandler');
 const authService = require('../services/auth.service');
+const googleService = require('../services/google-auth.service');
+const config = require('../config');
+const { errores } = require('../utils/errors');
 
 /** Direccion de origen (auditoria). Se recorta a 45 caracteres (VARCHAR(45)). */
 function direccionOrigen(req) {
@@ -61,4 +64,29 @@ const restablecerContrasena = manejarAsync(async (req, res) => {
   return res.status(200).json({ ok: true, data: datos });
 });
 
-module.exports = { registrar, iniciarSesion, solicitarRecuperacion, restablecerContrasena };
+const iniciarGoogle = manejarAsync(async (_req, res) => {
+  if (!googleService.habilitado()) return res.status(404).json({ ok: false, error: { codigo: 'GOOGLE_DESHABILITADO', mensaje: 'Inicio con Google no configurado.' } });
+  const state = googleService.crearState();
+  res.setHeader('Set-Cookie', `google_oauth_state=${encodeURIComponent(state)}; HttpOnly; SameSite=Lax; Max-Age=600; Path=/api/auth/google${config.entorno === 'production' ? '; Secure' : ''}`);
+  return res.redirect(302, googleService.urlAutorizacion(state));
+});
+
+const callbackGoogle = manejarAsync(async (req, res) => {
+  if (!googleService.habilitado()) return res.status(404).json({ ok: false, error: { codigo: 'GOOGLE_DESHABILITADO', mensaje: 'Inicio con Google no configurado.' } });
+  const cookies = String(req.headers.cookie || '').split(';').map((item) => item.trim().split('='));
+  let esperado = '';
+  try {
+    esperado = decodeURIComponent((cookies.find(([nombre]) => nombre === 'google_oauth_state') || [])[1] || '');
+  } catch (_error) {
+    esperado = '';
+  }
+  if (!googleService.validarState(req.query.state, esperado)) {
+    throw errores.solicitudInvalida('La validacion de seguridad de Google fallo.', 'GOOGLE_STATE_INVALIDO');
+  }
+  res.setHeader('Set-Cookie', 'google_oauth_state=; HttpOnly; SameSite=Lax; Max-Age=0; Path=/api/auth/google');
+  const datos = await googleService.autenticarGoogle(req.query.code);
+  const destino = `${config.google.frontendOrigin}/login#google_token=${encodeURIComponent(datos.token)}`;
+  return res.redirect(302, destino);
+});
+
+module.exports = { registrar, iniciarSesion, solicitarRecuperacion, restablecerContrasena, iniciarGoogle, callbackGoogle };

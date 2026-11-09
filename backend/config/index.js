@@ -9,6 +9,7 @@
  */
 
 const path = require('path');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
 
 dotenv.config({
@@ -48,6 +49,19 @@ const config = {
     secreto: process.env.JWT_SECRET || '',
     expiracion: process.env.JWT_EXPIRES_IN || '2h',
     emisor: process.env.JWT_ISSUER || 'apuestadb-api',
+  },
+
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || '',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL || '',
+    stateSecret:
+      process.env.GOOGLE_STATE_SECRET ||
+      process.env.JWT_SECRET ||
+      crypto.randomBytes(32).toString('hex'),
+    frontendOrigin: (aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']).find((origen) =>
+      /^https?:\/\/[^*]+$/i.test(origen),
+    ) || 'http://localhost:5173').replace(/\/$/, ''),
   },
 
   bcrypt: {

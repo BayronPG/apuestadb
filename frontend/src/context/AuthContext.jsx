@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { iniciarSesion as iniciarSesionApi } from '../services/authService.js';
+import { iniciarSesion as iniciarSesionApi, obtenerPerfil } from '../services/authService.js';
 import { registrarManejadorNoAutorizado } from '../services/api.js';
 import {
   guardarToken,
@@ -70,6 +70,15 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const loginConToken = useCallback(async (tokenGoogle) => {
+    guardarToken(tokenGoogle);
+    setToken(tokenGoogle);
+    const perfil = await obtenerPerfil();
+    guardarUsuario(perfil);
+    setUsuario(perfil);
+    return perfil;
+  }, []);
+
   const limpiarError = useCallback(() => setError(null), []);
 
   const valor = useMemo(
@@ -82,6 +91,7 @@ export function AuthProvider({ children }) {
       cargando,
       error,
       login,
+      loginConToken,
       logout,
       limpiarError,
     }),

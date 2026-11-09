@@ -38,6 +38,9 @@ notepad .env
 | Variable | Por defecto | Descripción |
 |---|---|---|
 | `JWT_SECRET` | (vacío) | Clave de firma. **Obligatoria, mínimo 32 caracteres.** |
+| `GOOGLE_CLIENT_ID` | (vacío) | Cliente OAuth 2.0; si falta, Google SSO queda deshabilitado. |
+| `GOOGLE_CLIENT_SECRET` | (vacío) | Secreto OAuth 2.0 de Google. |
+| `GOOGLE_CALLBACK_URL` | (vacío) | URL registrada para `/api/auth/google/callback`. |
 | `JWT_EXPIRES_IN` | `2h` | Vigencia del token (`15m`, `2h`, `7d`, ...). |
 | `JWT_ISSUER` | `apuestadb-api` | Emisor (`iss`) que se exige al verificar. |
 | `BCRYPT_ROUNDS` | `10` | Rondas de costo de bcrypt (decisión del proyecto: 10). |

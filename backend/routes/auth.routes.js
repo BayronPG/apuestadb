@@ -65,6 +65,9 @@ router.post(
   authController.iniciarSesion,
 );
 
+router.get('/google', authController.iniciarGoogle);
+router.get('/google/callback', authController.callbackGoogle);
+
 router.post('/recuperar', [cadenaCorreo], validar, authController.solicitarRecuperacion);
 
 router.post(
