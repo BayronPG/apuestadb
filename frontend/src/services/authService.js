@@ -14,6 +14,11 @@ export async function iniciarSesion({ correo, contrasena }) {
   return desenvolver(respuesta);
 }
 
+export async function obtenerPerfil() {
+  const respuesta = await api.get('/usuarios/perfil');
+  return desenvolver(respuesta);
+}
+
 /** POST /api/auth/registro -> { idUsuario, mensaje } (201) */
 export async function registrarUsuario({ nombres, apellidos, correo, contrasena, telefono }) {
   const cuerpo = { nombres, apellidos, correo, contrasena };

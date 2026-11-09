@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import Alert from '../components/Alert.jsx';
@@ -18,7 +18,7 @@ import { ROLES } from '../utils/constantes.js';
  * localStorage y expone `usuario` y `rol`.
  */
 export default function Login() {
-  const { login, estaAutenticado, esAdministrador } = useAuth();
+  const { login, loginConToken, estaAutenticado, esAdministrador } = useAuth();
   const navegar = useNavigate();
   const ubicacion = useLocation();
 
@@ -27,6 +27,17 @@ export default function Login() {
   const [errores, setErrores] = useState({});
   const [errorServidor, setErrorServidor] = useState(null);
   const [enviando, setEnviando] = useState(false);
+
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.hash.slice(1)).get('google_token');
+    if (!token) return;
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    setEnviando(true);
+    loginConToken(token)
+      .then((usuario) => navegar(usuario.rol === ROLES.administrador ? '/admin' : '/dashboard', { replace: true }))
+      .catch((excepcion) => setErrorServidor(mensajeDeError(excepcion)))
+      .finally(() => setEnviando(false));
+  }, [loginConToken, navegar]);
 
   if (estaAutenticado) {
     const destino = ubicacion.state?.desde || (esAdministrador ? '/admin' : '/dashboard');
@@ -108,6 +119,9 @@ export default function Login() {
       <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>
         {enviando ? <Loader tamano="sm" texto="Validando..." /> : 'Entrar'}
       </button>
+      <a className="btn btn--secundario btn--bloque" href="/api/auth/google" style={{ marginTop: 'var(--esp-2)' }}>
+        Continuar con Google
+      </a>
 
       <p className="texto-pequeno centrado" style={{ marginTop: 'var(--esp-4)' }}>
         <Link to="/recuperar">Olvide mi contrasena</Link>
