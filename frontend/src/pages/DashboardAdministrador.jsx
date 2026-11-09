@@ -10,6 +10,7 @@ import CuotaDestacada from '../components/CuotaDestacada.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import EventoDestacado from '../components/EventoDestacado.jsx';
 import FormField from '../components/FormField.jsx';
+import GestionLogosEquipos from '../components/GestionLogosEquipos.jsx';
 import GraficaBarras from '../components/GraficaBarras.jsx';
 import Icono from '../components/Icono.jsx';
 import ListaActividad from '../components/ListaActividad.jsx';
@@ -559,6 +560,8 @@ export default function DashboardAdministrador() {
           cargando={finalizados.cargando}
         />
       </section>
+
+      <GestionLogosEquipos />
 
       {/* ---------------------------------------------- graficas de gestion -- */}
       <div className="panel-grid panel-grid--1-2">
