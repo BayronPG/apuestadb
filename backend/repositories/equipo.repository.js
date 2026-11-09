@@ -2,6 +2,12 @@
 
 const mysql = require('../config/db/mysql');
 
+async function listarParaAsociar() {
+  const pool = await mysql.obtenerPool();
+  const [filas] = await pool.query('SELECT id_equipo, nombre FROM Equipo');
+  return filas;
+}
+
 async function actualizarLogo(idEquipo, { fileId, url }) {
   const pool = await mysql.obtenerPool();
   const [resultado] = await pool.query(
@@ -16,4 +22,4 @@ async function actualizarLogo(idEquipo, { fileId, url }) {
   return filas[0] || null;
 }
 
-module.exports = { actualizarLogo };
+module.exports = { listarParaAsociar, actualizarLogo };

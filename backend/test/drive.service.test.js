@@ -40,7 +40,6 @@ test('sube logo, guarda fileId/url y no retorna tokens', async () => {
         return { data: { id: 'file-123' } };
       },
     },
-    permissions: { create: async () => ({}) },
   };
   const repository = {
     actualizarLogo: async (idEquipo, logo) => ({
@@ -48,7 +47,7 @@ test('sube logo, guarda fileId/url y no retorna tokens', async () => {
     }),
   };
   const resultado = await service.subirLogo(9, archivo(), { driveApi, repository });
-  assert.equal(resultado.fileId, 'file-123');
+  assert.equal(Object.prototype.hasOwnProperty.call(resultado, 'fileId'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(resultado, 'access_token'), false);
   assert.equal(llamadas.length, 1);
 });
@@ -59,4 +58,38 @@ test('reporta proveedor Drive caído', async () => {
     driveApi,
     repository: { actualizarLogo: async () => null },
   }), { codigo: 'DRIVE_PROVEEDOR_NO_DISPONIBLE' });
+});
+
+test('normaliza nombres quitando extension, adornos, tildes y separadores', () => {
+  assert.equal(service.normalizarNombre('Logo_Fútbol-Club Águilas.PNG'), 'futbol club aguilas');
+});
+
+test('asocia solo coincidencias unicas y reporta omitidos sin fileId', async () => {
+  const actualizados = [];
+  const driveApi = {
+    files: {
+      list: async () => ({
+        data: {
+          files: [
+            { id: 'a', name: 'logo Atletico-Nacional.png', mimeType: 'image/png', webViewLink: 'https://drive/a' },
+            { id: 'b', name: 'escudo Desconocido.jpg', mimeType: 'image/jpeg', webViewLink: 'https://drive/b' },
+            { id: 'c', name: 'Footylogos Tigres.webp', mimeType: 'image/webp', webViewLink: 'https://drive/c' },
+          ],
+        },
+      }),
+    },
+  };
+  const repository = {
+    listarParaAsociar: async () => [
+      { id_equipo: 1, nombre: 'Atlético Nacional' },
+      { id_equipo: 2, nombre: 'Tigres' },
+      { id_equipo: 3, nombre: 'Tigres' },
+    ],
+    actualizarLogo: async (idEquipo, logo) => actualizados.push({ idEquipo, logo }),
+  };
+  const reporte = await service.asociarLogos({ driveApi, repository });
+  assert.equal(reporte.asociados, 1);
+  assert.deepEqual(actualizados.map((item) => item.idEquipo), [1]);
+  assert.deepEqual(reporte.omitidos.map((item) => item.razon), ['SIN_COINCIDENCIA', 'COINCIDENCIA_AMBIGUA']);
+  assert.equal(JSON.stringify(reporte).includes('fileId'), false);
 });
