@@ -28,9 +28,9 @@ function manejadorErrores(error, req, res, next) {
   }
 
   if (errorFinal.estadoHttp >= 500) {
-    console.error('[error]', req.method, req.originalUrl, '-', error && (error.stack || error.message));
+    console.error('[error]', req.method, req.path, errorFinal.codigo);
   } else if (config.entorno !== 'test') {
-    console.warn('[aviso]', req.method, req.originalUrl, '-', errorFinal.codigo, errorFinal.mensaje);
+    console.warn('[aviso]', req.method, req.path, errorFinal.codigo);
   }
 
   const cuerpo = {

@@ -12,7 +12,16 @@ const GOOGLE_USERINFO = 'https://openidconnect.googleapis.com/v1/userinfo';
 const STATE_TTL_MS = 10 * 60 * 1000;
 
 function habilitado() {
-  return Boolean(config.google.clientId && config.google.clientSecret && config.google.callbackUrl);
+  return Boolean(
+    config.google.clientId &&
+      config.google.clientSecret &&
+      config.google.callbackUrl &&
+      config.google.stateSecret,
+  );
+}
+
+function diagnosticar(etapa, codigo) {
+  console.warn('[google]', etapa, codigo);
 }
 
 function crearState(now = Date.now()) {
@@ -64,29 +73,55 @@ async function autenticarGoogle(
         grant_type: 'authorization_code',
       }),
     });
-    if (!tokenResponse.ok) throw new Error(`Token HTTP ${tokenResponse.status}`);
+    if (!tokenResponse.ok) {
+      diagnosticar('TOKEN_EXCHANGE', 'GOOGLE_TOKEN_HTTP_ERROR');
+      throw errores.noDisponible('No fue posible autenticar con Google.', 'GOOGLE_PROVEEDOR_NO_DISPONIBLE');
+    }
     const tokens = await tokenResponse.json();
+    if (!tokens.access_token) {
+      diagnosticar('TOKEN_EXCHANGE', 'GOOGLE_TOKEN_INVALIDO');
+      throw errores.noDisponible('No fue posible autenticar con Google.', 'GOOGLE_PROVEEDOR_NO_DISPONIBLE');
+    }
     const perfilResponse = await fetchImpl(GOOGLE_USERINFO, {
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
-    if (!perfilResponse.ok) throw new Error(`Perfil HTTP ${perfilResponse.status}`);
+    if (!perfilResponse.ok) {
+      diagnosticar('USERINFO', 'GOOGLE_USERINFO_HTTP_ERROR');
+      throw errores.noDisponible('No fue posible autenticar con Google.', 'GOOGLE_PROVEEDOR_NO_DISPONIBLE');
+    }
     const perfil = await perfilResponse.json();
     if (perfil.email_verified !== true && perfil.email_verified !== 'true') {
+      diagnosticar('USERINFO', 'GOOGLE_CORREO_NO_VERIFICADO');
       throw errores.noAutenticado('Google no ha verificado este correo.', 'GOOGLE_CORREO_NO_VERIFICADO');
     }
-    if (!perfil.email) throw errores.noAutenticado('Google no devolvio un correo valido.', 'GOOGLE_CORREO_INVALIDO');
+    if (!perfil.email) {
+      diagnosticar('USERINFO', 'GOOGLE_CORREO_INVALIDO');
+      throw errores.noAutenticado('Google no devolvio un correo valido.', 'GOOGLE_CORREO_INVALIDO');
+    }
 
-    let usuario = await repository.buscarCredencialesPorCorreo(perfil.email);
+    let usuario;
+    try {
+      usuario = await repository.buscarCredencialesPorCorreo(perfil.email);
+    } catch (error) {
+      diagnosticar('DATABASE', 'GOOGLE_DATABASE_ERROR');
+      throw errores.interno('No fue posible consultar el usuario.', 'GOOGLE_DATABASE_ERROR');
+    }
     if (!usuario) {
       const nombres = String(perfil.given_name || perfil.name || 'Usuario').slice(0, 100);
       const apellidos = String(perfil.family_name || 'Google').slice(0, 100);
-      const creado = await repository.registrar({
-        nombres,
-        apellidos,
-        correo: perfil.email,
-        contrasenaHash: crypto.randomBytes(32).toString('hex'),
-        telefono: null,
-      });
+      let creado;
+      try {
+        creado = await repository.registrar({
+          nombres,
+          apellidos,
+          correo: perfil.email,
+          contrasenaHash: crypto.randomBytes(32).toString('hex'),
+          telefono: null,
+        });
+      } catch (error) {
+        diagnosticar('DATABASE', 'GOOGLE_DATABASE_ERROR');
+        throw errores.interno('No fue posible crear el usuario.', 'GOOGLE_DATABASE_ERROR');
+      }
       usuario = {
         id_usuario: creado.idUsuario,
         nombres,
@@ -98,7 +133,13 @@ async function autenticarGoogle(
       };
     }
     if (usuario.estado !== 'activo') throw errores.prohibido('El usuario esta inhabilitado.', 'USUARIO_INHABILITADO');
-    const token = firmarToken({ idUsuario: usuario.id_usuario, rol: usuario.nombre_rol });
+    let token;
+    try {
+      token = firmarToken({ idUsuario: usuario.id_usuario, rol: usuario.nombre_rol });
+    } catch (error) {
+      diagnosticar('JWT', 'GOOGLE_JWT_ERROR');
+      throw errores.interno('No fue posible emitir la sesion.', 'GOOGLE_JWT_ERROR');
+    }
     return {
       token,
       expiraEn: config.jwt.expiracion,
@@ -113,6 +154,7 @@ async function autenticarGoogle(
     };
   } catch (error) {
     if (error && error.esOperacional) throw error;
+    diagnosticar('TOKEN_EXCHANGE', 'GOOGLE_PROVEEDOR_NO_DISPONIBLE');
     throw errores.noDisponible('No fue posible autenticar con Google.', 'GOOGLE_PROVEEDOR_NO_DISPONIBLE');
   }
 }

@@ -24,6 +24,7 @@ const { manejadorErrores } = require('./middlewares/errorHandler');
 const app = express();
 
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 
 // Cabeceras de seguridad HTTP (helmet con sus valores por defecto).
 app.use(helmet());
