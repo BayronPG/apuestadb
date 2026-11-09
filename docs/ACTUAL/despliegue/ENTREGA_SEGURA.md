@@ -65,5 +65,5 @@ cd backend && npm start
 - [x] Bases administradas no creadas: cuota Compute 0 y política regional.
 - [x] Multibase completo demostrable en local con Docker (health 4/4).
 - [x] Sin secretos versionados; credenciales solo en App Settings/GitHub Secrets.
-- [x] Workflow único zure-backend.yml (sin Static Web Apps).
+- [x] Workflow único `.github/workflows/azure-backend.yml` (sin Static Web Apps).
 - [ ] SSO, Drive, Wompi y Firebase: sin credenciales, no expuestos.

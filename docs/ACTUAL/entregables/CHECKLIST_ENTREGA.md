@@ -93,6 +93,7 @@
 - [x] Documentos en MongoDB (108 documentos, liquidación única por apuesta).
 - [x] Auth/usuarios en SQL Server (9 usuarios, 2 roles).
 - [x] Health 4/4 y 10/10 endpoints de integración.
-- [x] Build de frontend (ite build) sin errores.
+- [x] Build de frontend (`vite build`) sin errores.
 - [x] Sin secretos versionados.
-- [ ] Despliegue Azure y cuentas externas (SSO, Drive, Wompi, Firebase): pendiente de credenciales.
+- [x] Despliegue Azure: App Service F1 público con frontend/backend y health degradado documentado.
+- [ ] Cuentas externas (SSO, Drive, Wompi, Firebase): pendiente de credenciales.
