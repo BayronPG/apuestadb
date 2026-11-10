@@ -123,6 +123,16 @@ const config = {
     motor: (process.env.DOCUMENTOS_MOTOR || 'sqlserver').toLowerCase(),
   },
 
+  // Wompi (pagos simulados). Las llaves solo viven en el entorno.
+  wompi: {
+    publicKey: process.env.WOMPI_PUBLIC_KEY || '',
+    privateKey: process.env.WOMPI_PRIVATE_KEY || '',
+    eventsSecret: process.env.WOMPI_EVENTS_SECRET || '',
+    integritySecret: process.env.WOMPI_INTEGRITY_SECRET || '',
+    checkoutUrl: process.env.WOMPI_CHECKOUT_URL || 'https://checkout.wompi.co/p/',
+    redirectUrl: process.env.WOMPI_REDIRECT_URL || '',
+  },
+
   // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
   saldo: {
     motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),
