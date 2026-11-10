@@ -11,9 +11,12 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
+// En pruebas el entorno se define en el propio test: .env no debe pisarlo.
+const entornoPruebas = process.env.NODE_ENV === 'test';
+
 dotenv.config({
   path: path.resolve(__dirname, '..', '.env'),
-  override: process.env.NODE_ENV !== 'production',
+  override: !entornoPruebas && process.env.NODE_ENV !== 'production',
 });
 
 function aEntero(valor, porDefecto) {

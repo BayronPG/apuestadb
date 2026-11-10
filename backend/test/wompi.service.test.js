@@ -1,5 +1,6 @@
 'use strict';
 
+process.env.NODE_ENV = 'test';
 process.env.WOMPI_PUBLIC_KEY = 'pub_test_demo';
 process.env.WOMPI_PRIVATE_KEY = 'prv_test_demo';
 process.env.WOMPI_EVENTS_SECRET = 'events_test_demo';
