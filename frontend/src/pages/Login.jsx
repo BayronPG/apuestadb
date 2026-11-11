@@ -29,6 +29,10 @@ export default function Login() {
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
+    setContrasena('');
+  }, []);
+
+  useEffect(() => {
     const token = new URLSearchParams(window.location.hash.slice(1)).get('google_token');
     if (!token) return;
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
@@ -114,6 +118,7 @@ export default function Login() {
         autoComplete="current-password"
         placeholder="••••••••"
         deshabilitado={enviando}
+        mostrarContrasena
       />
 
       <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>

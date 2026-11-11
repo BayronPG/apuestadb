@@ -35,7 +35,11 @@ export async function obtenerTokenRecaptcha(accion) {
   const listo = await cargarScript();
   if (!listo) return null;
   try {
-    return await window.grecaptcha.execute(SITE_KEY, { action: accion });
+    return await new Promise((resolve, reject) => {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha.execute(SITE_KEY, { action: accion }).then(resolve).catch(reject);
+      });
+    });
   } catch (_error) {
     return null;
   }

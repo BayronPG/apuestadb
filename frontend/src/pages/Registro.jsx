@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Alert from '../components/Alert.jsx';
@@ -31,6 +31,10 @@ export default function Registro() {
   const [errores, setErrores] = useState({});
   const [errorServidor, setErrorServidor] = useState(null);
   const [enviando, setEnviando] = useState(false);
+
+  useEffect(() => {
+    setFormulario((anterior) => ({ ...anterior, contrasena: '', confirmacion: '' }));
+  }, []);
 
   const cambiar = (evento) => {
     const { name, value } = evento.target;
@@ -135,6 +139,7 @@ export default function Registro() {
         autoComplete="new-password"
         ayuda="Entre 8 y 72 caracteres (bcrypt en el backend)."
         deshabilitado={enviando}
+        mostrarContrasena
       />
 
       <FormField
@@ -147,6 +152,7 @@ export default function Registro() {
         requerido
         autoComplete="new-password"
         deshabilitado={enviando}
+        mostrarContrasena
       />
 
       <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>

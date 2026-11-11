@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 /**
  * Campo de formulario con etiqueta, ayuda y mensaje de error accesible.
  *
@@ -13,6 +15,7 @@
  *   - requerido   : boolean
  *   - opciones    : Array<{ valor, etiqueta }>  (para tipo 'select')
  *   - deshabilitado, placeholder, autoComplete, min, max, step, maxLength, filas
+ *   - mostrarContrasena: boolean (muestra un control para alternar la visibilidad)
  *
  * Ejemplo:
  *   <FormField etiqueta="Correo" nombre="correo" tipo="email" valor={correo}
@@ -37,7 +40,9 @@ export default function FormField({
   maxLength,
   filas = 4,
   className = '',
+  mostrarContrasena = false,
 }) {
+  const [contrasenaVisible, setContrasenaVisible] = useState(false);
   const idAyuda = ayuda ? `${nombre}-ayuda` : undefined;
   const idError = error ? `${nombre}-error` : undefined;
   const descrito = [idAyuda, idError].filter(Boolean).join(' ') || undefined;
@@ -100,16 +105,30 @@ export default function FormField({
       )}
 
       {!['select', 'textarea', 'checkbox'].includes(tipo) && (
-        <input
-          {...comunes}
-          type={tipo}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          min={min}
-          max={max}
-          step={step}
-          maxLength={maxLength}
-        />
+        <>
+          <input
+            {...comunes}
+            type={mostrarContrasena && tipo === 'password' && contrasenaVisible ? 'text' : tipo}
+            placeholder={placeholder}
+            autoComplete={autoComplete}
+            min={min}
+            max={max}
+            step={step}
+            maxLength={maxLength}
+          />
+          {mostrarContrasena && tipo === 'password' && (
+            <button
+              type="button"
+              className="btn btn--fantasma btn--sm"
+              onClick={() => setContrasenaVisible((visible) => !visible)}
+              aria-controls={nombre}
+              aria-pressed={contrasenaVisible}
+              style={{ alignSelf: 'flex-end', marginTop: 'calc(-1 * var(--esp-1))' }}
+            >
+              {contrasenaVisible ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+            </button>
+          )}
+        </>
       )}
 
       {ayuda && (
