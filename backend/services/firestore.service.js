@@ -22,18 +22,20 @@ function obtenerDb() {
   if (intento) return null;
   intento = true;
   try {
+    // firebase-admin v12+: API modular; versiones antiguas exponen admin.credential.cert.
     // eslint-disable-next-line global-require
-    const admin = require('firebase-admin');
+    const { initializeApp, cert, getApps } = require('firebase-admin/app');
+    // eslint-disable-next-line global-require
+    const { getFirestore } = require('firebase-admin/firestore');
     if (!app) {
-      app = admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: config.firebase.projectId,
-          clientEmail: config.firebase.clientEmail,
-          privateKey: config.firebase.privateKey,
-        }),
+      const credencial = cert({
+        projectId: config.firebase.projectId,
+        clientEmail: config.firebase.clientEmail,
+        privateKey: config.firebase.privateKey,
       });
+      app = getApps().length > 0 ? getApps()[0] : initializeApp({ credential: credencial });
     }
-    db = admin.firestore(app);
+    db = getFirestore(app);
   } catch (_error) {
     db = null;
   }
@@ -65,11 +67,10 @@ async function guardarTransaccion(datos) {
 async function listarTransacciones(idUsuario, limite = 50) {
   const base = obtenerDb();
   if (!base) return { habilitado: false, transacciones: [] };
+  // Sin orderBy para evitar un índice compuesto: se ordena en memoria.
   const consulta = await base
     .collection(config.firebase.collection)
     .where('idUsuario', '==', Number(idUsuario))
-    .orderBy('fecha', 'desc')
-    .limit(limite)
     .get();
   const transacciones = consulta.docs.map((doc) => {
     const dato = doc.data();
@@ -79,7 +80,7 @@ async function listarTransacciones(idUsuario, limite = 50) {
       estado: dato.estado,
       fecha: dato.fecha && typeof dato.fecha.toDate === 'function' ? dato.fecha.toDate().toISOString() : dato.fecha,
     };
-  });
+  }).sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)).slice(0, limite);
   return { habilitado: true, transacciones };
 }
 
