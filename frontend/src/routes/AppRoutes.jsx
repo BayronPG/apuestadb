@@ -20,6 +20,7 @@ import Notificaciones from '../pages/Notificaciones.jsx';
 import PerfilUsuario from '../pages/PerfilUsuario.jsx';
 import RankingUsuarios from '../pages/RankingUsuarios.jsx';
 import ReportesAdministrativos from '../pages/ReportesAdministrativos.jsx';
+import AdminLogos from '../pages/AdminLogos.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
 /**
@@ -62,6 +63,7 @@ export default function AppRoutes() {
           <Route element={<RoleRoute rol="administrador" />}>
             <Route path="/admin" element={<DashboardAdministrador />} />
             <Route path="/admin/reportes" element={<ReportesAdministrativos />} />
+            <Route path="/admin/logos" element={<AdminLogos />} />
             <Route path="/ranking" element={<RankingUsuarios />} />
           </Route>
         </Route>

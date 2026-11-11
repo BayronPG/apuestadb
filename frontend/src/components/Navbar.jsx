@@ -119,6 +119,11 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
                 Panel administrador
               </Link>
             )}
+            {esAdministrador && (
+              <Link to="/admin/logos" role="menuitem" onClick={() => setMenuAbierto(false)}>
+                Cargar escudos
+              </Link>
+            )}
             <button type="button" role="menuitem" onClick={cerrarSesion}>
               Cerrar sesion
             </button>
