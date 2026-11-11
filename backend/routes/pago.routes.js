@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const express = require('express');
 const { body, param } = require('express-validator');
@@ -20,6 +20,9 @@ router.post(
   pagoController.checkout,
 );
 
+// Alias compatible con la URL publica acordada: /api/pagos/wompi/webhook
+router.post('/wompi/webhook', pagoController.webhook);
+
 router.get(
   '/:referencia',
   autenticar,
@@ -29,3 +32,4 @@ router.get(
 );
 
 module.exports = router;
+
