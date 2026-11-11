@@ -26,8 +26,20 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-// Cabeceras de seguridad HTTP (helmet con sus valores por defecto).
-app.use(helmet());
+// Cabeceras de seguridad HTTP. CSP permite los dominios de reCAPTCHA v3.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", 'https://www.google.com', 'https://www.gstatic.com'],
+        frameSrc: ["'self'", 'https://www.google.com', 'https://recaptcha.google.com'],
+        connectSrc: ["'self'", 'https://www.google.com'],
+        imgSrc: ["'self'", 'data:', 'https://www.gstatic.com'],
+      },
+    },
+  }),
+);
 
 // CORS configurable por lista CSV; el wildcard se limita a entornos no productivos.
 app.use(

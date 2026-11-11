@@ -14,6 +14,17 @@ const checkout = manejarAsync(async (req, res) => {
     idTipoSaldo: Number(idTipoSaldo),
     monto,
   });
+  try {
+    await firestoreService.guardarTransaccion({
+      idUsuario: req.usuario.id,
+      referencia: datos.referencia,
+      monto: Number(datos.montoCentavos) / 100,
+      estado: 'PENDIENTE',
+      fecha: new Date(),
+    });
+  } catch (_error) {
+    // El historial espejo no bloquea el checkout.
+  }
   return res.status(201).json({ ok: true, data: datos });
 });
 
