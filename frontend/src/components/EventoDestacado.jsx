@@ -6,6 +6,23 @@ import Icono from './Icono.jsx';
 import Loader from './Loader.jsx';
 import { fechaHora, textoEstado, tipoBadgeEstado } from '../utils/formato.js';
 
+const LOGO_POR_DEFECTO = '/assets/logo-equipo-default.svg';
+
+function Escudo({ nombre, logos }) {
+  const url = logos?.get(nombre) || LOGO_POR_DEFECTO;
+  return (
+    <img
+      className="team-logo"
+      style={{ width: 24, height: 24 }}
+      src={url}
+      alt=""
+      onError={(evento) => {
+        evento.currentTarget.src = LOGO_POR_DEFECTO;
+      }}
+    />
+  );
+}
+
 /**
  * Evento destacado del panel: enfrentamiento, metadatos y cuotas vigentes.
  *
@@ -31,6 +48,7 @@ export default function EventoDestacado({
   cargandoCuotas = false,
   errorCuotas = null,
   maxCuotas = 3,
+  logos = null,
 }) {
   if (!evento) return null;
 
@@ -47,13 +65,13 @@ export default function EventoDestacado({
 
       <div className="evento-destacado__equipos">
         <span className="evento-destacado__equipo evento-destacado__equipo--local">
-          {evento.equipo_local}
+          <Escudo nombre={evento.equipo_local} logos={logos} /> {evento.equipo_local}
         </span>
         <span className="evento-destacado__vs" aria-hidden="true">
           vs
         </span>
         <span className="evento-destacado__equipo evento-destacado__equipo--visitante">
-          {evento.equipo_visitante}
+          <Escudo nombre={evento.equipo_visitante} logos={logos} /> {evento.equipo_visitante}
         </span>
       </div>
 
