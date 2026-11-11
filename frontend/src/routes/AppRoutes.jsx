@@ -12,6 +12,7 @@ import DashboardUsuario from '../pages/DashboardUsuario.jsx';
 import DashboardAdministrador from '../pages/DashboardAdministrador.jsx';
 import EventosActivos from '../pages/EventosActivos.jsx';
 import EventosFinalizados from '../pages/EventosFinalizados.jsx';
+import EquiposJugadores from '../pages/EquiposJugadores.jsx';
 import CrearApuesta from '../pages/CrearApuesta.jsx';
 import HistorialApuestas from '../pages/HistorialApuestas.jsx';
 import SaldoUsuario from '../pages/SaldoUsuario.jsx';
@@ -52,6 +53,7 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<DashboardUsuario />} />
           <Route path="/eventos" element={<EventosActivos />} />
           <Route path="/eventos/finalizados" element={<EventosFinalizados />} />
+          <Route path="/equipos" element={<EquiposJugadores />} />
           <Route path="/apuestas/nueva" element={<CrearApuesta />} />
           <Route path="/apuestas" element={<HistorialApuestas />} />
           <Route path="/saldo" element={<SaldoUsuario />} />

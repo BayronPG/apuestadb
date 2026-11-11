@@ -108,6 +108,9 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
             <Link to="/eventos" role="menuitem" onClick={() => setMenuAbierto(false)}>
               Eventos
             </Link>
+            <Link to="/equipos" role="menuitem" onClick={() => setMenuAbierto(false)}>
+              Equipos y jugadores
+            </Link>
             <Link to="/apuestas/nueva" role="menuitem" onClick={() => setMenuAbierto(false)}>
               Nueva apuesta
             </Link>
