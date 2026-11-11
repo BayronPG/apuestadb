@@ -23,6 +23,9 @@ router.post(
 // Alias compatible con la URL publica acordada: /api/pagos/wompi/webhook
 router.post('/wompi/webhook', pagoController.webhook);
 
+// Historial de transacciones Wompi del usuario autenticado.
+router.get('/wompi', autenticar, pagoController.listar);
+
 router.get(
   '/:referencia',
   autenticar,

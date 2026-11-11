@@ -105,6 +105,20 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
             <Link to="/apuestas" role="menuitem" onClick={() => setMenuAbierto(false)}>
               Mis apuestas
             </Link>
+            <Link to="/eventos" role="menuitem" onClick={() => setMenuAbierto(false)}>
+              Eventos
+            </Link>
+            <Link to="/apuestas/nueva" role="menuitem" onClick={() => setMenuAbierto(false)}>
+              Nueva apuesta
+            </Link>
+            <Link to="/ranking" role="menuitem" onClick={() => setMenuAbierto(false)}>
+              Ranking
+            </Link>
+            {esAdministrador && (
+              <Link to="/admin" role="menuitem" onClick={() => setMenuAbierto(false)}>
+                Panel administrador
+              </Link>
+            )}
             <button type="button" role="menuitem" onClick={cerrarSesion}>
               Cerrar sesion
             </button>

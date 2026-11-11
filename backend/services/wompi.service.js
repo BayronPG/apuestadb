@@ -158,6 +158,19 @@ async function consultarPago(referencia, { idUsuario, rol }, { repository = pago
   };
 }
 
+/** Historial de pagos Wompi del usuario (APROBADO, PENDIENTE, RECHAZADO). */
+async function listarPagos({ idUsuario }, { repository = pagoRepository } = {}) {
+  const filas = await repository.listarPorUsuario(idUsuario);
+  return filas.map((pago) => ({
+    referencia: pago.referencia,
+    estado: pago.estado,
+    monto: Number(pago.monto_centavos) / 100,
+    moneda: pago.moneda,
+    creado: pago.creado,
+    actualizado: pago.actualizado,
+  }));
+}
+
 module.exports = {
   habilitado,
   firmarIntegridad,
@@ -167,4 +180,5 @@ module.exports = {
   crearCheckout,
   procesarEvento,
   consultarPago,
+  listarPagos,
 };

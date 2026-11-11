@@ -51,4 +51,17 @@ async function marcarEstado(referencia, estado, { transactionId = null, eventoId
   return rows[0] || null;
 }
 
-module.exports = { crear, obtener, obtenerPorEvento, marcarAprobado, marcarEstado };
+/** Lista los pagos Wompi de un usuario (solo lectura, sin tocar el flujo de cobro). */
+async function listarPorUsuario(idUsuario) {
+  const pool = await postgresql.obtenerPool();
+  const { rows } = await pool.query(
+    `SELECT referencia, monto_centavos, moneda, estado, creado, actualizado
+       FROM PagoWompi
+      WHERE id_usuario = $1
+      ORDER BY creado DESC`,
+    [idUsuario],
+  );
+  return rows;
+}
+
+module.exports = { crear, obtener, obtenerPorEvento, marcarAprobado, marcarEstado, listarPorUsuario };

@@ -49,6 +49,24 @@ export function cuentasNormalizadas(datos) {
 }
 
 /**
+ * POST /api/pagos/wompi/checkout -> { referencia, montoCentavos, checkoutUrl }
+ * Crea el pago pendiente y devuelve la URL real de Wompi Sandbox.
+ */
+export async function crearCheckoutWompi({ idTipoSaldo, monto }) {
+  const respuesta = await api.post('/pagos/wompi/checkout', { idTipoSaldo, monto });
+  return desenvolver(respuesta);
+}
+
+/**
+ * GET /api/pagos/wompi -> { pagos[], total }
+ * Historial de transacciones Wompi del usuario (APROBADO, PENDIENTE, RECHAZADO).
+ */
+export async function consultarPagosWompi() {
+  const respuesta = await api.get('/pagos/wompi');
+  return desenvolver(respuesta);
+}
+
+/**
  * GET /api/saldo/movimientos -> { movimientos, total }
  * @param {{idTipoSaldo?:number, desde?:string, hasta?:string}} filtros
  * `idTipoSaldo` se obtiene de GET /api/saldo (campo idTipoSaldo).

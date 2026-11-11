@@ -23,4 +23,9 @@ const estado = manejarAsync(async (req, res) => {
   return res.status(200).json({ ok: true, data: datos });
 });
 
-module.exports = { checkout, webhook, estado };
+const listar = manejarAsync(async (req, res) => {
+  const pagos = await wompiService.listarPagos({ idUsuario: req.usuario.id });
+  return res.status(200).json({ ok: true, data: { pagos, total: pagos.length } });
+});
+
+module.exports = { checkout, webhook, estado, listar };
