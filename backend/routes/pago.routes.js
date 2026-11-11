@@ -26,6 +26,9 @@ router.post('/wompi/webhook', pagoController.webhook);
 // Historial de transacciones Wompi del usuario autenticado.
 router.get('/wompi', autenticar, pagoController.listar);
 
+// Historial espejo en Firestore (no sustituye a PostgreSQL).
+router.get('/firestore', autenticar, pagoController.listarFirestore);
+
 router.get(
   '/:referencia',
   autenticar,

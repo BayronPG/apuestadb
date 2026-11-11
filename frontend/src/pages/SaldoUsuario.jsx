@@ -12,9 +12,11 @@ import { usePeticion } from '../hooks/usePeticion.js';
 import {
   consultarSaldo,
   consultarPagosWompi,
+  consultarHistorialFirestore,
   crearCheckoutWompi,
   cuentasNormalizadas,
 } from '../services/saldoService.js';
+import { obtenerTokenRecaptcha } from '../utils/recaptcha.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fechaHora, moneda } from '../utils/formato.js';
 import { normalizarError } from '../utils/errores.js';
@@ -43,6 +45,8 @@ export default function SaldoUsuario() {
   const [filtroPagos, setFiltroPagos] = useState('TODAS');
   const cargarPagos = useCallback(() => consultarPagosWompi(), []);
   const { datos: datosPagos, cargando: cargandoPagos } = usePeticion(cargarPagos, []);
+  const cargarFirestore = useCallback(() => consultarHistorialFirestore(), []);
+  const { datos: datosFirestore, cargando: cargandoFirestore, error: errorFirestore } = usePeticion(cargarFirestore, []);
   const cuentaWompi = cuentas.find((cuenta) => cuenta.idTipoSaldo !== null) || null;
 
   const pagos = useMemo(() => datosPagos?.pagos || [], [datosPagos]);
@@ -60,9 +64,11 @@ export default function SaldoUsuario() {
     }
     setEnviandoWompi(true);
     try {
+      const recaptchaToken = await obtenerTokenRecaptcha('recarga');
       const datosCheckout = await crearCheckoutWompi({
         idTipoSaldo: cuentaWompi.idTipoSaldo,
         monto: Number(montoWompi),
+        recaptchaToken,
       });
       window.location.assign(datosCheckout.checkoutUrl);
     } catch (excepcion) {
@@ -257,6 +263,49 @@ export default function SaldoUsuario() {
             { clave: 'referencia', titulo: 'Referencia' },
           ]}
         />
+      </Card>
+
+      <Card
+        titulo="Historial Firestore"
+        subtitulo="Espejo de transacciones (PostgreSQL sigue siendo la fuente de verdad)"
+      >
+        {errorFirestore && (
+          <p className="texto-pequeno texto-suave">No se pudo consultar Firestore.</p>
+        )}
+        {!errorFirestore && datosFirestore && datosFirestore.habilitado === false && (
+          <p className="texto-pequeno texto-suave">
+            Firestore no está configurado en este entorno.
+          </p>
+        )}
+        {!errorFirestore && datosFirestore?.habilitado !== false && (
+          <Table
+            filas={datosFirestore?.transacciones || []}
+            cargando={cargandoFirestore}
+            claveFila={(fila) => fila.referencia}
+            vacio={{
+              titulo: 'Sin transacciones en Firestore',
+              mensaje: 'Aún no se ha replicado ningún pago.',
+              icono: '🔥',
+            }}
+            columnas={[
+              { clave: 'fecha', titulo: 'Fecha', render: (fila) => fechaHora(fila.fecha) },
+              {
+                clave: 'monto',
+                titulo: 'Monto',
+                alineacion: 'der',
+                render: (fila) => <strong>{moneda(fila.monto)}</strong>,
+              },
+              {
+                clave: 'estado',
+                titulo: 'Estado',
+                render: (fila) => (
+                  <Badge tipo={tonoEstado[fila.estado] || 'neutro'}>{fila.estado}</Badge>
+                ),
+              },
+              { clave: 'referencia', titulo: 'Referencia' },
+            ]}
+          />
+        )}
       </Card>
     </div>
   );

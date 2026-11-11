@@ -136,6 +136,21 @@ const config = {
     redirectUrl: process.env.WOMPI_REDIRECT_URL || '',
   },
 
+  // reCAPTCHA v3 (registro y checkout Wompi). Si no hay secret, se omite.
+  recaptcha: {
+    siteKey: process.env.RECAPTCHA_SITE_KEY || '',
+    secretKey: process.env.RECAPTCHA_SECRET_KEY || '',
+    minScore: Number(process.env.RECAPTCHA_MIN_SCORE || 0.5),
+  },
+
+  // Firestore: historial paralelo de transacciones (PostgreSQL sigue siendo la verdad).
+  firebase: {
+    projectId: process.env.FIREBASE_PROJECT_ID || '',
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    collection: process.env.FIRESTORE_COLLECTION || 'transacciones',
+  },
+
   // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
   saldo: {
     motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),

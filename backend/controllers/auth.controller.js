@@ -8,6 +8,7 @@
 const { manejarAsync } = require('../utils/asyncHandler');
 const authService = require('../services/auth.service');
 const googleService = require('../services/google-auth.service');
+const recaptchaService = require('../services/recaptcha.service');
 const config = require('../config');
 const { errores } = require('../utils/errors');
 
@@ -20,6 +21,8 @@ function direccionOrigen(req) {
 /** POST /api/auth/registro */
 const registrar = manejarAsync(async (req, res) => {
   const { nombres, apellidos, correo, contrasena, telefono } = req.body;
+
+  await recaptchaService.verificar(req.body.recaptchaToken, direccionOrigen(req));
 
   const datos = await authService.registrar({
     nombres,

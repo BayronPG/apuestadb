@@ -52,8 +52,10 @@ export function cuentasNormalizadas(datos) {
  * POST /api/pagos/wompi/checkout -> { referencia, montoCentavos, checkoutUrl }
  * Crea el pago pendiente y devuelve la URL real de Wompi Sandbox.
  */
-export async function crearCheckoutWompi({ idTipoSaldo, monto }) {
-  const respuesta = await api.post('/pagos/wompi/checkout', { idTipoSaldo, monto });
+export async function crearCheckoutWompi({ idTipoSaldo, monto, recaptchaToken }) {
+  const cuerpo = { idTipoSaldo, monto };
+  if (recaptchaToken) cuerpo.recaptchaToken = recaptchaToken;
+  const respuesta = await api.post('/pagos/wompi/checkout', cuerpo);
   return desenvolver(respuesta);
 }
 
@@ -63,6 +65,12 @@ export async function crearCheckoutWompi({ idTipoSaldo, monto }) {
  */
 export async function consultarPagosWompi() {
   const respuesta = await api.get('/pagos/wompi');
+  return desenvolver(respuesta);
+}
+
+/** GET /api/pagos/firestore -> { habilitado, transacciones[] } */
+export async function consultarHistorialFirestore() {
+  const respuesta = await api.get('/pagos/firestore');
   return desenvolver(respuesta);
 }
 

@@ -20,9 +20,10 @@ export async function obtenerPerfil() {
 }
 
 /** POST /api/auth/registro -> { idUsuario, mensaje } (201) */
-export async function registrarUsuario({ nombres, apellidos, correo, contrasena, telefono }) {
+export async function registrarUsuario({ nombres, apellidos, correo, contrasena, telefono, recaptchaToken }) {
   const cuerpo = { nombres, apellidos, correo, contrasena };
   if (telefono) cuerpo.telefono = telefono;
+  if (recaptchaToken) cuerpo.recaptchaToken = recaptchaToken;
   const respuesta = await api.post('/auth/registro', cuerpo);
   return desenvolver(respuesta);
 }
