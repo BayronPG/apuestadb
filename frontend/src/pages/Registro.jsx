@@ -5,7 +5,7 @@ import Alert from '../components/Alert.jsx';
 import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
 import { registrarUsuario } from '../services/authService.js';
-import { obtenerTokenRecaptcha } from '../utils/recaptcha.js';
+import { obtenerTokenRecaptcha, recaptchaConfigurado } from '../utils/recaptcha.js';
 import { mensajeDeError } from '../utils/errores.js';
 import { validarRegistro, sinErrores } from '../utils/validaciones.js';
 
@@ -51,6 +51,10 @@ export default function Registro() {
     setEnviando(true);
     try {
       const recaptchaToken = await obtenerTokenRecaptcha('registro');
+      if (recaptchaConfigurado && !recaptchaToken) {
+        setErrorServidor('No fue posible validar reCAPTCHA. Intenta de nuevo en unos segundos.');
+        return;
+      }
       await registrarUsuario({
         nombres: formulario.nombres.trim(),
         apellidos: formulario.apellidos.trim(),

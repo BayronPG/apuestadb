@@ -16,7 +16,7 @@ import {
   crearCheckoutWompi,
   cuentasNormalizadas,
 } from '../services/saldoService.js';
-import { obtenerTokenRecaptcha } from '../utils/recaptcha.js';
+import { obtenerTokenRecaptcha, recaptchaConfigurado } from '../utils/recaptcha.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fechaHora, moneda } from '../utils/formato.js';
 import { normalizarError } from '../utils/errores.js';
@@ -65,6 +65,10 @@ export default function SaldoUsuario() {
     setEnviandoWompi(true);
     try {
       const recaptchaToken = await obtenerTokenRecaptcha('recarga');
+      if (recaptchaConfigurado && !recaptchaToken) {
+        setErrorWompi('No fue posible validar reCAPTCHA. Intenta de nuevo en unos segundos.');
+        return;
+      }
       const datosCheckout = await crearCheckoutWompi({
         idTipoSaldo: cuentaWompi.idTipoSaldo,
         monto: Number(montoWompi),
