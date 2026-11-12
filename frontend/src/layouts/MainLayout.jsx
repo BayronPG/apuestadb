@@ -3,19 +3,25 @@ import { Outlet } from 'react-router-dom';
 
 import Navbar from '../components/Navbar.jsx';
 import Sidebar from '../components/Sidebar.jsx';
+import TopBar from '../components/TopBar.jsx';
+import SportsRail from '../components/SportsRail.jsx';
 import Footer from '../components/Footer.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { usePeticion } from '../hooks/usePeticion.js';
 import { consultarSaldo } from '../services/saldoService.js';
 
 /**
- * Layout principal de la zona autenticada: navbar + sidebar + contenido + footer.
+ * Layout principal de la zona autenticada.
  *
- * El sidebar es fijo en escritorio (> 1024px) y un panel deslizante con velo en
- * tablet y movil. El chip de saldo del navbar usa GET /api/saldo (una unica
- * peticion por montaje del layout).
+ * - Usuario: shell de sportsbook (TopBar + SportsRail + contenido + footer).
+ * - Administrador: navbar + sidebar de backoffice, porque necesita los modulos
+ *   de administracion.
+ *
+ * El chip de saldo usa GET /api/saldo (una unica peticion por montaje).
  */
 export default function MainLayout() {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const { esAdministrador } = useAuth();
 
   const cargarSaldo = useCallback(() => consultarSaldo(), []);
   const { datos: saldo } = usePeticion(cargarSaldo, []);
@@ -28,10 +34,17 @@ export default function MainLayout() {
         Saltar al contenido principal
       </a>
 
-      <Navbar onAbrirMenu={() => setMenuAbierto(true)} saldoTotal={saldo?.saldoTotal ?? null} />
+      {esAdministrador ? (
+        <Navbar onAbrirMenu={() => setMenuAbierto(true)} saldoTotal={saldo?.saldoTotal ?? null} />
+      ) : (
+        <>
+          <TopBar saldoTotal={saldo?.saldoTotal ?? null} />
+          <SportsRail />
+        </>
+      )}
 
       <div className="app-cuerpo">
-        <Sidebar abierto={menuAbierto} onCerrar={cerrarMenu} />
+        {esAdministrador && <Sidebar abierto={menuAbierto} onCerrar={cerrarMenu} />}
 
         {menuAbierto && (
           <button
@@ -49,7 +62,7 @@ export default function MainLayout() {
         </main>
       </div>
 
-      <Footer />
+      <Footer variante={esAdministrador ? 'sistema' : 'usuario'} />
     </div>
   );
 }

@@ -11,9 +11,12 @@
 const path = require('path');
 const dotenv = require('dotenv');
 
+// En pruebas el entorno se define en el propio test: .env no debe pisarlo.
+const entornoPruebas = process.env.NODE_ENV === 'test';
+
 dotenv.config({
   path: path.resolve(__dirname, '..', '.env'),
-  override: process.env.NODE_ENV !== 'production',
+  override: !entornoPruebas && process.env.NODE_ENV !== 'production',
 });
 
 function aEntero(valor, porDefecto) {
@@ -50,14 +53,26 @@ const config = {
     emisor: process.env.JWT_ISSUER || 'apuestadb-api',
   },
 
+  totp: {
+    encryptionKey: process.env.TOTP_ENCRYPTION_KEY || '',
+    issuer: process.env.TOTP_ISSUER || 'ApuestaDB',
+    windowSeconds: aEntero(process.env.TOTP_WINDOW_SECONDS, 30),
+    maxIntentos: aEntero(process.env.TOTP_MAX_INTENTOS, 5),
+    bloqueoMinutos: aEntero(process.env.TOTP_BLOQUEO_MINUTOS, 5),
+  },
+
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackUrl: process.env.GOOGLE_CALLBACK_URL || '',
+    driveCallbackUrl: process.env.GOOGLE_DRIVE_CALLBACK_URL || '',
     stateSecret: process.env.GOOGLE_STATE_SECRET || process.env.JWT_SECRET || '',
     frontendOrigin: (aLista(process.env.CORS_ORIGINS, ['http://localhost:5173']).find((origen) =>
       /^https?:\/\/[^*]+$/i.test(origen),
     ) || 'http://localhost:5173').replace(/\/$/, ''),
+    driveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID || '',
+    driveRefreshToken: process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '',
+    defaultTeamLogoUrl: process.env.DEFAULT_TEAM_LOGO_URL || '/assets/logo-equipo-default.svg',
   },
 
   bcrypt: {
@@ -119,6 +134,31 @@ const config = {
     motor: (process.env.DOCUMENTOS_MOTOR || 'sqlserver').toLowerCase(),
   },
 
+  // Wompi (pagos simulados). Las llaves solo viven en el entorno.
+  wompi: {
+    publicKey: process.env.WOMPI_PUBLIC_KEY || '',
+    privateKey: process.env.WOMPI_PRIVATE_KEY || '',
+    eventsSecret: process.env.WOMPI_EVENTS_SECRET || '',
+    integritySecret: process.env.WOMPI_INTEGRITY_SECRET || '',
+    checkoutUrl: process.env.WOMPI_CHECKOUT_URL || 'https://checkout.wompi.co/p/',
+    redirectUrl: process.env.WOMPI_REDIRECT_URL || '',
+  },
+
+  // reCAPTCHA v3 (registro y checkout Wompi). Si no hay secret, se omite.
+  recaptcha: {
+    siteKey: process.env.RECAPTCHA_SITE_KEY || '',
+    secretKey: process.env.RECAPTCHA_SECRET_KEY || '',
+    minScore: Number(process.env.RECAPTCHA_MIN_SCORE || 0.5),
+  },
+
+  // Firestore: historial paralelo de transacciones (PostgreSQL sigue siendo la verdad).
+  firebase: {
+    projectId: process.env.FIREBASE_PROJECT_ID || '',
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    collection: process.env.FIRESTORE_COLLECTION || 'transacciones',
+  },
+
   // Motor que resuelve las LECTURAS del dominio financiero (Fase 16).
   saldo: {
     motor: (process.env.SALDO_MOTOR || 'sqlserver').toLowerCase(),
@@ -144,6 +184,10 @@ function validarConfiguracion() {
     problemas.push('JWT_SECRET no esta definido.');
   } else if (config.jwt.secreto.length < 32) {
     problemas.push('JWT_SECRET debe tener 32 caracteres o mas.');
+  }
+
+  if (!config.totp.encryptionKey) {
+    problemas.push('TOTP_ENCRYPTION_KEY no esta definido; 2FA no podra activarse.');
   }
 
   if (!config.bd.baseDatos) problemas.push('DB_NAME no esta definido.');

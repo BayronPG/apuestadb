@@ -15,6 +15,7 @@
 
 const saldoRepository = require('../repositories/saldo.repository');
 const apuestaMongo = require('../repositories/apuesta.mongo.repository');
+const config = require('../config');
 const { errores } = require('../utils/errors');
 
 function validarOpcion(opcion) {
@@ -50,16 +51,18 @@ async function registrar({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempot
     throw errores.noEncontrado('La cuenta de saldo no existe.', 'CUENTA_NO_ENCONTRADA');
   }
 
+  const idApuesta = await apuestaMongo.siguienteId();
+  const idApuestaMovimiento = config.saldo.motor === 'postgresql' ? idApuesta : null;
   const debito = await saldoRepository.registrarMovimiento({
     idSaldoCuenta: cuenta.id_saldo_cuenta,
     nombreMovimiento: 'apuesta',
     monto,
+    idApuesta: idApuestaMovimiento,
     referencia: 'Descuento por registro de apuesta',
     claveIdempotencia: `apuesta:${clave}`,
   });
 
   try {
-    const idApuesta = await apuestaMongo.siguienteId();
     const documento = {
       id_apuesta: idApuesta,
       id_usuario: Number(idUsuario),
@@ -81,6 +84,7 @@ async function registrar({ idUsuario, idOpcion, idTipoSaldo, monto, claveIdempot
         idSaldoCuenta: cuenta.id_saldo_cuenta,
         nombreMovimiento: 'ajuste',
         monto,
+        idApuesta: idApuestaMovimiento,
         referencia: 'Compensacion apuesta fallida',
         claveIdempotencia: `comp:${clave}`,
       });

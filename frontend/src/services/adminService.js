@@ -61,3 +61,9 @@ export async function consultarAuditoria({ idUsuario, operacion, desde, hasta, t
   const respuesta = await api.get('/auditoria', { params: parametros });
   return desenvolver(respuesta);
 }
+
+/** Solicita la URL OAuth de Drive; el JWT viaja solo en Authorization. */
+export async function autorizarGoogleDrive() {
+  const respuesta = await api.get('/integraciones/drive/autorizar');
+  return desenvolver(respuesta);
+}

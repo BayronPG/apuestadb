@@ -18,7 +18,7 @@ import { ROLES } from '../utils/constantes.js';
  * localStorage y expone `usuario` y `rol`.
  */
 export default function Login() {
-  const { login, loginConToken, estaAutenticado, esAdministrador } = useAuth();
+  const { login, login2fa, loginConToken, estaAutenticado, esAdministrador } = useAuth();
   const navegar = useNavigate();
   const ubicacion = useLocation();
 
@@ -27,9 +27,25 @@ export default function Login() {
   const [errores, setErrores] = useState({});
   const [errorServidor, setErrorServidor] = useState(null);
   const [enviando, setEnviando] = useState(false);
+  const [challengeToken, setChallengeToken] = useState(null);
+  const [codigo2fa, setCodigo2fa] = useState('');
+  const [modo2fa, setModo2fa] = useState(false);
 
   useEffect(() => {
-    const token = new URLSearchParams(window.location.hash.slice(1)).get('google_token');
+    setContrasena('');
+  }, []);
+
+  useEffect(() => {
+    const parametros = new URLSearchParams(window.location.hash.slice(1));
+    const desafio = parametros.get('google_2fa');
+    if (desafio) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+      setChallengeToken(desafio);
+      setModo2fa(true);
+      setEnviando(false);
+      return;
+    }
+    const token = parametros.get('google_token');
     if (!token) return;
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
     setEnviando(true);
@@ -53,7 +69,14 @@ export default function Login() {
 
     setEnviando(true);
     try {
-      const usuario = await login({ correo, contrasena });
+      const resultado = await login({ correo, contrasena });
+      if (resultado.requiere2fa) {
+        setChallengeToken(resultado.challengeToken);
+        setCodigo2fa('');
+        setModo2fa(true);
+        return;
+      }
+      const usuario = resultado;
       const destino =
         ubicacion.state?.desde ||
         (usuario.rol === ROLES.administrador ? '/admin' : '/dashboard');
@@ -64,6 +87,70 @@ export default function Login() {
       setEnviando(false);
     }
   };
+
+  const manejar2fa = async (evento) => {
+    evento.preventDefault();
+    setErrorServidor(null);
+    if (!/^\d{6}$/.test(codigo2fa)) {
+      setErrorServidor('Ingresa el codigo de 6 digitos.');
+      return;
+    }
+    setEnviando(true);
+    try {
+      const usuario = await login2fa({ challengeToken, codigo: codigo2fa });
+      const destino =
+        ubicacion.state?.desde ||
+        (usuario.rol === ROLES.administrador ? '/admin' : '/dashboard');
+      navegar(destino, { replace: true });
+    } catch (excepcion) {
+      setErrorServidor(mensajeDeError(excepcion));
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  if (modo2fa) {
+    return (
+      <form onSubmit={manejar2fa} noValidate>
+        <h1 style={{ fontSize: 'var(--fs-xl)' }}>Verificacion en dos pasos</h1>
+        <p className="texto-suave texto-pequeno">
+          Ingresa el codigo de 6 digitos de Google Authenticator o Microsoft Authenticator.
+        </p>
+        {errorServidor && (
+          <Alert tipo="error" titulo="No fue posible verificar" onCerrar={() => setErrorServidor(null)}>
+            {errorServidor}
+          </Alert>
+        )}
+        <FormField
+          etiqueta="Codigo 2FA"
+          nombre="codigo2fa"
+          tipo="text"
+          valor={codigo2fa}
+          onChange={(evento) => setCodigo2fa(evento.target.value.replace(/\D/g, '').slice(0, 6))}
+          requerido
+          maxLength={6}
+          autoComplete="one-time-code"
+          placeholder="000000"
+          deshabilitado={enviando}
+        />
+        <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>
+          {enviando ? <Loader tamano="sm" texto="Verificando..." /> : 'Verificar'}
+        </button>
+        <button
+          type="button"
+          className="btn btn--fantasma btn--bloque"
+          onClick={() => {
+            setModo2fa(false);
+            setChallengeToken(null);
+            setCodigo2fa('');
+            setErrorServidor(null);
+          }}
+        >
+          Volver
+        </button>
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={manejarEnvio} noValidate>
@@ -114,6 +201,7 @@ export default function Login() {
         autoComplete="current-password"
         placeholder="••••••••"
         deshabilitado={enviando}
+        mostrarContrasena
       />
 
       <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>

@@ -63,6 +63,12 @@ const TRAZOS = {
       <path d="M12 7.5V12l3 2" />
     </>
   ),
+  buscar: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-3.6-3.6" />
+    </>
+  ),
   alerta: (
     <>
       <path d="M12 4.5 21 19.5H3Z" />

@@ -1,36 +1,112 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import Alert from '../components/Alert.jsx';
 import Badge from '../components/Badge.jsx';
 import Card from '../components/Card.jsx';
 import EmptyState from '../components/EmptyState.jsx';
+import EventoCard from '../components/EventoCard.jsx';
 import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
+import SlipApuesta, { calcularPremio } from '../components/SlipApuesta.jsx';
+import SlipDrawer from '../components/SlipDrawer.jsx';
 import { usePeticion } from '../hooks/usePeticion.js';
 import { listarEventosActivos, obtenerOpcionesEvento } from '../services/eventoService.js';
-import { fechaHora, textoEstado, tipoBadgeEstado } from '../utils/formato.js';
+import { listarEquipos } from '../services/equipoService.js';
+import { fechaHora, moneda, textoEstado } from '../utils/formato.js';
 import { ESTADOS_OPERABLES } from '../utils/constantes.js';
+import '../styles/sportsbook.css';
+
+/** Máximo de cuotas que se muestran en el resumen de la tarjeta. */
+const MAX_CUOTAS_RESUMEN = 3;
+
+/** Etiqueta fija 1 | X | 2 para el resumen de la cartelera. */
+const ETIQUETA_FIJA = {
+  local: '1',
+  '1': '1',
+  empate: 'X',
+  x: 'X',
+  visitante: '2',
+  '2': '2',
+};
+const ORDEN_ETIQUETA = { '1': 0, X: 1, '2': 2 };
+
+/** Carga las opciones de la tarjeta solo cuando entra en el viewport. */
+function useEnVista() {
+  const ref = useRef(null);
+  const [enVista, setEnVista] = useState(false);
+
+  useEffect(() => {
+    const nodo = ref.current;
+    if (!nodo || typeof IntersectionObserver === 'undefined') {
+      setEnVista(true);
+      return undefined;
+    }
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        if (entradas.some((entrada) => entrada.isIntersecting)) {
+          setEnVista(true);
+          observador.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observador.observe(nodo);
+    return () => observador.disconnect();
+  }, []);
+
+  return [ref, enVista];
+}
 
 /**
- * Cuotas reales de un evento (GET /api/eventos/:id/opciones).
- * Componente local: solo se monta cuando el usuario despliega las cuotas, de modo
- * que la cartelera no dispara una peticion por tarjeta.
+ * Primer mercado con opciones del evento -> cuotas del resumen.
+ * Los valores salen del endpoint existente; no se inventan cuotas.
  */
-function CuotasEvento({ idEvento }) {
-  const cargar = useCallback(() => obtenerOpcionesEvento(idEvento), [idEvento]);
-  const { datos, cargando, error, recargar } = usePeticion(cargar, [idEvento]);
+function resumirCuotas(mercados, idEvento, seleccion) {
+  const mercado =
+    mercados.find(
+      (item) => item.estado === ESTADOS_OPERABLES.mercado && (item.opciones?.length || 0) > 0,
+    ) || mercados.find((item) => (item.opciones?.length || 0) > 0);
 
-  const mercados = datos?.mercados || [];
+  if (!mercado) return [];
 
-  if (cargando) return <Loader texto="Cargando cuotas..." />;
+  const mercadoAbierto = mercado.estado === ESTADOS_OPERABLES.mercado;
+
+  const opciones = [...mercado.opciones]
+    .map((opcion) => ({
+      opcion,
+      etiquetaFija: ETIQUETA_FIJA[String(opcion.etiqueta).toLowerCase()] || String(opcion.etiqueta),
+    }))
+    .sort(
+      (a, b) =>
+        (ORDEN_ETIQUETA[a.etiquetaFija] ?? 9) - (ORDEN_ETIQUETA[b.etiquetaFija] ?? 9),
+    )
+    .slice(0, MAX_CUOTAS_RESUMEN);
+
+  return opciones.map(({ opcion, etiquetaFija }) => {
+    const clave = String(opcion.idOpcion);
+    const operable = mercadoAbierto && opcion.estado === ESTADOS_OPERABLES.opcion;
+    return {
+      clave,
+      etiqueta: etiquetaFija,
+      valor: opcion.cuotaVigente,
+      mercado: mercado.nombre,
+      deshabilitada: !operable,
+      seleccionada: seleccion?.idEvento === idEvento && seleccion?.clave === clave,
+    };
+  });
+}
+
+/** Mercados completos del evento (mismo marcado que usaba la pantalla). */
+function DetalleMercados({ mercados, cargando, error, onReintentar }) {
+  if (cargando && mercados.length === 0) return <Loader texto="Cargando cuotas..." />;
 
   if (error) {
     return (
       <Alert tipo="error" titulo="No se pudieron cargar las cuotas">
         {error.mensaje}
         <div className="fila" style={{ marginTop: 'var(--esp-3)' }}>
-          <button type="button" className="btn btn--secundario btn--sm" onClick={() => recargar()}>
+          <button type="button" className="btn btn--secundario btn--sm" onClick={onReintentar}>
             Reintentar
           </button>
         </div>
@@ -58,8 +134,7 @@ function CuotasEvento({ idEvento }) {
             </div>
             <div className="cuotas">
               {mercado.opciones.map((opcion) => {
-                const operable =
-                  mercadoAbierto && opcion.estado === ESTADOS_OPERABLES.opcion;
+                const operable = mercadoAbierto && opcion.estado === ESTADOS_OPERABLES.opcion;
                 return (
                   <span
                     key={opcion.idOpcion}
@@ -83,24 +158,87 @@ function CuotasEvento({ idEvento }) {
 }
 
 /**
+ * Tarjeta de la cartelera: envuelve EventoCard y mantiene la carga diferida
+ * (`GET /api/eventos/:id/opciones` se pide al entrar en el viewport y se
+ * reutiliza para el resumen y para el detalle expandido).
+ */
+function EventoTarjeta({ evento, logos, expandido, onAlternar, seleccion, onSeleccionar }) {
+  const [ref, enVista] = useEnVista();
+  const cargar = useCallback(() => obtenerOpcionesEvento(evento.id_evento), [evento.id_evento]);
+  const { datos, cargando, error, recargar } = usePeticion(cargar, [evento.id_evento], {
+    inmediato: false,
+  });
+
+  useEffect(() => {
+    if (enVista) recargar();
+  }, [enVista, recargar]);
+
+  const mercados = datos?.mercados || [];
+  const cuotas = useMemo(
+    () => resumirCuotas(mercados, evento.id_evento, seleccion),
+    [mercados, evento.id_evento, seleccion],
+  );
+
+  return (
+    <div className="sb-cartelera__item" ref={ref}>
+      <EventoCard
+        evento={evento}
+        logos={logos}
+        cuotas={cuotas}
+        cargandoCuotas={enVista && cargando && mercados.length === 0}
+        onSeleccionarCuota={(cuota) => onSeleccionar(evento, cuota)}
+        onAbrirMercados={onAlternar}
+        etiquetaMercados={expandido ? '− mercados' : '+ mercados'}
+        acciones={
+          <Link className="btn btn--primario btn--sm" to={`/apuestas/nueva?evento=${evento.id_evento}`}>
+            Apostar
+          </Link>
+        }
+      >
+        {expandido && (
+          <DetalleMercados
+            mercados={mercados}
+            cargando={cargando}
+            error={error}
+            onReintentar={() => recargar()}
+          />
+        )}
+      </EventoCard>
+    </div>
+  );
+}
+
+/**
  * Cartelera de eventos activos. Ruta: /eventos
  *
- * Endpoints:
+ * Endpoints (sin cambios):
  *   GET /api/eventos/activos                    -> { eventos[], total }  (snake_case)
  *   GET /api/eventos/:id/opciones               -> { evento, mercados[] } (camelCase)
  *
- * Las cuotas se consultan bajo demanda por evento con el endpoint de la Fase 10.1;
- * no se muestran valores simulados.
+ * Las cuotas del resumen salen del mismo endpoint de opciones y se piden cuando
+ * la tarjeta entra en el viewport; el detalle de mercados se renderiza solo al
+ * desplegar la tarjeta.
  */
 export default function EventosActivos() {
-  const [deporte, setDeporte] = useState('');
-  const [busqueda, setBusqueda] = useState('');
-  const [desplegado, setDesplegado] = useState(null);
+  const [parametros] = useSearchParams();
+  const [deporte, setDeporte] = useState(parametros.get('deporte') || '');
+  const [busqueda, setBusqueda] = useState(parametros.get('q') || '');
+  const [expandido, setExpandido] = useState(null);
+  const [seleccion, setSeleccion] = useState(null);
+  const [monto, setMonto] = useState('');
+  const [drawerAbierto, setDrawerAbierto] = useState(false);
 
   const cargar = useCallback(() => listarEventosActivos(), []);
   const { datos, cargando, error, recargar } = usePeticion(cargar, []);
 
   const eventos = datos?.eventos || [];
+
+  const cargarEquipos = useCallback(() => listarEquipos(), []);
+  const { datos: datosEquipos } = usePeticion(cargarEquipos, []);
+  const logos = useMemo(
+    () => new Map((datosEquipos?.equipos || []).map((equipo) => [equipo.nombre, equipo.logoUrl])),
+    [datosEquipos],
+  );
 
   const deportes = useMemo(
     () => Array.from(new Set(eventos.map((evento) => evento.deporte).filter(Boolean))).sort(),
@@ -120,14 +258,68 @@ export default function EventosActivos() {
     });
   }, [eventos, deporte, busqueda]);
 
+  const alternarExpandido = (idEvento) => {
+    setExpandido((actual) => (String(actual) === String(idEvento) ? null : idEvento));
+  };
+
+  const alternarSeleccion = (evento, cuota) => {
+    const repetida =
+      seleccion && seleccion.idEvento === evento.id_evento && seleccion.clave === cuota.clave;
+
+    if (repetida) {
+      setSeleccion(null);
+      return;
+    }
+
+    setSeleccion({
+      idEvento: evento.id_evento,
+      clave: cuota.clave,
+      liga: evento.liga,
+      equipoLocal: evento.equipo_local,
+      equipoVisitante: evento.equipo_visitante,
+      mercado: cuota.mercado,
+      etiqueta: cuota.etiqueta,
+      cuota: Number(cuota.valor),
+    });
+
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches) {
+      setDrawerAbierto(true);
+    }
+  };
+
+  const quitarSeleccion = () => setSeleccion(null);
+
+  const premio = seleccion ? calcularPremio(monto, seleccion.cuota) : 0;
+  const enlaceContinuar = useMemo(() => {
+    if (!seleccion) return null;
+    const parametros = new URLSearchParams({
+      evento: String(seleccion.idEvento),
+      mercado: seleccion.mercado || '',
+      opcion: seleccion.clave,
+      cuota: Number(seleccion.cuota).toFixed(2),
+    });
+    if (Number(monto) > 0) parametros.set('monto', String(Math.trunc(Number(monto))));
+    return `/apuestas/nueva?${parametros.toString()}`;
+  }, [seleccion, monto]);
+
+  const propsSlip = {
+    seleccion,
+    monto,
+    onMonto: setMonto,
+    onQuitar: quitarSeleccion,
+    enlaceContinuar,
+  };
+
   return (
-    <div className="pila">
+    <>
+      <div className="sb-con-layout">
+        <div className="pila">
       <header className="pagina__cabecera">
         <div>
           <h1>Eventos activos</h1>
           <p>
-            Eventos programados o en curso (vista vw_EventosActivos). Despliega un evento para ver
-            sus mercados, opciones y cuotas vigentes.
+            Cartelera de eventos programados o en curso. Elige una cuota y continua en la pantalla
+            de apuesta cuando quieras registrar el monto.
           </p>
         </div>
         <div className="fila fila--envuelve">
@@ -209,63 +401,47 @@ export default function EventosActivos() {
 
       {!cargando && filtrados.length > 0 && (
         <>
-          <div className="grid grid-2">
+          <div className="sb-cartelera">
             {filtrados.map((evento) => (
-              <Card key={evento.id_evento} titulo={evento.liga} subtitulo={evento.temporada}>
-                <div className="evento">
-                  <div className="evento__meta">
-                    <Badge tipo={tipoBadgeEstado(evento.estado)}>{textoEstado(evento.estado)}</Badge>
-                    <span>{evento.deporte}</span>
-                    <span>·</span>
-                    <span>{evento.estadio}</span>
-                  </div>
-
-                  <div className="evento__equipos">
-                    {evento.equipo_local} <span className="vs">vs</span> {evento.equipo_visitante}
-                  </div>
-
-                  <div className="evento__datos">
-                    <span>Inicio: {fechaHora(evento.fecha_hora_inicio)}</span>
-                    <span>Mercados abiertos: {evento.mercados_abiertos ?? 0}</span>
-                  </div>
-
-                  <div className="fila fila--envuelve">
-                    <button
-                      type="button"
-                      className="btn btn--secundario btn--sm"
-                      onClick={() =>
-                        setDesplegado((actual) =>
-                          String(actual) === String(evento.id_evento) ? null : evento.id_evento,
-                        )
-                      }
-                      aria-expanded={String(desplegado) === String(evento.id_evento)}
-                    >
-                      {String(desplegado) === String(evento.id_evento)
-                        ? 'Ocultar cuotas'
-                        : 'Ver cuotas'}
-                    </button>
-                    <Link
-                      className="btn btn--primario btn--sm"
-                      to={`/apuestas/nueva?evento=${evento.id_evento}`}
-                    >
-                      Apostar en este evento
-                    </Link>
-                  </div>
-
-                  {String(desplegado) === String(evento.id_evento) && (
-                    <CuotasEvento idEvento={evento.id_evento} />
-                  )}
-                </div>
-              </Card>
+              <EventoTarjeta
+                key={evento.id_evento}
+                evento={evento}
+                logos={logos}
+                expandido={String(expandido) === String(evento.id_evento)}
+                onAlternar={() => alternarExpandido(evento.id_evento)}
+                seleccion={seleccion}
+                onSeleccionar={alternarSeleccion}
+              />
             ))}
           </div>
 
           <p className="texto-pequeno texto-suave">
-            {filtrados.length} de {eventos.length} evento(s) mostrados. Las cuotas provienen de
-            GET /api/eventos/:id/opciones.
+            {filtrados.length} de {eventos.length} evento(s) mostrados.
           </p>
         </>
       )}
-    </div>
+        </div>
+
+        <aside className="sb-slip-lateral" aria-label="Apuesta en curso">
+          <SlipApuesta {...propsSlip} />
+        </aside>
+      </div>
+
+      <SlipDrawer
+        abierto={drawerAbierto}
+        onAbrir={() => setDrawerAbierto(true)}
+        onCerrar={() => setDrawerAbierto(false)}
+        haySeleccion={Boolean(seleccion)}
+        resumen={{
+          titulo: seleccion ? `${seleccion.etiqueta} · ${Number(seleccion.cuota).toFixed(2)}` : '',
+          detalle:
+            seleccion && Number(monto) > 0
+              ? `${moneda(Number(monto))} · premio ${moneda(premio)}`
+              : '',
+        }}
+      >
+        <SlipApuesta variante="drawer" {...propsSlip} />
+      </SlipDrawer>
+    </>
   );
 }

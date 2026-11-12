@@ -34,17 +34,25 @@ import { ESTADOS_OPERABLES } from '../utils/constantes.js';
 export default function CrearApuesta() {
   const [parametros] = useSearchParams();
   const eventoInicial = parametros.get('evento') || '';
+  const opcionInicial = parametros.get('opcion') || '';
+  const mercadoInicial = parametros.get('mercado') || '';
+  const cuotaInicial = parametros.get('cuota') || '';
+  const montoInicial = useMemo(() => {
+    const valor = Number(parametros.get('monto'));
+    return Number.isFinite(valor) && valor > 0 ? String(Math.trunc(valor)) : '';
+  }, [parametros]);
 
   // ------------------------------------------------------------- formulario --
   const [idEvento, setIdEvento] = useState(eventoInicial);
   const [idOpcion, setIdOpcion] = useState('');
   const [idTipoSaldo, setIdTipoSaldo] = useState('');
-  const [monto, setMonto] = useState('');
+  const [monto, setMonto] = useState(montoInicial);
   const [confirmacion, setConfirmacion] = useState(false);
   const [errores, setErrores] = useState({});
   const [errorServidor, setErrorServidor] = useState(null);
   const [exito, setExito] = useState(null);
   const [enviando, setEnviando] = useState(false);
+  const [opcionPrecargada, setOpcionPrecargada] = useState(!opcionInicial);
 
   // ------------------------------------------------------------ cartelera -----
   const cargarEventos = useCallback(() => listarEventosActivos(), []);
@@ -84,6 +92,20 @@ export default function CrearApuesta() {
   useEffect(() => {
     setIdOpcion('');
   }, [idEvento]);
+
+  // Precarga de la cuota elegida en la cartelera (`?opcion=`). Se aplica una
+  // sola vez, cuando el catalogo ya trae la opcion; despues manda la edicion
+  // manual del usuario.
+  useEffect(() => {
+    if (opcionPrecargada || !opcionInicial) return;
+    const existe = mercados.some((mercado) =>
+      mercado.opciones.some((opcion) => String(opcion.idOpcion) === opcionInicial),
+    );
+    if (existe) {
+      setIdOpcion(opcionInicial);
+      setOpcionPrecargada(true);
+    }
+  }, [mercados, opcionInicial, opcionPrecargada]);
 
   const opcionElegida = useMemo(() => {
     for (const mercado of mercados) {
@@ -164,6 +186,15 @@ export default function CrearApuesta() {
         </div>
       </header>
 
+      {opcionInicial && (
+        <Alert tipo="info" titulo="Seleccion traida desde la cartelera">
+          {mercadoInicial ? `${mercadoInicial} · ` : ''}
+          {opcionElegida ? opcionElegida.etiqueta : 'Opcion elegida'}
+          {cuotaInicial ? ` @ ${cuotaInicial}` : ''}. Puedes cambiar el evento, la opcion o el monto
+          antes de confirmar.
+        </Alert>
+      )}
+
       {exito && (
         <Alert tipo="exito" titulo={`Apuesta #${exito.idApuesta} registrada`} onCerrar={() => setExito(null)}>
           {exito.mensaje} El monto ya fue debitado del saldo seleccionado.
@@ -187,7 +218,7 @@ export default function CrearApuesta() {
 
       <div className="grid grid-2">
         <div className="pila">
-          <Card titulo="1. Evento" subtitulo="GET /api/eventos/activos">
+          <Card titulo="Evento" subtitulo="Elige el partido de la cartelera">
             {eventos.error && (
               <Alert tipo="error" titulo="No se pudieron cargar los eventos">
                 {eventos.error.mensaje}
@@ -226,7 +257,7 @@ export default function CrearApuesta() {
             )}
           </Card>
 
-          <Card titulo="2. Mercado y opcion" subtitulo="GET /api/eventos/:id/opciones">
+          <Card titulo="Mercado y opcion" subtitulo="Cuotas vigentes del evento">
             {!idEvento && (
               <EmptyState
                 icono="🎯"
@@ -315,13 +346,13 @@ export default function CrearApuesta() {
 
             {idEvento && mercados.length > 0 && (
               <p className="texto-pequeno texto-suave" style={{ margin: 0 }}>
-                El premio potencial se recalcula con la API al escribir el monto
-                (<code>?monto=</code>) y el definitivo lo calcula la base al liquidar.
+                El premio se recalcula al escribir el monto; el valor definitivo se fija al
+                liquidar la apuesta.
               </p>
             )}
           </Card>
 
-          <Card titulo="3. Saldo, monto y confirmacion" subtitulo="GET /api/saldo y POST /api/apuestas">
+          <Card titulo="Saldo, monto y confirmacion" subtitulo="Saldo ficticio, sin dinero real">
             {saldo.error && (
               <Alert tipo="error" titulo="No se pudieron cargar las cuentas de saldo">
                 {saldo.error.mensaje}

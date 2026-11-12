@@ -165,3 +165,58 @@
   /* Movimiento suave */
   --transicion-suave: 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
+
+/* ============================================================================
+   Fase 19 - Refinamiento visual global (sportsbook)
+   Overrides aditivos: paleta mas profunda, radios contenidos, tipografia y
+   sombras. No cambia clases ni estructura; solo tokens.
+   ============================================================================ */
+:root {
+  /* Superficies y texto */
+  --color-fondo: #070b14;
+  --color-superficie: #0d1524;
+  --color-superficie-2: #131e30;
+  --color-superficie-3: #0a1220;
+  --color-borde: #1e293b;
+  --color-borde-suave: #16202f;
+  --color-texto: #eaf0f9;
+  --color-texto-suave: #93a4bf;
+
+  /* Marca y estados (paleta sportsbook) */
+  --color-primario: #10b981;
+  --color-primario-oscuro: #059669;
+  --color-primario-claro: #34d399;
+  --color-exito: #22c55e;
+  --color-advertencia: #f59e0b;
+  --color-vivo: #ef4444;
+  --color-acento: #14b8a6;
+  --color-acento-oscuro: #0d9488;
+  --color-info: #38bdf8;
+
+  --grad-marca: linear-gradient(135deg, #059669, #10b981);
+  --grad-panel: linear-gradient(160deg, rgba(16, 185, 129, 0.14) 0%, rgba(19, 30, 48, 0) 62%);
+  --grad-panel-acento: linear-gradient(160deg, rgba(20, 184, 166, 0.14) 0%, rgba(19, 30, 48, 0) 62%);
+  --grad-cuota-acento: linear-gradient(160deg, rgba(20, 184, 166, 0.16) 0%, rgba(24, 35, 56, 0.9) 100%);
+  --grad-acento: linear-gradient(135deg, #14b8a6, #0d9488);
+  --borde-resalte-acento: rgba(20, 184, 166, 0.4);
+  --tinte-primario: rgba(16, 185, 129, 0.15);
+  --anillo-foco: 0 0 0 3px rgba(16, 185, 129, 0.42);
+
+  /* Radios mas contenidos (look producto, no dashboard) */
+  --radio-sm: 6px;
+  --radio-md: 8px;
+  --radio-lg: 12px;
+  --radio-xl: 14px;
+  --radio-2xl: 18px;
+
+  /* Tipografia */
+  --fuente-base: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    system-ui, sans-serif;
+  --fs-xl: 24px;
+  --fs-2xl: 30px;
+
+  /* Elevacion */
+  --sombra-tarjeta: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 34px rgba(0, 0, 0, 0.38);
+  --sombra-elevada: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --borde-resalte: rgba(16, 185, 129, 0.42);
+}

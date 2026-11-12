@@ -21,6 +21,7 @@ import { usePeticion } from '../hooks/usePeticion.js';
 import { consultarSaldo, cuentasNormalizadas, consultarMovimientos } from '../services/saldoService.js';
 import { listarApuestas } from '../services/apuestaService.js';
 import { listarEventosActivos, obtenerOpcionesEvento } from '../services/eventoService.js';
+import { listarEquipos } from '../services/equipoService.js';
 import { listarNotificaciones } from '../services/notificacionService.js';
 import { ESTADOS_OPERABLES } from '../utils/constantes.js';
 import {
@@ -70,12 +71,14 @@ export default function DashboardUsuario() {
   const cargarSaldo = useCallback(() => consultarSaldo(), []);
   const cargarApuestas = useCallback(() => listarApuestas(), []);
   const cargarEventos = useCallback(() => listarEventosActivos(), []);
+  const cargarEquipos = useCallback(() => listarEquipos(), []);
   const cargarMovimientos = useCallback(() => consultarMovimientos(), []);
   const cargarNotificaciones = useCallback(() => listarNotificaciones({ limite: 6 }), []);
 
   const saldo = usePeticion(cargarSaldo, []);
   const apuestas = usePeticion(cargarApuestas, []);
   const eventos = usePeticion(cargarEventos, []);
+  const equipos = usePeticion(cargarEquipos, []);
   const movimientos = usePeticion(cargarMovimientos, []);
   const notificaciones = usePeticion(cargarNotificaciones, []);
 
@@ -85,6 +88,11 @@ export default function DashboardUsuario() {
   const listaEventos = eventos.datos?.eventos || [];
   const listaMovimientos = movimientos.datos?.movimientos || [];
   const listaNotificaciones = notificaciones.datos?.notificaciones || [];
+
+  const logosPorEquipo = useMemo(
+    () => new Map((equipos.datos?.equipos || []).map((equipo) => [equipo.nombre, equipo.logoUrl])),
+    [equipos.datos],
+  );
 
   const ultimasApuestas = listaApuestas.slice(0, 5);
 
@@ -394,7 +402,7 @@ export default function DashboardUsuario() {
               Eventos destacados
             </h2>
             <p className="panel-seccion__subtitulo">
-              Cartelera prioritaria con sus cuotas vigentes (GET /api/eventos/:id/opciones)
+              Cuotas vigentes de la cartelera prioritaria
             </p>
           </div>
           <Link className="btn btn--secundario btn--sm" to="/eventos">
@@ -426,6 +434,7 @@ export default function DashboardUsuario() {
               <EventoDestacado
                 key={evento.id_evento}
                 evento={evento}
+                logos={logosPorEquipo}
                 cuotas={cuotasPorEvento.get(evento.id_evento) || []}
                 cargandoCuotas={cuotasDestacadas.cargando}
                 errorCuotas={

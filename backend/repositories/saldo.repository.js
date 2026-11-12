@@ -73,6 +73,36 @@ function mapearErrorPg(error) {
 
 /** Cuenta de saldo del usuario y tipo (solo PostgreSQL, usada por la saga). */
 async function obtenerCuenta(idUsuario, idTipoSaldo) {
+  const buscar = () =>
+    consultarPg(
+      `SELECT sc.id_saldo_cuenta, sc.id_usuario, sc.id_tipo_saldo, sc.saldo_actual
+         FROM SaldoCuenta sc
+        WHERE sc.id_usuario = $1 AND sc.id_tipo_saldo = $2`,
+      [idUsuario, idTipoSaldo],
+    );
+
+  const encontradas = await buscar();
+  if (encontradas[0]) return encontradas[0];
+
+  // Usuarios creados despues de la migracion pueden no tener cuenta en
+  // PostgreSQL: se crea en cero la primera vez que se necesita (idempotente).
+  try {
+    await consultarPg(
+      `INSERT INTO SaldoCuenta (id_usuario, id_tipo_saldo, saldo_actual)
+       VALUES ($1, $2, 0)
+       ON CONFLICT (id_usuario, id_tipo_saldo) DO NOTHING`,
+      [idUsuario, idTipoSaldo],
+    );
+  } catch (_error) {
+    // Tipo de saldo inexistente u otro fallo: se responde con lo que haya.
+  }
+
+  const filas = await buscar();
+  return filas[0] || null;
+}
+
+/** Lectura simple de la cuenta sin efectos secundarios (verificaciones). */
+async function leerCuenta(idUsuario, idTipoSaldo) {
   const filas = await consultarPg(
     `SELECT sc.id_saldo_cuenta, sc.id_usuario, sc.id_tipo_saldo, sc.saldo_actual
        FROM SaldoCuenta sc

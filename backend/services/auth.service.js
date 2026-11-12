@@ -15,6 +15,7 @@
 
 const usuarioRepository = require('../repositories/usuario.repository');
 const auditoriaService = require('./auditoria.service');
+const twofactorService = require('./twofactor.service');
 const { hashearContrasena, verificarContrasena } = require('../utils/hash');
 const { firmarToken } = require('../utils/jwt');
 const { errores } = require('../utils/errors');
@@ -105,6 +106,22 @@ async function iniciarSesion({ correo, contrasena }, contexto = {}) {
     });
   }
 
+  const desafio = await twofactorService.crearDesafio(
+    credencial.id_usuario,
+    credencial.nombre_rol,
+  );
+  if (desafio) {
+    await auditoriaService.registrarSeguro({
+      operacion: OPERACION.inicioSesion,
+      entidadAfectada: 'Usuario',
+      resultado: 'exito',
+      idUsuario: credencial.id_usuario,
+      descripcion: 'Credenciales correctas; segundo factor pendiente.',
+      direccionOrigen,
+    });
+    return { requiere2fa: true, challengeToken: desafio, expiraEn: '5m' };
+  }
+
   const token = firmarToken({
     idUsuario: credencial.id_usuario,
     rol: credencial.nombre_rol,
@@ -138,7 +155,7 @@ async function solicitarRecuperacion({ correo }) {
 }
 
 /** Restablece la contrasena con un token vigente; el hash lo calcula el backend. */
-async function restablecerContrasena({ correo, valorToken, nuevaContrasena }) {
+async function restablecerContrasena({ correo, valorToken, nuevaContrasena }, contexto = {}) {
   const nuevaContrasenaHash = await hashearContrasena(nuevaContrasena);
 
   const resultado = await usuarioRepository.restablecerContrasena({
@@ -146,6 +163,13 @@ async function restablecerContrasena({ correo, valorToken, nuevaContrasena }) {
     valorToken,
     nuevaContrasenaHash,
   });
+
+  const credencial = await usuarioRepository.buscarCredencialesPorCorreo(correo);
+  if (credencial) {
+    await twofactorService.resetPorRecuperacion(credencial.id_usuario, {
+      direccionOrigen: contexto.direccionOrigen || null,
+    });
+  }
 
   return { mensaje: resultado.mensaje || 'Contrasena restablecida correctamente.' };
 }

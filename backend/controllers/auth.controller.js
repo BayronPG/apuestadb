@@ -8,6 +8,8 @@
 const { manejarAsync } = require('../utils/asyncHandler');
 const authService = require('../services/auth.service');
 const googleService = require('../services/google-auth.service');
+const recaptchaService = require('../services/recaptcha.service');
+const twofactorService = require('../services/twofactor.service');
 const config = require('../config');
 const { errores } = require('../utils/errors');
 
@@ -20,6 +22,8 @@ function direccionOrigen(req) {
 /** POST /api/auth/registro */
 const registrar = manejarAsync(async (req, res) => {
   const { nombres, apellidos, correo, contrasena, telefono } = req.body;
+
+  await recaptchaService.verificar(req.body.recaptchaToken, direccionOrigen(req));
 
   const datos = await authService.registrar({
     nombres,
@@ -44,6 +48,16 @@ const iniciarSesion = manejarAsync(async (req, res) => {
   return res.status(200).json({ ok: true, data: datos });
 });
 
+/** POST /api/auth/2fa/verificar */
+const verificarSegundoFactor = manejarAsync(async (req, res) => {
+  const datos = await twofactorService.verificarDesafio(
+    req.body.challengeToken,
+    req.body.codigo,
+    { direccionOrigen: direccionOrigen(req) },
+  );
+  return res.status(200).json({ ok: true, data: datos });
+});
+
 /** POST /api/auth/recuperar */
 const solicitarRecuperacion = manejarAsync(async (req, res) => {
   const { correo } = req.body;
@@ -59,7 +73,7 @@ const restablecerContrasena = manejarAsync(async (req, res) => {
     correo,
     valorToken,
     nuevaContrasena,
-  });
+  }, { direccionOrigen: direccionOrigen(req) });
 
   return res.status(200).json({ ok: true, data: datos });
 });
@@ -85,8 +99,18 @@ const callbackGoogle = manejarAsync(async (req, res) => {
   }
   res.setHeader('Set-Cookie', 'google_oauth_state=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/api/auth/google');
   const datos = await googleService.autenticarGoogle(req.query.code);
-  const destino = `${config.google.frontendOrigin}/login#google_token=${encodeURIComponent(datos.token)}`;
+  const destino = datos.requiere2fa
+    ? `${config.google.frontendOrigin}/login#google_2fa=${encodeURIComponent(datos.challengeToken)}`
+    : `${config.google.frontendOrigin}/login#google_token=${encodeURIComponent(datos.token)}`;
   return res.redirect(302, destino);
 });
 
-module.exports = { registrar, iniciarSesion, solicitarRecuperacion, restablecerContrasena, iniciarGoogle, callbackGoogle };
+module.exports = {
+  registrar,
+  iniciarSesion,
+  verificarSegundoFactor,
+  solicitarRecuperacion,
+  restablecerContrasena,
+  iniciarGoogle,
+  callbackGoogle,
+};

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import Alert from '../components/Alert.jsx';
@@ -9,9 +9,17 @@ import Loader from '../components/Loader.jsx';
 import Metrica from '../components/Metrica.jsx';
 import Table from '../components/Table.jsx';
 import { usePeticion } from '../hooks/usePeticion.js';
-import { consultarSaldo, cuentasNormalizadas } from '../services/saldoService.js';
+import {
+  consultarSaldo,
+  consultarPagosWompi,
+  consultarHistorialFirestore,
+  crearCheckoutWompi,
+  cuentasNormalizadas,
+} from '../services/saldoService.js';
+import { obtenerTokenRecaptcha, recaptchaConfigurado } from '../utils/recaptcha.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fechaHora, moneda } from '../utils/formato.js';
+import { normalizarError } from '../utils/errores.js';
 
 /**
  * Saldo del usuario. Ruta: /saldo
@@ -31,6 +39,48 @@ export default function SaldoUsuario() {
   const { datos, cargando, error, recargar } = usePeticion(cargar, []);
 
   const cuentas = useMemo(() => cuentasNormalizadas(datos), [datos]);
+  const [montoWompi, setMontoWompi] = useState(10000);
+  const [enviandoWompi, setEnviandoWompi] = useState(false);
+  const [errorWompi, setErrorWompi] = useState(null);
+  const [filtroPagos, setFiltroPagos] = useState('TODAS');
+  const cargarPagos = useCallback(() => consultarPagosWompi(), []);
+  const { datos: datosPagos, cargando: cargandoPagos } = usePeticion(cargarPagos, []);
+  const cargarFirestore = useCallback(() => consultarHistorialFirestore(), []);
+  const { datos: datosFirestore, cargando: cargandoFirestore, error: errorFirestore } = usePeticion(cargarFirestore, []);
+  const cuentaWompi = cuentas.find((cuenta) => cuenta.idTipoSaldo !== null) || null;
+
+  const pagos = useMemo(() => datosPagos?.pagos || [], [datosPagos]);
+  const pagosFiltrados = useMemo(
+    () => (filtroPagos === 'TODAS' ? pagos : pagos.filter((pago) => pago.estado === filtroPagos)),
+    [pagos, filtroPagos],
+  );
+  const tonoEstado = { APROBADO: 'exito', PENDIENTE: 'advertencia', RECHAZADO: 'error' };
+
+  const recargarConWompi = async () => {
+    setErrorWompi(null);
+    if (!cuentaWompi) {
+      setErrorWompi('No hay una cuenta de saldo disponible para aplicar la recarga.');
+      return;
+    }
+    setEnviandoWompi(true);
+    try {
+      const recaptchaToken = await obtenerTokenRecaptcha('recarga');
+      if (recaptchaConfigurado && !recaptchaToken) {
+        setErrorWompi('No fue posible validar reCAPTCHA. Intenta de nuevo en unos segundos.');
+        return;
+      }
+      const datosCheckout = await crearCheckoutWompi({
+        idTipoSaldo: cuentaWompi.idTipoSaldo,
+        monto: Number(montoWompi),
+        recaptchaToken,
+      });
+      window.location.assign(datosCheckout.checkoutUrl);
+    } catch (excepcion) {
+      setErrorWompi(normalizarError(excepcion).mensaje);
+    } finally {
+      setEnviandoWompi(false);
+    }
+  };
 
   return (
     <div className="pila">
@@ -80,6 +130,41 @@ export default function SaldoUsuario() {
             <Link className="btn btn--primario btn--sm" to="/admin">
               Ir al panel administrativo
             </Link>
+          )}
+        </Card>
+
+        <Card titulo="Recargar con Wompi Sandbox" subtitulo="Pago simulado - sin dinero real">
+          <p className="texto-pequeno texto-suave">
+            Se crea un pago pendiente en PagoWompi y se abre el checkout real de Wompi Sandbox
+            con el tipo de saldo de tu cuenta.
+          </p>
+          {errorWompi && (
+            <Alert tipo="error" titulo="No se pudo iniciar la recarga" onCerrar={() => setErrorWompi(null)}>
+              {errorWompi}
+            </Alert>
+          )}
+          <label className="campo">
+            <span className="campo__etiqueta">Monto (COP)</span>
+            <select
+              className="campo__control"
+              value={montoWompi}
+              onChange={(evento) => setMontoWompi(Number(evento.target.value))}
+            >
+              <option value={10000}>$10.000</option>
+              <option value={20000}>$20.000</option>
+              <option value={50000}>$50.000</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            className="btn btn--primario btn--sm"
+            onClick={recargarConWompi}
+            disabled={enviandoWompi || !cuentaWompi}
+          >
+            {enviandoWompi ? 'Creando pago...' : 'Ir a Wompi Sandbox'}
+          </button>
+          {!cuentaWompi && (
+            <p className="texto-pequeno texto-suave">Necesitas una cuenta de saldo para recargar.</p>
           )}
         </Card>
       </div>
@@ -137,6 +222,94 @@ export default function SaldoUsuario() {
         <div className="card__pie">
           <Link to="/saldo/movimientos">Ver historial de movimientos</Link>
         </div>
+      </Card>
+
+      <Card
+        titulo="Transacciones Wompi"
+        subtitulo="Historial de pagos: aprobados, pendientes y rechazados"
+      >
+        <div className="fila" style={{ gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+          {['TODAS', 'APROBADO', 'PENDIENTE', 'RECHAZADO'].map((estado) => (
+            <button
+              key={estado}
+              type="button"
+              className={`btn btn--sm ${filtroPagos === estado ? 'btn--primario' : 'btn--fantasma'}`}
+              onClick={() => setFiltroPagos(estado)}
+            >
+              {estado === 'TODAS' ? 'Todas' : estado}
+            </button>
+          ))}
+        </div>
+        <Table
+          filas={pagosFiltrados}
+          cargando={cargandoPagos}
+          claveFila={(fila) => fila.referencia}
+          vacio={{
+            titulo: 'Sin transacciones',
+            mensaje: 'Aun no hay pagos Wompi para este usuario.',
+            icono: '💳',
+          }}
+          columnas={[
+            { clave: 'creado', titulo: 'Fecha', render: (fila) => fechaHora(fila.creado) },
+            {
+              clave: 'monto',
+              titulo: 'Monto',
+              alineacion: 'der',
+              render: (fila) => <strong>{moneda(fila.monto)}</strong>,
+            },
+            {
+              clave: 'estado',
+              titulo: 'Estado',
+              render: (fila) => (
+                <Badge tipo={tonoEstado[fila.estado] || 'neutro'}>{fila.estado}</Badge>
+              ),
+            },
+            { clave: 'referencia', titulo: 'Referencia' },
+          ]}
+        />
+      </Card>
+
+      <Card
+        titulo="Historial Firestore"
+        subtitulo="Espejo de transacciones (PostgreSQL sigue siendo la fuente de verdad)"
+      >
+        {errorFirestore && (
+          <p className="texto-pequeno texto-suave">No se pudo consultar Firestore.</p>
+        )}
+        {!errorFirestore && datosFirestore && datosFirestore.habilitado === false && (
+          <p className="texto-pequeno texto-suave">
+            Firestore no está configurado en este entorno.
+          </p>
+        )}
+        {!errorFirestore && datosFirestore?.habilitado !== false && (
+          <Table
+            filas={datosFirestore?.transacciones || []}
+            cargando={cargandoFirestore}
+            claveFila={(fila) => fila.referencia}
+            vacio={{
+              titulo: 'Sin transacciones en Firestore',
+              mensaje: 'Aún no se ha replicado ningún pago.',
+              icono: '🔥',
+            }}
+            columnas={[
+              { clave: 'fecha', titulo: 'Fecha', render: (fila) => fechaHora(fila.fecha) },
+              {
+                clave: 'monto',
+                titulo: 'Monto',
+                alineacion: 'der',
+                render: (fila) => <strong>{moneda(fila.monto)}</strong>,
+              },
+              {
+                clave: 'estado',
+                titulo: 'Estado',
+                render: (fila) => (
+                  <Badge tipo={tonoEstado[fila.estado] || 'neutro'}>{fila.estado}</Badge>
+                ),
+              },
+              { clave: 'referencia', titulo: 'Referencia' },
+            ]}
+          />
+        )}
       </Card>
     </div>
   );

@@ -7,6 +7,13 @@
  */
 
 const { sql, p, ejecutar, consultar } = require('../config/database');
+const postgresql = require('../config/db/postgresql');
+const config = require('../config');
+
+/** Con SALDO_MOTOR=postgresql los saldos del listado salen de PostgreSQL. */
+function saldosEnPostgresql() {
+  return config.saldo.motor === 'postgresql';
+}
 
 /**
  * Registra un usuario y crea sus cuentas de saldo en cero.
@@ -57,11 +64,32 @@ async function buscarCredencialesPorCorreo(correo) {
   return resultado.registros[0] || null;
 }
 
+/** Obtiene la credencial del usuario por id (para validar la desactivacion de 2FA). */
+async function buscarCredencialesPorId(idUsuario) {
+  const resultado = await consultar(
+    `SELECT TOP (1)
+            u.id_usuario,
+            u.nombres,
+            u.apellidos,
+            u.correo,
+            u.telefono,
+            u.contrasena,
+            u.estado,
+            r.nombre AS nombre_rol
+       FROM dbo.Usuario u
+       JOIN dbo.Rol r ON r.id_rol = u.id_rol
+      WHERE u.id_usuario = @id_usuario`,
+    { id_usuario: p(sql.Int, idUsuario) },
+  );
+  return resultado.registros[0] || null;
+}
+
 /**
  * Lista los usuarios con su rol y saldo consolidado (vista vw_SaldoConsolidado).
  * @param {{estado?:string, rol?:string, limite?:number}} filtros
  */
 async function listar({ estado = null, rol = null, limite = 200 } = {}) {
+  const usaPg = saldosEnPostgresql();
   const resultado = await consultar(
     `SELECT TOP (@limite)
             u.id_usuario,
@@ -71,13 +99,9 @@ async function listar({ estado = null, rol = null, limite = 200 } = {}) {
             u.telefono,
             u.estado,
             u.fecha_registro,
-            r.nombre        AS rol,
-            sc.saldo_tokens,
-            sc.saldo_pse,
-            sc.saldo_total
+            r.nombre        AS rol
        FROM dbo.Usuario u
        JOIN dbo.Rol r ON r.id_rol = u.id_rol
-       LEFT JOIN dbo.vw_SaldoConsolidado sc ON sc.id_usuario = u.id_usuario
       WHERE (@estado IS NULL OR u.estado = @estado)
         AND (@rol IS NULL OR r.nombre = @rol)
       ORDER BY u.fecha_registro DESC`,
@@ -88,7 +112,38 @@ async function listar({ estado = null, rol = null, limite = 200 } = {}) {
     },
   );
 
-  return resultado.registros;
+  if (!usaPg) {
+    const saldosSql = await consultar(
+      `SELECT id_usuario, saldo_tokens, saldo_pse, saldo_total FROM dbo.vw_SaldoConsolidado`,
+    );
+    const porUsuario = new Map(
+      saldosSql.registros.map((fila) => [Number(fila.id_usuario), fila]),
+    );
+    return resultado.registros.map((fila) => {
+      const saldo = porUsuario.get(Number(fila.id_usuario)) || {};
+      return {
+        ...fila,
+        saldo_tokens: saldo.saldo_tokens ?? 0,
+        saldo_pse: saldo.saldo_pse ?? 0,
+        saldo_total: saldo.saldo_total ?? 0,
+      };
+    });
+  }
+
+  const pool = await postgresql.obtenerPool();
+  const { rows } = await pool.query(
+    `SELECT id_usuario, saldo_tokens, saldo_pse, saldo_total FROM vw_saldoconsolidado`,
+  );
+  const porUsuario = new Map(rows.map((fila) => [Number(fila.id_usuario), fila]));
+  return resultado.registros.map((fila) => {
+    const saldo = porUsuario.get(Number(fila.id_usuario)) || {};
+    return {
+      ...fila,
+      saldo_tokens: saldo.saldo_tokens ?? 0,
+      saldo_pse: saldo.saldo_pse ?? 0,
+      saldo_total: saldo.saldo_total ?? 0,
+    };
+  });
 }
 
 /** Obtiene un perfil sin credenciales ni datos internos. */
@@ -186,6 +241,7 @@ async function restablecerContrasena({ correo, valorToken, nuevaContrasenaHash }
 module.exports = {
   registrar,
   buscarCredencialesPorCorreo,
+  buscarCredencialesPorId,
   listar,
   obtenerPerfil,
   actualizarPerfil,

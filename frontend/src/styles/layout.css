@@ -366,3 +366,109 @@
     justify-content: space-between;
   }
 }
+
+/* ============================================================================
+   Fase 19 - Shell: navbar y sidebar
+   ============================================================================ */
+.navbar {
+  background: rgba(8, 13, 22, 0.82);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navbar__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--grad-marca);
+  letter-spacing: -0.05em;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+}
+
+.navbar__titulo strong {
+  font-size: 16px;
+  letter-spacing: -0.015em;
+}
+
+.navbar__titulo span {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.navbar__saldo {
+  border-radius: 10px;
+  background: rgba(19, 30, 48, 0.9);
+}
+
+.navbar__saldo .valor {
+  font-variant-numeric: tabular-nums;
+}
+
+.navbar__desplegable {
+  border-radius: 12px;
+  background: var(--color-superficie);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.sidebar {
+  background: linear-gradient(180deg, rgba(13, 21, 36, 0.98) 0%, rgba(7, 11, 20, 0.98) 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: var(--esp-3);
+}
+
+.sidebar__grupo-titulo {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #74849f;
+  margin: var(--esp-4) var(--esp-2) var(--esp-1);
+}
+
+.sidebar__enlace {
+  position: relative;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  border: 1px solid transparent;
+}
+
+.sidebar__enlace:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sidebar__enlace.activo {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: transparent;
+  color: var(--color-texto);
+}
+
+.sidebar__enlace.activo::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  left: -10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-primario);
+}
+
+.sidebar__icono {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+.sidebar__enlace.activo .sidebar__icono {
+  color: var(--color-primario);
+  opacity: 1;
+}
+
+.app-contenido {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}

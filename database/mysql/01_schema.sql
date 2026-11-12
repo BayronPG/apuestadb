@@ -85,6 +85,8 @@ CREATE TABLE IF NOT EXISTS Equipo (
   siglas VARCHAR(10) NULL,
   fecha_fundacion DATE NULL,
   estado VARCHAR(20) NOT NULL DEFAULT 'vigente',
+  logo_file_id VARCHAR(100) NULL,
+  logo_url VARCHAR(500) NULL,
   PRIMARY KEY (id_equipo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

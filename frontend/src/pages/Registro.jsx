@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Alert from '../components/Alert.jsx';
 import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
+import PasswordStrength from '../components/PasswordStrength.jsx';
 import { registrarUsuario } from '../services/authService.js';
+import { obtenerTokenRecaptcha, recaptchaConfigurado } from '../utils/recaptcha.js';
 import { mensajeDeError } from '../utils/errores.js';
 import { validarRegistro, sinErrores } from '../utils/validaciones.js';
 
@@ -31,6 +33,10 @@ export default function Registro() {
   const [errorServidor, setErrorServidor] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
+  useEffect(() => {
+    setFormulario((anterior) => ({ ...anterior, contrasena: '', confirmacion: '' }));
+  }, []);
+
   const cambiar = (evento) => {
     const { name, value } = evento.target;
     setFormulario((anterior) => ({ ...anterior, [name]: value }));
@@ -45,12 +51,18 @@ export default function Registro() {
 
     setEnviando(true);
     try {
+      const recaptchaToken = await obtenerTokenRecaptcha('registro');
+      if (recaptchaConfigurado && !recaptchaToken) {
+        setErrorServidor('No fue posible validar reCAPTCHA. Intenta de nuevo en unos segundos.');
+        return;
+      }
       await registrarUsuario({
         nombres: formulario.nombres.trim(),
         apellidos: formulario.apellidos.trim(),
         correo: formulario.correo.trim(),
         contrasena: formulario.contrasena,
         telefono: formulario.telefono.trim() || undefined,
+        recaptchaToken,
       });
       navegar('/login', { replace: true, state: { registrado: true, correo: formulario.correo } });
     } catch (excepcion) {
@@ -130,9 +142,11 @@ export default function Registro() {
         error={errores.contrasena}
         requerido
         autoComplete="new-password"
-        ayuda="Entre 8 y 72 caracteres (bcrypt en el backend)."
+        ayuda="Minimo 8 caracteres, con mayuscula, minuscula, numero y simbolo."
         deshabilitado={enviando}
+        mostrarContrasena
       />
+      <PasswordStrength valor={formulario.contrasena} />
 
       <FormField
         etiqueta="Confirmar contrasena"
@@ -144,6 +158,7 @@ export default function Registro() {
         requerido
         autoComplete="new-password"
         deshabilitado={enviando}
+        mostrarContrasena
       />
 
       <button type="submit" className="btn btn--primario btn--bloque" disabled={enviando}>

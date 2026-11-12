@@ -12,6 +12,7 @@ const app = require('./app');
 const config = require('./config');
 const { probarConexion, cerrarPool } = require('./config/database');
 const { cerrarTodos } = require('./config/db');
+const { iniciar: iniciarReporteRm } = require('./services/reporte-rm.scheduler');
 
 async function iniciar() {
   const problemas = config.validarConfiguracion();
@@ -38,6 +39,8 @@ async function iniciar() {
       '[bd] La API igualmente responde; las rutas que consultan datos fallaran hasta restablecer la conexion.',
     );
   }
+
+  iniciarReporteRm();
 
   const apagar = (senal) => {
     console.log(`[proceso] Senal ${senal}: cerrando servidor...`);

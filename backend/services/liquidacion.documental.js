@@ -3,7 +3,7 @@
 /**
  * Liquidacion documental (Fase 17.1).
  *
- * - Resultado y opcion ganadora se derivan del catalogo en MySQL.
+ * - Resultado y opcion ganadora se derivan de SQL Server (mismo origen que registrarResultado).
  * - El premio se acredita en PostgreSQL con el MISMO tipo de saldo de la apuesta.
  * - La liquidacion se inserta en MongoDB con id_apuesta unico: un duplicado no
  *   vuelve a pagar (idempotencia + indice unico).
@@ -12,7 +12,7 @@
  * - No se declara ACID entre motores.
  */
 
-const mysql = require('../config/db/mysql');
+const { consultar, p, sql } = require('../config/database');
 const saldoRepository = require('../repositories/saldo.repository');
 const docs = require('../repositories/documentos.mongo.repository');
 const { errores } = require('../utils/errors');
@@ -24,17 +24,16 @@ function ganador(marcadorLocal, marcadorVisitante) {
 }
 
 async function datosResultado(idOpcion) {
-  const pool = await mysql.obtenerPool();
-  const [filas] = await pool.query(
+  const resultado = await consultar(
     `SELECT o.id_opcion, o.etiqueta, m.id_evento, r.id_resultado,
             r.marcador_local, r.marcador_visitante, r.estado AS estado_resultado
-       FROM OpcionApuesta o
-       JOIN Mercado m ON m.id_mercado = o.id_mercado
-       LEFT JOIN Resultado r ON r.id_evento = m.id_evento
-      WHERE o.id_opcion = ?`,
-    [idOpcion],
+       FROM dbo.OpcionApuesta o
+       JOIN dbo.Mercado m ON m.id_mercado = o.id_mercado
+       LEFT JOIN dbo.Resultado r ON r.id_evento = m.id_evento
+      WHERE o.id_opcion = @id_opcion`,
+    { id_opcion: p(sql.Int, idOpcion) },
   );
-  return filas[0] || null;
+  return resultado.registros[0] || null;
 }
 
 async function liquidarUna(apuesta, idAdministrador) {
@@ -59,6 +58,7 @@ async function liquidarUna(apuesta, idAdministrador) {
       idSaldoCuenta: cuenta.id_saldo_cuenta,
       nombreMovimiento: 'premio',
       monto: premio,
+      idApuesta: apuesta.id_apuesta,
       referencia: `Premio apuesta ${apuesta.id_apuesta}`,
       claveIdempotencia: `liquidacion:${apuesta.id_apuesta}`,
     });
@@ -83,6 +83,7 @@ async function liquidarUna(apuesta, idAdministrador) {
           idSaldoCuenta: cuenta.id_saldo_cuenta,
           nombreMovimiento: 'apuesta',
           monto: premio,
+          idApuesta: apuesta.id_apuesta,
           referencia: `Compensacion liquidacion ${apuesta.id_apuesta}`,
           claveIdempotencia: `comp:liquidacion:${apuesta.id_apuesta}`,
         });

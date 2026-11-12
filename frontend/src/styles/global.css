@@ -251,3 +251,50 @@ kbd {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+.team-logo { width: 20px; height: 20px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
+
+/* ============================================================================
+   Fase 19 - Fondo y base tipografica
+   ============================================================================ */
+body {
+  background-color: var(--color-fondo);
+  background-image:
+    radial-gradient(1200px 560px at 8% -12%, rgba(16, 185, 129, 0.1), transparent 62%),
+    radial-gradient(900px 480px at 100% -4%, rgba(16, 185, 129, 0.07), transparent 58%);
+  background-attachment: fixed;
+}
+
+h1,
+h2 {
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-weight: 700;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #24344c transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #223047;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -11,13 +11,28 @@ import Loader from './Loader.jsx';
  *
  * No recibe props.
  */
-export default function Footer() {
+export default function Footer({ variante = 'sistema' }) {
   const consultar = useCallback(() => consultarSalud(), []);
-  const { datos, cargando, error } = usePeticion(consultar, []);
+  const { datos, cargando, error } = usePeticion(consultar, [], {
+    inmediato: variante !== 'usuario',
+  });
 
   const estadoBase = datos?.baseDatos?.estado || null;
   const tipoBase =
     estadoBase === 'conectada' ? 'exito' : estadoBase === 'sin_respuesta' ? 'advertencia' : 'error';
+
+  if (variante === 'usuario') {
+    return (
+      <footer className="footer footer--usuario">
+        <div className="contenedor footer__contenido">
+          <span>ApuestaDB · Saldo ficticio, sin dinero real · Juego responsable</span>
+          <span className="footer__estado">
+            <span className="texto-pequeno">Cuenta de practica</span>
+          </span>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="footer">
