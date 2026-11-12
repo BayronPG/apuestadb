@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const config = require('../config');
 const usuarioRepository = require('../repositories/usuario.repository');
+const twofactorService = require('./twofactor.service');
 const { firmarToken } = require('../utils/jwt');
 const { errores } = require('../utils/errors');
 
@@ -133,6 +134,10 @@ async function autenticarGoogle(
       };
     }
     if (usuario.estado !== 'activo') throw errores.prohibido('El usuario esta inhabilitado.', 'USUARIO_INHABILITADO');
+    const desafio = await twofactorService.crearDesafio(usuario.id_usuario, usuario.nombre_rol);
+    if (desafio) {
+      return { requiere2fa: true, challengeToken: desafio, expiraEn: '5m' };
+    }
     let token;
     try {
       token = firmarToken({ idUsuario: usuario.id_usuario, rol: usuario.nombre_rol });

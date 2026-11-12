@@ -10,7 +10,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "rm:backfill": "node scripts/reporte_rm.js backfill",
+    "rm:refresh": "node scripts/reporte_rm.js refresh"
   },
   "keywords": [
     "apuestadb",
@@ -34,6 +36,8 @@
     "mssql": "^11.0.1",
     "multer": "^2.5.0",
     "mysql2": "^3.24.6",
-    "pg": "^8.23.1"
+    "otplib": "^13.6.0",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4"
   }
 }

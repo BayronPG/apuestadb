@@ -8,7 +8,7 @@ import RoleRoute from '../components/RoleRoute.jsx';
 import Login from '../pages/Login.jsx';
 import Registro from '../pages/Registro.jsx';
 import RecuperarContrasena from '../pages/RecuperarContrasena.jsx';
-import DashboardUsuario from '../pages/DashboardUsuario.jsx';
+import HomeSportsbook from '../pages/HomeSportsbook.jsx';
 import DashboardAdministrador from '../pages/DashboardAdministrador.jsx';
 import EventosActivos from '../pages/EventosActivos.jsx';
 import EventosFinalizados from '../pages/EventosFinalizados.jsx';
@@ -19,6 +19,7 @@ import SaldoUsuario from '../pages/SaldoUsuario.jsx';
 import HistorialMovimientos from '../pages/HistorialMovimientos.jsx';
 import Notificaciones from '../pages/Notificaciones.jsx';
 import PerfilUsuario from '../pages/PerfilUsuario.jsx';
+import Seguridad from '../pages/Seguridad.jsx';
 import RankingUsuarios from '../pages/RankingUsuarios.jsx';
 import ReportesAdministrativos from '../pages/ReportesAdministrativos.jsx';
 import AdminLogos from '../pages/AdminLogos.jsx';
@@ -50,7 +51,7 @@ export default function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
 
-          <Route path="/dashboard" element={<DashboardUsuario />} />
+          <Route path="/dashboard" element={<HomeSportsbook />} />
           <Route path="/eventos" element={<EventosActivos />} />
           <Route path="/eventos/finalizados" element={<EventosFinalizados />} />
           <Route path="/equipos" element={<EquiposJugadores />} />
@@ -60,6 +61,7 @@ export default function AppRoutes() {
           <Route path="/saldo/movimientos" element={<HistorialMovimientos />} />
           <Route path="/notificaciones" element={<Notificaciones />} />
           <Route path="/perfil" element={<PerfilUsuario />} />
+          <Route path="/seguridad" element={<Seguridad />} />
 
           {/* ------------------- Solo administrador ------------------------ */}
           <Route element={<RoleRoute rol="administrador" />}>

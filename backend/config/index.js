@@ -53,6 +53,14 @@ const config = {
     emisor: process.env.JWT_ISSUER || 'apuestadb-api',
   },
 
+  totp: {
+    encryptionKey: process.env.TOTP_ENCRYPTION_KEY || '',
+    issuer: process.env.TOTP_ISSUER || 'ApuestaDB',
+    windowSeconds: aEntero(process.env.TOTP_WINDOW_SECONDS, 30),
+    maxIntentos: aEntero(process.env.TOTP_MAX_INTENTOS, 5),
+    bloqueoMinutos: aEntero(process.env.TOTP_BLOQUEO_MINUTOS, 5),
+  },
+
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -176,6 +184,10 @@ function validarConfiguracion() {
     problemas.push('JWT_SECRET no esta definido.');
   } else if (config.jwt.secreto.length < 32) {
     problemas.push('JWT_SECRET debe tener 32 caracteres o mas.');
+  }
+
+  if (!config.totp.encryptionKey) {
+    problemas.push('TOTP_ENCRYPTION_KEY no esta definido; 2FA no podra activarse.');
   }
 
   if (!config.bd.baseDatos) problemas.push('DB_NAME no esta definido.');

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { iniciales, nombreCompleto, moneda } from '../utils/formato.js';
 import Badge from './Badge.jsx';
+import Icono from './Icono.jsx';
 
 /**
  * Barra superior de la aplicacion autenticada.
@@ -52,7 +53,7 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
         onClick={onAbrirMenu}
         aria-label="Abrir menu de navegacion"
       >
-        ☰
+        <Icono nombre="rayas" tamano={18} />
       </button>
 
       <Link to={esAdministrador ? '/admin' : '/dashboard'} className="navbar__marca">
@@ -61,7 +62,7 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
         </span>
         <span className="navbar__titulo">
           <strong>ApuestaDB</strong>
-          <span>Apuestas simuladas · Bases de Datos 2</span>
+          <span>Apuestas deportivas · saldo ficticio</span>
         </span>
       </Link>
 
@@ -74,7 +75,8 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
         )}
 
         <Link className="btn btn--fantasma btn--sm" to="/notificaciones" aria-label="Notificaciones">
-          🔔 <span className="solo-lectores">Notificaciones</span>
+          <Icono nombre="campana" tamano={18} />
+          <span className="solo-lectores">Notificaciones</span>
         </Link>
 
         <button
@@ -98,6 +100,9 @@ export default function Navbar({ onAbrirMenu, saldoTotal = null }) {
             <hr className="separador" style={{ margin: '4px 0' }} />
             <Link to="/perfil" role="menuitem" onClick={() => setMenuAbierto(false)}>
               Mi perfil
+            </Link>
+            <Link to="/seguridad" role="menuitem" onClick={() => setMenuAbierto(false)}>
+              Seguridad (2FA)
             </Link>
             <Link to="/saldo" role="menuitem" onClick={() => setMenuAbierto(false)}>
               Mi saldo

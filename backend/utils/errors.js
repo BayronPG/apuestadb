@@ -48,6 +48,9 @@ const errores = {
   conflicto: (mensaje = 'La operacion entra en conflicto con el estado actual.', codigo = 'CONFLICTO') =>
     new ErrorApi(codigo, mensaje, 409),
 
+  demasiadasSolicitudes: (mensaje = 'Demasiadas solicitudes.', codigo = 'DEMASIADAS_SOLICITUDES') =>
+    new ErrorApi(codigo, mensaje, 429),
+
   interno: (mensaje = 'Error interno del servidor.', codigo = 'ERROR_INTERNO') =>
     new ErrorApi(codigo, mensaje, 500),
 

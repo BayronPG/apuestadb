@@ -68,6 +68,16 @@ router.post(
 router.get('/google', authController.iniciarGoogle);
 router.get('/google/callback', authController.callbackGoogle);
 
+router.post(
+  '/2fa/verificar',
+  [
+    body('challengeToken').isString().notEmpty().withMessage('El desafio 2FA es obligatorio.'),
+    body('codigo').matches(/^\d{6}$/).withMessage('El codigo debe tener 6 digitos.'),
+  ],
+  validar,
+  authController.verificarSegundoFactor,
+);
+
 router.post('/recuperar', [cadenaCorreo], validar, authController.solicitarRecuperacion);
 
 router.post(

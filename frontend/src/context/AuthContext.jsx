@@ -1,6 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { iniciarSesion as iniciarSesionApi, obtenerPerfil } from '../services/authService.js';
+import {
+  iniciarSesion as iniciarSesionApi,
+  verificarSegundoFactor,
+  obtenerPerfil,
+} from '../services/authService.js';
 import { registrarManejadorNoAutorizado } from '../services/api.js';
 import {
   guardarToken,
@@ -57,6 +61,25 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const datos = await iniciarSesionApi({ correo, contrasena });
+      if (datos.requiere2fa) return datos;
+      guardarToken(datos.token);
+      guardarUsuario(datos.usuario);
+      setToken(datos.token);
+      setUsuario(datos.usuario);
+      return datos.usuario;
+    } catch (excepcion) {
+      setError(excepcion);
+      throw excepcion;
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  const login2fa = useCallback(async ({ challengeToken, codigo }) => {
+    setCargando(true);
+    setError(null);
+    try {
+      const datos = await verificarSegundoFactor({ challengeToken, codigo });
       guardarToken(datos.token);
       guardarUsuario(datos.usuario);
       setToken(datos.token);
@@ -91,11 +114,12 @@ export function AuthProvider({ children }) {
       cargando,
       error,
       login,
+      login2fa,
       loginConToken,
       logout,
       limpiarError,
     }),
-    [usuario, token, cargando, error, login, logout, limpiarError],
+    [usuario, token, cargando, error, login, login2fa, loginConToken, logout, limpiarError],
   );
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;
