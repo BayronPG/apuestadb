@@ -7,6 +7,8 @@
  */
 
 const { consultar } = require('../config/database');
+const postgresql = require('../config/db/postgresql');
+const config = require('../config');
 
 /** Resumen por evento: apuestas, monto apostado, premios y margen. */
 async function administrativo() {
@@ -18,6 +20,14 @@ async function administrativo() {
 
 /** Resumen por tipo de saldo: recargado, apostado, premios y saldo en cuentas. */
 async function financiero() {
+  if (config.saldo.motor === 'postgresql') {
+    const pool = await postgresql.obtenerPool();
+    const { rows } = await pool.query(
+      `SELECT * FROM vw_reportefinanciero ORDER BY tipo_saldo ASC`,
+    );
+    return rows;
+  }
+
   const resultado = await consultar(
     `SELECT * FROM dbo.vw_ReporteFinanciero ORDER BY tipo_saldo ASC`,
   );

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert.jsx';
 import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
+import PasswordStrength from '../components/PasswordStrength.jsx';
 import { registrarUsuario } from '../services/authService.js';
 import { obtenerTokenRecaptcha, recaptchaConfigurado } from '../utils/recaptcha.js';
 import { mensajeDeError } from '../utils/errores.js';
@@ -141,10 +142,11 @@ export default function Registro() {
         error={errores.contrasena}
         requerido
         autoComplete="new-password"
-        ayuda="Entre 8 y 72 caracteres (bcrypt en el backend)."
+        ayuda="Minimo 8 caracteres, con mayuscula, minuscula, numero y simbolo."
         deshabilitado={enviando}
         mostrarContrasena
       />
+      <PasswordStrength valor={formulario.contrasena} />
 
       <FormField
         etiqueta="Confirmar contrasena"

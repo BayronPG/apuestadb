@@ -16,6 +16,7 @@ export function usePeticion(peticion, dependencias = [], opciones = {}) {
   const [cargando, setCargando] = useState(Boolean(inmediato));
   const [error, setError] = useState(null);
   const montado = useRef(true);
+  const solicitud = useRef(0);
 
   useEffect(() => {
     montado.current = true;
@@ -26,17 +27,24 @@ export function usePeticion(peticion, dependencias = [], opciones = {}) {
 
   const ejecutar = useCallback(
     async (argumento) => {
+      const actual = solicitud.current + 1;
+      solicitud.current = actual;
       setCargando(true);
       setError(null);
       try {
         const resultado = await peticion(argumento);
-        if (montado.current) setDatos(resultado);
+        // Solo la ultima peticion puede pisar el estado: las respuestas viejas
+        // (p. ej. una carga sin `monto` que responde despues del recalculo)
+        // dejaban datos obsoletos en pantalla.
+        if (montado.current && actual === solicitud.current) setDatos(resultado);
         return resultado;
       } catch (excepcion) {
-        if (montado.current) setError(normalizarError(excepcion));
+        if (montado.current && actual === solicitud.current) {
+          setError(normalizarError(excepcion));
+        }
         return null;
       } finally {
-        if (montado.current) setCargando(false);
+        if (montado.current && actual === solicitud.current) setCargando(false);
       }
     },
     // `peticion` se recrea en cada render del consumidor: las dependencias

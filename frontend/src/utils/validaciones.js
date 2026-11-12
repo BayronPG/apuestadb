@@ -16,10 +16,32 @@ export function esCorreoValido(valor) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(texto);
 }
 
-/** Valida la contrasena (8 a 72 caracteres). */
-export function esContrasenaValida(valor) {
+/** Evalua la contrasena y devuelve criterios, nivel y validez. */
+export function evaluarContrasena(valor) {
   const texto = valor || '';
-  return texto.length >= LONGITUD_MINIMA_CONTRASENA && texto.length <= LONGITUD_MAXIMA_CONTRASENA;
+  const criterios = {
+    longitud: texto.length >= LONGITUD_MINIMA_CONTRASENA && texto.length <= LONGITUD_MAXIMA_CONTRASENA,
+    mayuscula: /[A-Z]/.test(texto),
+    minuscula: /[a-z]/.test(texto),
+    numero: /\d/.test(texto),
+    simbolo: /[^A-Za-z0-9]/.test(texto),
+  };
+  const cumplidos = Object.values(criterios).filter(Boolean).length;
+  let nivel = 'debil';
+  if (cumplidos >= 5) nivel = 'fuerte';
+  else if (cumplidos >= 3) nivel = 'media';
+  return {
+    criterios,
+    cumplidos,
+    total: 5,
+    nivel,
+    valida: cumplidos === 5,
+  };
+}
+
+/** Valida la contrasena con todos los criterios de seguridad. */
+export function esContrasenaValida(valor) {
+  return evaluarContrasena(valor).valida;
 }
 
 /** Valida que un monto sea numerico y mayor que cero. */
@@ -56,7 +78,7 @@ export function validarRegistro({ nombres, apellidos, correo, contrasena, confir
   else if (apellidos.trim().length > 100) errores.apellidos = 'El apellido excede 100 caracteres.';
   if (!esCorreoValido(correo)) errores.correo = 'Ingrese un correo valido.';
   if (!esContrasenaValida(contrasena)) {
-    errores.contrasena = 'La contrasena debe tener entre 8 y 72 caracteres.';
+    errores.contrasena = 'Debe tener 8-72 caracteres, mayuscula, minuscula, numero y simbolo.';
   }
   if (contrasena !== confirmacion) errores.confirmacion = 'Las contrasenas no coinciden.';
   if (telefono && telefono.trim().length > 20) errores.telefono = 'El telefono excede 20 caracteres.';
@@ -76,7 +98,7 @@ export function validarRestablecimiento({ correo, valorToken, nuevaContrasena, c
   if (!esCorreoValido(correo)) errores.correo = 'Ingrese un correo valido.';
   if (!valorToken || !valorToken.trim()) errores.valorToken = 'El token es obligatorio.';
   if (!esContrasenaValida(nuevaContrasena)) {
-    errores.nuevaContrasena = 'La contrasena debe tener entre 8 y 72 caracteres.';
+    errores.nuevaContrasena = 'Debe tener 8-72 caracteres, mayuscula, minuscula, numero y simbolo.';
   }
   if (nuevaContrasena !== confirmacion) errores.confirmacion = 'Las contrasenas no coinciden.';
   return errores;

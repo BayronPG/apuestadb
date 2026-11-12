@@ -26,7 +26,15 @@ const cadenaContrasena = body('contrasena')
   .isString()
   .withMessage('La contrasena debe ser texto.')
   .isLength({ min: 8, max: 72 })
-  .withMessage('La contrasena debe tener entre 8 y 72 caracteres.');
+  .withMessage('La contrasena debe tener entre 8 y 72 caracteres.')
+  .matches(/[A-Z]/)
+  .withMessage('La contrasena debe incluir al menos una mayuscula.')
+  .matches(/[a-z]/)
+  .withMessage('La contrasena debe incluir al menos una minuscula.')
+  .matches(/\d/)
+  .withMessage('La contrasena debe incluir al menos un numero.')
+  .matches(/[^A-Za-z0-9]/)
+  .withMessage('La contrasena debe incluir al menos un simbolo.');
 
 router.post(
   '/registro',
@@ -93,7 +101,15 @@ router.post(
     body('nuevaContrasena')
       .isString()
       .isLength({ min: 8, max: 72 })
-      .withMessage('La nueva contrasena debe tener entre 8 y 72 caracteres.'),
+      .withMessage('La nueva contrasena debe tener entre 8 y 72 caracteres.')
+      .matches(/[A-Z]/)
+      .withMessage('La nueva contrasena debe incluir al menos una mayuscula.')
+      .matches(/[a-z]/)
+      .withMessage('La nueva contrasena debe incluir al menos una minuscula.')
+      .matches(/\d/)
+      .withMessage('La nueva contrasena debe incluir al menos un numero.')
+      .matches(/[^A-Za-z0-9]/)
+      .withMessage('La nueva contrasena debe incluir al menos un simbolo.'),
   ],
   validar,
   authController.restablecerContrasena,

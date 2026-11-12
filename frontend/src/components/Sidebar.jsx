@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext.jsx';
+import Icono from './Icono.jsx';
 
 /**
  * Navegacion lateral de la aplicacion autenticada.
@@ -14,21 +15,21 @@ import { useAuth } from '../context/AuthContext.jsx';
  */
 
 const ENLACES_USUARIO = [
-  { a: '/dashboard', etiqueta: 'Panel', icono: '🏠' },
-  { a: '/eventos', etiqueta: 'Eventos activos', icono: '⚽' },
-  { a: '/eventos/finalizados', etiqueta: 'Eventos finalizados', icono: '🏁' },
-  { a: '/apuestas/nueva', etiqueta: 'Crear apuesta', icono: '🎫' },
-  { a: '/apuestas', etiqueta: 'Historial de apuestas', icono: '📄' },
-  { a: '/saldo', etiqueta: 'Mi saldo', icono: '💰' },
-  { a: '/saldo/movimientos', etiqueta: 'Movimientos', icono: '🔁' },
-  { a: '/notificaciones', etiqueta: 'Notificaciones', icono: '🔔' },
-  { a: '/perfil', etiqueta: 'Mi perfil', icono: '👤' },
+  { a: '/dashboard', etiqueta: 'Panel', icono: 'eventos' },
+  { a: '/eventos', etiqueta: 'Eventos activos', icono: 'balon' },
+  { a: '/eventos/finalizados', etiqueta: 'Eventos finalizados', icono: 'escudo' },
+  { a: '/apuestas/nueva', etiqueta: 'Crear apuesta', icono: 'apuestas' },
+  { a: '/apuestas', etiqueta: 'Historial de apuestas', icono: 'reporte' },
+  { a: '/saldo', etiqueta: 'Mi saldo', icono: 'saldo' },
+  { a: '/saldo/movimientos', etiqueta: 'Movimientos', icono: 'tendencia' },
+  { a: '/notificaciones', etiqueta: 'Notificaciones', icono: 'campana' },
+  { a: '/perfil', etiqueta: 'Mi perfil', icono: 'usuario' },
 ];
 
 const ENLACES_ADMIN = [
-  { a: '/admin', etiqueta: 'Panel administrativo', icono: '🛠️' },
-  { a: '/admin/reportes', etiqueta: 'Reportes', icono: '📊' },
-  { a: '/ranking', etiqueta: 'Ranking de usuarios', icono: '🏆' },
+  { a: '/admin', etiqueta: 'Panel administrativo', icono: 'rayas' },
+  { a: '/admin/reportes', etiqueta: 'Reportes', icono: 'reporte' },
+  { a: '/ranking', etiqueta: 'Ranking de usuarios', icono: 'ranking' },
 ];
 
 export default function Sidebar({ abierto = false, onCerrar = () => {} }) {
@@ -45,7 +46,7 @@ export default function Sidebar({ abierto = false, onCerrar = () => {} }) {
       onClick={onCerrar}
     >
       <span className="sidebar__icono" aria-hidden="true">
-        {icono}
+        <Icono nombre={icono} tamano={18} />
       </span>
       {etiqueta}
     </NavLink>
@@ -66,7 +67,7 @@ export default function Sidebar({ abierto = false, onCerrar = () => {} }) {
       <span className="sidebar__grupo-titulo">Ayuda</span>
       <span className="sidebar__enlace" style={{ cursor: 'default' }}>
         <span className="sidebar__icono" aria-hidden="true">
-          ⚠️
+          <Icono nombre="alerta" tamano={18} />
         </span>
         Saldo ficticio, sin dinero real
       </span>

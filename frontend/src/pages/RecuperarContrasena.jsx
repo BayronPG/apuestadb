@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../components/Alert.jsx';
 import FormField from '../components/FormField.jsx';
 import Loader from '../components/Loader.jsx';
+import PasswordStrength from '../components/PasswordStrength.jsx';
 import { solicitarRecuperacion, restablecerContrasena } from '../services/authService.js';
 import { mensajeDeError } from '../utils/errores.js';
 import {
@@ -161,9 +162,10 @@ export default function RecuperarContrasena() {
             error={errores.nuevaContrasena}
             requerido
             autoComplete="new-password"
-            ayuda="Entre 8 y 72 caracteres."
+            ayuda="Minimo 8 caracteres, con mayuscula, minuscula, numero y simbolo."
             deshabilitado={cargando}
           />
+          <PasswordStrength valor={nuevaContrasena} />
 
           <FormField
             etiqueta="Confirmar nueva contrasena"

@@ -402,7 +402,7 @@ export default function DashboardUsuario() {
               Eventos destacados
             </h2>
             <p className="panel-seccion__subtitulo">
-              Cartelera prioritaria con sus cuotas vigentes (GET /api/eventos/:id/opciones)
+              Cuotas vigentes de la cartelera prioritaria
             </p>
           </div>
           <Link className="btn btn--secundario btn--sm" to="/eventos">
